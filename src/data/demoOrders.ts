@@ -1,0 +1,106 @@
+import type { Order } from "@/lib/types";
+import { stagesFor } from "@/lib/stages";
+
+/**
+ * Pedidos de demonstração com identificador fixo, para que o link de
+ * acompanhamento funcione mesmo sem ter passado pelo fluxo (por exemplo, ao
+ * abrir a URL direto ou recarregar a página).
+ */
+export const demoOrders: Record<string, Order> = {
+  "demo-comida": {
+    id: "demo-comida",
+    vertical: "comida",
+    createdAt: 0,
+    payment: "pix",
+    total: 58.79,
+    stages: stagesFor("comida", "Chega em 30–40 min"),
+    origin: { label: "Braseiro Burger", lat: -23.5569, lng: -46.6913 },
+    destination: { label: "Rua Harmonia, 480", lat: -23.5535, lng: -46.6889 },
+    restaurantName: "Braseiro Burger",
+    restaurantSlug: "braseiro-burger",
+    lines: [
+      {
+        lineId: "d1",
+        itemId: "smash-duplo",
+        name: "Smash duplo",
+        unitPrice: 40.9,
+        quantity: 1,
+        selections: [
+          { groupLabel: "Ponto da carne", choiceLabel: "Ao ponto", price: 0 },
+          { groupLabel: "Adicionais", choiceLabel: "Bacon crocante", price: 6 },
+        ],
+      },
+      {
+        lineId: "d2",
+        itemId: "limonada",
+        name: "Limonada suíça",
+        unitPrice: 12,
+        quantity: 1,
+        selections: [],
+      },
+    ],
+    subtotal: 52.9,
+    deliveryFee: 6.99,
+    discount: 0,
+    deliveryMode: "padrao",
+    addressLabel: "Rua Harmonia, 480 · Apto 62 · Vila Madalena",
+    courier: { name: "Wesley Santos", vehicle: "Moto", rating: 4.9 },
+  },
+  "demo-corrida": {
+    id: "demo-corrida",
+    vertical: "corrida",
+    createdAt: 0,
+    payment: "cartao",
+    total: 24.3,
+    stages: stagesFor("corrida", "Chega em 22 min"),
+    origin: { label: "Rua Harmonia, 480", lat: -23.5535, lng: -46.6889 },
+    destination: { label: "Av. Paulista, 1578", lat: -23.5614, lng: -46.656 },
+    category: "pop",
+    categoryName: "99Pop",
+    distanceKm: 5.8,
+    durationMin: 22,
+    driver: {
+      name: "Carlos Henrique",
+      rating: 4.92,
+      vehicle: "Chevrolet Onix",
+      color: "prata",
+      plate: "FGH-2C47",
+      trips: 3218,
+    },
+  },
+  "demo-entrega": {
+    id: "demo-entrega",
+    vertical: "entrega",
+    createdAt: 0,
+    payment: "pix",
+    total: 24.9,
+    stages: stagesFor("entrega", "Chega em 25–35 min"),
+    origin: { label: "Rua Aspicuelta, 312", lat: -23.5569, lng: -46.6913 },
+    destination: { label: "Rua Oscar Freire, 379", lat: -23.5622, lng: -46.6683 },
+    pickup: {
+      street: "Rua Aspicuelta",
+      number: "312",
+      complement: "Loja",
+      neighborhood: "Vila Madalena",
+      city: "São Paulo",
+      cep: "05433-010",
+      name: "Braseiro Burger",
+      phone: "11912345678",
+    },
+    dropoff: {
+      street: "Rua Oscar Freire",
+      number: "379",
+      complement: "apto 42",
+      neighborhood: "Jardins",
+      city: "São Paulo",
+      cep: "01426-001",
+      name: "Maria Souza",
+      phone: "11987654321",
+    },
+    content: "Pedido #4821 · 2 lanches e 1 bebida",
+    size: "pequeno",
+    declaredValue: 60,
+    distanceKm: 4.1,
+    courier: { name: "Diego Nascimento", vehicle: "Honda CG 160", plate: "DKT-7F31", rating: 4.88 },
+  },
+};
