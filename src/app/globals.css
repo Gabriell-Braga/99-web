@@ -1,26 +1,170 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-sans: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-yellow-99: #ffdd00;
+  --color-yellow-99-light: #ffeb66;
+  --color-yellow-99-hover: #ffe433;
+  --color-yellow-99-border: #f8c400;
+  --color-yellow-99-deep: #f1b500;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-orange-99: #fc4c02;
+  --color-orange-99-hover: #ff7b1c;
+  --color-orange-99-pressed: #e05e00;
+  --color-orange-99-soft: #ff9447;
+  --color-orange-99-bg: #fff4f0;
+  /* Laranja para texto pequeno: #fc4c02 fica em 3,4:1 sobre branco; este tom garante 4,5:1. */
+  --color-orange-99-text: #c43c00;
+
+  --color-black-99: #212121;
+  --color-offwhite-99: #f1f1f1;
+  --color-subtle-99: #f9f9f9;
+  --color-border-99: #e9e8e9;
+  --color-placeholder-99: #b3b3b3;
+  --color-disabled-99: #9c9c9c;
+  /* DESIGN.md indica #858585, mas ele fica em 3,7:1 sobre branco. #6b6b6b garante 4,5:1 em texto pequeno. */
+  --color-muted-99: #6b6b6b;
+  --color-secondary-99: #4a4b4a;
+
+  --color-success-99: #00e070;
+  --color-success-99-deep: #00a854;
+  --color-success-99-bg: #e6fbf0;
+  --color-info-99: #1085d4;
+  --color-warning-99: #f1b500;
+
+  --shadow-low: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-mid: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-high: 0 8px 16px rgba(0, 0, 0, 0.16);
+  --shadow-header: 0 0 10px rgba(0, 0, 0, 0.23);
+
+  --radius-pill: 72px;
+
+  --ease-99: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --animate-pulse-soft: pulse-soft 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  --animate-skeleton: skeleton 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 221, 0, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(255, 221, 0, 0);
+    }
+  }
+  @keyframes skeleton {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
   }
 }
 
+:root {
+  color-scheme: light;
+}
+
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  background: #ffffff;
+  color: var(--color-black-99);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Foco visível e consistente em tudo que é interativo. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-black-99);
+  outline-offset: 2px;
+}
+
+/* Na camada base para que utilitários como text-white vençam. */
+@layer base {
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  ::placeholder {
+    color: var(--color-placeholder-99);
+    opacity: 1;
+  }
+}
+
+/* Trilho horizontal sem barra de rolagem visível. */
+.scroll-rail {
+  scrollbar-width: none;
+}
+.scroll-rail::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mapa (Leaflet) */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #f1f1f1;
+}
+.leaflet-tooltip.map-tip {
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #212121;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+.leaflet-tooltip.map-tip::before {
+  display: none;
+}
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.8);
+}
+.leaflet-bar a {
+  color: #212121;
+}
+.map-pulse {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--pulse);
+  opacity: 0.6;
+  animation: map-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes map-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
 }
