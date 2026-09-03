@@ -26,8 +26,7 @@ export function Timeline({ stages, current }: TimelineProps) {
         return (
           <li key={s.id} className="flex gap-4" aria-current={active ? "step" : undefined}>
             <div className="flex flex-col items-center">
-              <motion.span
-                layout={!reduce}
+              <span
                 className={cx(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2",
                   done && "border-success-99 bg-success-99 text-black-99",
@@ -39,9 +38,9 @@ export function Timeline({ stages, current }: TimelineProps) {
                 {done ? (
                   <Icon name="check" size={16} strokeWidth={2.5} />
                 ) : (
-                  <span className={cx("h-2.5 w-2.5 rounded-full", active ? "bg-black-99" : "bg-border-99")} />
+                  <span className={cx("block h-2.5 w-2.5 shrink-0 rounded-full", active ? "bg-black-99" : "bg-border-99")} />
                 )}
-              </motion.span>
+              </span>
               {!last && (
                 <span
                   className={cx("my-1 w-0.5 flex-1 rounded-full", done ? "bg-success-99" : "bg-border-99")}
