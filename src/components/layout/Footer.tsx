@@ -1,17 +1,8 @@
 import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { author } from "@/data/author";
-import { Icon } from "@/components/ui/Icon";
-
-const linkLabels: Record<keyof typeof author.links, string> = {
-  linkedin: "LinkedIn",
-  github: "GitHub",
-  site: "Site",
-  whatsapp: "WhatsApp",
-};
 
 export function Footer() {
-  const links = (Object.keys(author.links) as (keyof typeof author.links)[]).filter((k) => author.links[k]);
   return (
     <footer className="border-t border-border-99 bg-subtle-99">
       <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 md:grid-cols-[1.2fr_1fr_1fr] md:px-8 xl:px-16">
@@ -44,21 +35,20 @@ export function Footer() {
           <span className="text-[13px] font-medium text-muted-99">Feito por</span>
           <p className="font-semibold">{author.name}</p>
           <p className="text-secondary-99">{author.role}</p>
-          <a href={`mailto:${author.email}`} className="flex w-fit items-center gap-2 rounded font-semibold hover:underline">
-            <Icon name="user" size={16} />
-            {author.email}
-          </a>
-          {links.length > 0 && (
-            <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 font-semibold" role="list">
-              {links.map((k) => (
-                <li key={k}>
-                  <a href={author.links[k]} target="_blank" rel="noopener noreferrer" className="rounded hover:underline">
-                    {linkLabels[k]}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
+          <ul className="mt-1 flex flex-col gap-1" role="list">
+            {author.links.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-fit rounded font-semibold hover:underline"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </footer>
