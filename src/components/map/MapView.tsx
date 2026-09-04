@@ -16,6 +16,7 @@ export interface MapViewProps {
   /** 0 a 1: posição do veículo ao longo do trajeto. Undefined esconde o marcador. */
   progress?: number;
   vehicle?: "car" | "moto" | "bag";
+  /** Cor do pino de destino. No app é laranja. */
   accent?: "yellow" | "orange";
   /** Pulso no ponto de origem enquanto procura motorista. */
   searching?: boolean;

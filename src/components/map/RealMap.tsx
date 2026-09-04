@@ -12,7 +12,7 @@ const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">Op
 function originIcon() {
   return L.divIcon({
     className: "",
-    html: '<svg width="24" height="24" viewBox="0 0 24 24" overflow="visible" style="display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))"><circle cx="12" cy="12" r="8" fill="#fff" stroke="#212121" stroke-width="3"/><circle cx="12" cy="12" r="3" fill="#212121"/></svg>',
+    html: '<svg width="24" height="24" viewBox="0 0 24 24" overflow="visible" style="display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))"><circle cx="12" cy="12" r="8" fill="#fff" stroke="#00C853" stroke-width="3.5"/></svg>',
     iconSize: [24, 24],
     iconAnchor: [12, 12],
   });
@@ -46,7 +46,7 @@ const vehiclePaths: Record<NonNullable<MapViewProps["vehicle"]>, string> = {
 function vehicleIcon(kind: NonNullable<MapViewProps["vehicle"]>) {
   return L.divIcon({
     className: "",
-    html: `<svg width="48" height="48" viewBox="0 0 48 48" overflow="visible" style="display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.2))"><circle cx="24" cy="24" r="20" fill="#fff" stroke="#212121" stroke-width="3"/><g transform="translate(12 12)" fill="none" stroke="#212121" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${vehiclePaths[kind]}</g></svg>`,
+    html: `<svg width="48" height="48" viewBox="0 0 48 48" overflow="visible" style="display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.2))"><circle cx="24" cy="24" r="20" fill="#fff" stroke="#212121" stroke-width="2.5"/><g transform="translate(12 12)" fill="none" stroke="#212121" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${vehiclePaths[kind]}</g></svg>`,
     iconSize: [48, 48],
     iconAnchor: [24, 24],
   });
@@ -67,7 +67,7 @@ export default function RealMap({
   route,
   progress,
   vehicle = "car",
-  accent = "yellow",
+  accent = "orange",
   searching,
   userLocation,
   interactive = true,
@@ -80,7 +80,7 @@ export default function RealMap({
   const vehicleRef = useRef<L.Marker | null>(null);
   const animRef = useRef<number | null>(null);
   const currentRef = useRef(0);
-  const accentHex = accent === "orange" ? "#FC4C02" : "#FFDD00";
+  const accentHex = accent === "yellow" ? "#FFDD00" : "#FC4C02";
 
   // Cria o mapa uma vez.
   useEffect(() => {
@@ -129,14 +129,14 @@ export default function RealMap({
     const line: LatLng[] = route && route.length > 1 ? route : origin && destination ? [origin, destination] : [];
     if (line.length > 1) {
       const latlngs = line.map((p) => [p.lat, p.lng] as L.LatLngExpression);
-      L.polyline(latlngs, { color: "#ffffff", weight: 9, opacity: 0.9, lineCap: "round", lineJoin: "round" }).addTo(group);
-      L.polyline(latlngs, { color: "#212121", weight: 4, lineCap: "round", lineJoin: "round" }).addTo(group);
+      L.polyline(latlngs, { color: "#ffffff", weight: 10, opacity: 0.9, lineCap: "round", lineJoin: "round" }).addTo(group);
+      L.polyline(latlngs, { color: "#00C853", weight: 6, lineCap: "round", lineJoin: "round" }).addTo(group);
       bounds.push(...latlngs);
     }
 
     if (origin) {
       if (searching) {
-        L.marker([origin.lat, origin.lng], { icon: searchingIcon(accentHex), interactive: false, keyboard: false }).addTo(group);
+        L.marker([origin.lat, origin.lng], { icon: searchingIcon("#FFDD00"), interactive: false, keyboard: false }).addTo(group);
       }
       L.marker([origin.lat, origin.lng], { icon: originIcon(), interactive: false, keyboard: false })
         .addTo(group)

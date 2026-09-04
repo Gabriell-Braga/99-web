@@ -3,8 +3,9 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { searchAddress, type GeoPlace } from "@/lib/geo";
 import { parseAddress, type ParsedAddress } from "@/lib/parseAddress";
-import { Input } from "@/components/ui/Field";
-import { Icon, type IconName } from "@/components/ui/Icon";
+import { recentAddresses, type RecentAddress } from "@/data/addresses";
+import { formatPhone } from "@/lib/format";
+import { Icon } from "@/components/ui/Icon";
 import { cx } from "@/lib/cx";
 
 export interface PastedExtras {
@@ -15,37 +16,53 @@ export interface PastedExtras {
 }
 
 interface AddressSearchProps {
-  label: string;
+  /** "Para onde vamos?" em corrida, "Entregar para" em entrega. */
   placeholder: string;
-  icon: IconName;
+  ariaLabel: string;
   value: GeoPlace | null;
   onChange: (place: GeoPlace | null, extras?: PastedExtras) => void;
   /** Opção "Usar localização atual" no topo da lista. */
   currentLocation?: GeoPlace | null;
   currentLoading?: boolean;
-  hint?: string;
-  error?: string;
   autoFocus?: boolean;
+  /** Mostra os endereços recentes antes de digitar. */
+  showRecents?: boolean;
 }
 
-type Status = "idle" | "loading" | "error" | "pasted";
+type Status = "idle" | "loading" | "error";
+
+function recentToPlace(r: RecentAddress): GeoPlace {
+  return {
+    id: r.id,
+    title: r.title,
+    subtitle: r.subtitle,
+    lat: r.lat,
+    lng: r.lng,
+    street: r.street,
+    number: r.number,
+    neighborhood: r.neighborhood,
+    city: r.city,
+    state: "SP",
+    cep: r.cep,
+    covered: true,
+  };
+}
 
 /**
- * Campo de endereço no estilo do aplicativo: busca com sugestões reais
- * (OpenStreetMap). Colar um endereço completo, vindo de outro sistema,
- * reconhece rua, número, complemento, nome e telefone e resolve no mapa.
+ * Campo de endereço com sugestões, o mesmo em corrida e em entrega. Campo
+ * branco de raio total com lupa, texto em 20px bold. Antes de digitar mostra
+ * os endereços recentes; ao digitar, resultados reais do OpenStreetMap.
+ * Navegável por teclado, com aria-activedescendant no item em foco.
  */
 export function AddressSearch({
-  label,
   placeholder,
-  icon,
+  ariaLabel,
   value,
   onChange,
   currentLocation,
   currentLoading,
-  hint,
-  error,
   autoFocus,
+  showRecents = true,
 }: AddressSearchProps) {
   const [text, setText] = useState(value ? value.title : "");
   const [prevValue, setPrevValue] = useState(value);
@@ -53,9 +70,9 @@ export function AddressSearch({
   const [results, setResults] = useState<GeoPlace[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [highlight, setHighlight] = useState(0);
-  const [pasteNote, setPasteNote] = useState<string | null>(null);
   const listId = useId();
   const wrapRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -124,7 +141,6 @@ export function AddressSearch({
         setStatus("error");
         setResults([]);
         setOpen(true);
-        setPasteNote(null);
         return true;
       }
       const best = { ...r[0] };
@@ -132,11 +148,8 @@ export function AddressSearch({
         best.number = f.number;
         best.title = `${best.street}, ${f.number}`;
       }
-      const extras: PastedExtras = { complement: f.complement, name: f.name, phone: f.phone, number: f.number };
-      const got = ["endereço", f.complement && "complemento", f.name && "nome", f.phone && "telefone"].filter(Boolean);
-      setPasteNote(`Reconhecemos ${got.join(", ")} do texto colado. Confira antes de continuar.`);
-      setStatus("pasted");
-      pick(best, extras);
+      setStatus("idle");
+      pick(best, { complement: f.complement, name: f.name, phone: f.phone, number: f.number });
     } catch (e) {
       if ((e as Error).name === "AbortError") return true;
       setStatus("error");
@@ -144,147 +157,172 @@ export function AddressSearch({
     return true;
   }
 
-  const showCurrent = Boolean(currentLocation || currentLoading) && (!text.trim() || text === value?.title);
-  const items = results;
+  const typing = text.trim().length > 0 && text !== value?.title;
+  const showCurrent = Boolean(currentLocation || currentLoading) && !typing;
+  const recents = showRecents && !typing ? recentAddresses : [];
+  const items: { id: string; kind: "current" | "recent" | "result"; place: GeoPlace | null; recent?: RecentAddress }[] = [
+    ...(showCurrent ? [{ id: "current", kind: "current" as const, place: currentLocation ?? null }] : []),
+    ...recents.map((r) => ({ id: r.id, kind: "recent" as const, place: recentToPlace(r), recent: r })),
+    ...(typing ? results.map((p) => ({ id: p.id, kind: "result" as const, place: p })) : []),
+  ];
+  const optionId = (i: number) => `${listId}-opt-${i}`;
+
+  function choose(i: number) {
+    const it = items[i];
+    if (!it || !it.place) return;
+    if (it.kind === "recent" && it.recent) {
+      pick(it.place, { name: it.recent.name, phone: it.recent.phone ? formatPhone(it.recent.phone) : undefined, number: it.recent.number });
+    } else {
+      pick(it.place);
+    }
+  }
+
+  const listOpen = open && (items.length > 0 || status === "error" || (typing && text.trim().length >= 3 && status !== "loading"));
 
   return (
     <div ref={wrapRef} className="relative">
-      <Input
-        label={label}
-        placeholder={placeholder}
-        value={text}
-        autoFocus={autoFocus}
-        leading={<Icon name={icon} />}
-        role="combobox"
-        aria-expanded={open}
-        aria-controls={listId}
-        aria-autocomplete="list"
-        autoComplete="off"
-        error={error}
-        hint={
-          status === "pasted" && pasteNote
-            ? pasteNote
-            : hint ?? (text.trim() && !value && !open ? "Escolha um endereço da lista." : undefined)
-        }
-        onFocus={() => setOpen(true)}
-        onChange={(e) => {
-          const v = e.target.value;
-          setText(v);
-          setOpen(true);
-          setPasteNote(null);
-          if (value) onChange(null);
-          runSearch(v);
-        }}
-        onPaste={(e) => {
-          const raw = e.clipboardData.getData("text");
-          if (raw.trim().length > 12 && /\d/.test(raw)) {
-            e.preventDefault();
-            void handlePaste(raw);
-          }
-        }}
-        onKeyDown={(e) => {
-          if (!open) return;
-          const total = items.length + (showCurrent && currentLocation ? 1 : 0);
-          if (e.key === "ArrowDown") {
-            e.preventDefault();
-            setHighlight((h) => Math.min(h + 1, total - 1));
-          } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            setHighlight((h) => Math.max(h - 1, 0));
-          } else if (e.key === "Enter") {
-            e.preventDefault();
-            if (showCurrent && currentLocation && highlight === 0) pick(currentLocation);
-            else {
-              const idx = highlight - (showCurrent && currentLocation ? 1 : 0);
-              if (items[idx]) pick(items[idx]);
+      <div className="relative">
+        <Icon name="search" size={22} strokeWidth={2.2} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
+        <input
+          ref={inputRef}
+          type="text"
+          role="combobox"
+          aria-label={ariaLabel}
+          aria-expanded={listOpen}
+          aria-controls={listId}
+          aria-autocomplete="list"
+          aria-activedescendant={listOpen && items[highlight] ? optionId(highlight) : undefined}
+          autoComplete="off"
+          autoFocus={autoFocus}
+          placeholder={placeholder}
+          value={text}
+          onFocus={() => setOpen(true)}
+          onChange={(e) => {
+            const v = e.target.value;
+            setText(v);
+            setOpen(true);
+            setHighlight(0);
+            if (value) onChange(null);
+            runSearch(v);
+          }}
+          onPaste={(e) => {
+            const raw = e.clipboardData.getData("text");
+            if (raw.trim().length > 12 && /\d/.test(raw)) {
+              e.preventDefault();
+              void handlePaste(raw);
             }
-          } else if (e.key === "Escape") {
-            setOpen(false);
-          }
-        }}
-        trailing={
-          status === "loading" ? (
-            <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-border-99 border-t-black-99" aria-label="Buscando" />
-          ) : text ? (
-            <button
-              type="button"
-              aria-label="Limpar endereço"
-              onClick={() => {
-                setText("");
-                setResults([]);
-                setPasteNote(null);
-                setStatus("idle");
-                onChange(null);
-                setOpen(true);
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-muted-99 hover:bg-offwhite-99"
-            >
-              <Icon name="x" size={16} />
-            </button>
-          ) : undefined
-        }
-      />
-      {open && (showCurrent || items.length > 0 || status === "error" || (text.trim().length >= 3 && status !== "loading")) && (
+          }}
+          onKeyDown={(e) => {
+            if (!listOpen) return;
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              setHighlight((h) => Math.min(h + 1, items.length - 1));
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              setHighlight((h) => Math.max(h - 1, 0));
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              choose(highlight);
+            } else if (e.key === "Escape") {
+              setOpen(false);
+            }
+          }}
+          className="h-14 w-full rounded-full border border-border-99 bg-white pl-14 pr-14 text-[20px] font-bold text-black-99 placeholder:font-bold placeholder:text-placeholder-99 focus:border-black-99 focus:outline-none"
+        />
+        {status === "loading" ? (
+          <span className="absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 animate-spin rounded-full border-2 border-border-99 border-t-black-99" aria-label="Buscando" />
+        ) : text ? (
+          <button
+            type="button"
+            aria-label="Limpar"
+            onClick={() => {
+              setText("");
+              setResults([]);
+              setStatus("idle");
+              onChange(null);
+              setOpen(true);
+              inputRef.current?.focus();
+            }}
+            className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-99 hover:bg-offwhite-99"
+          >
+            <Icon name="x" size={18} />
+          </button>
+        ) : null}
+      </div>
+
+      {listOpen && (
         <ul
           id={listId}
           role="listbox"
-          className="absolute left-0 right-0 top-full z-20 mt-2 max-h-80 overflow-y-auto rounded-xl border border-border-99 bg-white py-2 shadow-mid"
+          aria-label={typing ? "Resultados" : "Endereços recentes"}
+          className="absolute left-0 right-0 top-full z-20 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-border-99 bg-white py-2"
         >
-          {showCurrent && (
-            <li
-              role="option"
-              aria-selected={highlight === 0}
-              aria-disabled={!currentLocation}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => currentLocation && pick(currentLocation)}
-              onMouseEnter={() => setHighlight(0)}
-              className={cx(
-                "flex cursor-pointer items-start gap-3 px-4 py-2.5",
-                highlight === 0 && "bg-subtle-99",
-                !currentLocation && "cursor-default opacity-70",
-              )}
-            >
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-info-99/10 text-info-99">
-                <Icon name="target" size={16} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-semibold">Usar localização atual</span>
-                <span className="block truncate text-[13px] text-muted-99">
-                  {currentLoading ? "Obtendo sua posição…" : currentLocation ? `${currentLocation.title} · ${currentLocation.subtitle}` : "Não disponível"}
-                </span>
-              </span>
+          {!typing && recents.length > 0 && (
+            <li className="px-4 pb-1 pt-2 text-[13px] text-secondary-99" role="presentation">
+              Endereços recentes
             </li>
           )}
-          {items.map((p, i) => {
-            const idx = i + (showCurrent ? 1 : 0);
+          {items.map((it, i) => {
+            const active = i === highlight;
+            const contact = it.recent && it.recent.name ? `${it.recent.name} · ${formatPhone(it.recent.phone ?? "")}` : null;
             return (
               <li
-                key={p.id}
+                key={it.id}
+                id={optionId(i)}
                 role="option"
-                aria-selected={idx === highlight}
+                aria-selected={active}
+                aria-disabled={it.kind === "current" && !it.place}
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => pick(p)}
-                onMouseEnter={() => setHighlight(idx)}
-                className={cx("flex cursor-pointer items-start gap-3 px-4 py-2.5", idx === highlight && "bg-subtle-99")}
+                onClick={() => choose(i)}
+                onMouseEnter={() => setHighlight(i)}
+                className={cx(
+                  "flex cursor-pointer items-start gap-3 px-4 py-3",
+                  active && "bg-subtle-99",
+                  it.kind === "current" && !it.place && "cursor-default opacity-70",
+                )}
               >
-                <Icon name="pin" className="mt-0.5 shrink-0 text-muted-99" />
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold">{p.title}</span>
-                  <span className="block truncate text-[13px] text-muted-99">
-                    {p.subtitle}
-                    {!p.covered ? " · fora da área" : ""}
-                  </span>
+                <Icon
+                  name={it.kind === "current" ? "target" : it.kind === "recent" ? "clock" : "pin"}
+                  size={22}
+                  strokeWidth={2}
+                  className={cx("mt-0.5 shrink-0", it.kind === "current" ? "text-info-99" : "text-black-99")}
+                />
+                <span className="min-w-0 flex-1">
+                  {it.kind === "current" ? (
+                    <>
+                      <span className="block text-[15px] font-bold">Usar localização atual</span>
+                      <span className="block truncate text-sm text-secondary-99">
+                        {currentLoading ? "Obtendo sua posição…" : it.place ? `${it.place.title} · ${it.place.subtitle}` : "Não disponível"}
+                      </span>
+                    </>
+                  ) : it.kind === "recent" ? (
+                    <>
+                      <span className={cx("block text-[15px]", contact ? "font-bold" : "font-normal")}>{it.place?.title}</span>
+                      <span className="block truncate text-sm text-secondary-99">{contact ?? it.place?.subtitle}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="block text-[15px] font-bold">{it.place?.title}</span>
+                      <span className="block truncate text-sm text-secondary-99">
+                        {it.place?.subtitle}
+                        {it.place && !it.place.covered ? " · fora da área" : ""}
+                      </span>
+                    </>
+                  )}
                 </span>
+                <Icon name="chevronRight" size={18} className="mt-1 shrink-0 text-muted-99" />
               </li>
             );
           })}
           {status === "error" && (
-            <li className="px-4 py-3 text-sm text-orange-99-text">
+            <li className="px-4 py-3 text-sm text-orange-99-text" role="presentation">
               Não foi possível buscar agora. Confira a conexão e tente de novo.
             </li>
           )}
-          {status === "idle" && items.length === 0 && text.trim().length >= 3 && !showCurrent && (
-            <li className="px-4 py-3 text-sm text-muted-99">Nenhum endereço encontrado. Tente rua e número.</li>
+          {status === "idle" && typing && results.length === 0 && text.trim().length >= 3 && (
+            <li className="px-4 py-3 text-sm text-muted-99" role="presentation">
+              Nenhum endereço encontrado. Tente rua e número.
+            </li>
           )}
         </ul>
       )}
