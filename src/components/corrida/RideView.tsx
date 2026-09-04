@@ -11,28 +11,37 @@ import { useCurrentLocation } from "@/lib/useGeolocation";
 import type { PaymentMethod, RideCategory, RideOrder } from "@/lib/types";
 import { useApp } from "@/context/AppProvider";
 import { MapPanelLayout } from "@/components/layout/MapPanelLayout";
+import { ActionBar, PaymentBlock } from "@/components/layout/ActionBar";
 import { MapView } from "@/components/map/MapView";
 import { AddressSearch } from "@/components/map/AddressSearch";
+import { RoutePair } from "@/components/map/RoutePair";
+import { VehicleArt } from "@/components/ui/VehicleArt";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { Textarea } from "@/components/ui/Field";
-import { Icon, type IconName } from "@/components/ui/Icon";
+import { Icon } from "@/components/ui/Icon";
 import { BlockedHint, ErrorNote, InfoNote } from "@/components/ui/States";
-import { PaymentPicker } from "@/components/payment/PaymentPicker";
+import { PaymentPicker, paymentLabel } from "@/components/payment/PaymentPicker";
 import { CardForm, cardIsValid, emptyCard, type CardData } from "@/components/payment/CardForm";
 import { PaymentFlow } from "@/components/payment/PaymentFlow";
 import { cx } from "@/lib/cx";
-
-const categoryIcon: Record<RideCategory["id"], IconName> = {
-  pop: "car",
-  comfort: "car",
-  moto: "moto",
-  taxi: "car",
-};
 
 type Phase = "form" | "searching" | "no-driver" | "paying";
 
 /** Acima desta distância a primeira busca falha, para demonstrar o erro de "nenhum motorista". */
 const LOW_SUPPLY_KM = 25;
+
+const paymentIcon: Record<PaymentMethod, "pix" | "card" | "cash" | "ticket"> = {
+  pix: "pix",
+  cartao: "card",
+  dinheiro: "cash",
+  vale: "ticket",
+};
+
+function arrivalLabel(minutes: number): string {
+  const d = new Date(Date.now() + minutes * 60_000);
+  return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
 
 export function RideView() {
   const router = useRouter();
@@ -41,9 +50,12 @@ export function RideView() {
   const [origin, setOrigin] = useState<GeoPlace | null>(null);
   const [originTouched, setOriginTouched] = useState(false);
   const [destination, setDestination] = useState<GeoPlace | null>(null);
+  const [editing, setEditing] = useState<"origin" | "destination" | null>(null);
   const [routeState, setRouteState] = useState<{ key: string; route: RouteResult } | null>(null);
-  const [category, setCategory] = useState<RideCategory["id"] | null>(null);
-  const [payment, setPayment] = useState<PaymentMethod | null>(null);
+  const [category, setCategory] = useState<RideCategory["id"]>("pop");
+  const [negotiated, setNegotiated] = useState<number | null>(null);
+  const [payment, setPayment] = useState<PaymentMethod>("pix");
+  const [payOpen, setPayOpen] = useState(false);
   const [card, setCard] = useState<CardData>(emptyCard);
   const [cardTouched, setCardTouched] = useState<Partial<Record<keyof CardData, boolean>>>({});
   const [note, setNote] = useState("");
@@ -51,13 +63,12 @@ export function RideView() {
   const [attempts, setAttempts] = useState(0);
   const [orderId] = useState(() => newOrderId("corrida"));
 
-  // Origem começa na localização atual, como no aplicativo.
+  // Origem começa na localização atual, como no app.
   if (!originTouched && !origin && current.place) {
     setOrigin({ ...current.place, title: "Localização atual", subtitle: `${current.place.title} · ${current.place.subtitle}` });
   }
 
   const routeReady = Boolean(origin && destination && origin.covered && destination.covered);
-
   const routeKey = origin && destination ? `${origin.lat},${origin.lng}>${destination.lat},${destination.lng}` : null;
   const route = routeKey && routeState?.key === routeKey ? routeState.route : null;
 
@@ -72,16 +83,14 @@ export function RideView() {
 
   const km = route?.distanceKm ?? 0;
   const notCovered = [origin, destination].find((p) => p && !p.covered);
-  const selected = rideCategories.find((c) => c.id === category) ?? null;
-  const fare = selected ? rideFare(selected, km) : 0;
-  const duration = selected ? rideDurationMin(km, selected.id, route?.durationMin) : 0;
+  const selected = rideCategories.find((c) => c.id === category)!;
+  const suggested = route ? rideFare(selected, km) : 0;
+  const fare = selected.negotiable && negotiated !== null ? negotiated : suggested;
+  const duration = route ? rideDurationMin(km, selected.id, route.durationMin) : 0;
 
   const missing: string[] = [];
-  if (!origin) missing.push("informar a origem");
   if (!destination) missing.push("informar o destino");
   if (routeReady && !route) missing.push("calcular o trajeto");
-  if (routeReady && !category) missing.push("escolher a categoria");
-  if (routeReady && category && !payment) missing.push("escolher o pagamento");
   if (payment === "cartao" && !cardIsValid(card)) missing.push("completar os dados do cartão");
   const blocked = missing.length > 0 || Boolean(notCovered);
 
@@ -96,7 +105,7 @@ export function RideView() {
   }, [phase, km, attempts]);
 
   const confirm = useCallback(() => {
-    if (!origin || !destination || !selected || !payment) return;
+    if (!origin || !destination) return;
     const order: RideOrder = {
       id: orderId,
       vertical: "corrida",
@@ -116,7 +125,7 @@ export function RideView() {
     };
     saveOrder(order);
     router.push(`/pedido/${order.id}`);
-  }, [origin, destination, selected, payment, orderId, fare, duration, route, km, note, saveOrder, router]);
+  }, [origin, destination, orderId, payment, fare, duration, route, selected, km, note, saveOrder, router]);
 
   const map = useMemo(
     () => (
@@ -126,27 +135,18 @@ export function RideView() {
         route={route?.points}
         userLocation={current.status === "ready" ? current.position : null}
         center={current.position}
-        vehicle={selected?.id === "moto" ? "moto" : "car"}
+        vehicle={selected.art === "moto" ? "moto" : "car"}
         searching={phase === "searching"}
       />
     ),
-    [origin, destination, route, current.status, current.position, selected?.id, phase],
+    [origin, destination, route, current.status, current.position, selected.art, phase],
   );
 
-  if (phase === "paying" && payment) {
+  if (phase === "paying") {
     return (
       <MapPanelLayout
         map={map}
-        panel={
-          <PaymentFlow
-            method={payment}
-            amount={fare}
-            orderRef={orderId}
-            noun="corrida"
-            onConfirmed={confirm}
-            onCancel={() => setPhase("form")}
-          />
-        }
+        panel={<PaymentFlow method={payment} amount={fare} orderRef={orderId} noun="corrida" onConfirmed={confirm} onCancel={() => setPhase("form")} />}
       />
     );
   }
@@ -157,17 +157,17 @@ export function RideView() {
         map={map}
         panel={
           <div className="flex flex-col gap-6">
-            <h1 className="text-[28px] font-semibold">{selected?.name}</h1>
+            <h1 className="text-[22px] font-bold">{selected.name}</h1>
             {phase === "searching" ? (
               <div className="flex flex-col items-center gap-4 py-10 text-center" aria-live="polite">
                 <span className="h-12 w-12 animate-spin rounded-full border-4 border-offwhite-99 border-t-yellow-99-deep" aria-hidden="true" />
-                <p className="text-lg font-semibold">Procurando motorista</p>
-                <p className="text-sm text-secondary-99">Buscando o motorista mais próximo de {origin?.title}.</p>
+                <p className="text-[17px] font-bold">Procurando motorista</p>
+                <p className="text-[15px] text-secondary-99">Buscando o motorista mais próximo de {origin?.title}.</p>
               </div>
             ) : (
               <ErrorNote
                 title="Nenhum motorista encontrado"
-                description={`Não há motoristas de ${selected?.name} disponíveis para ${destination?.title} agora. Tente de novo em instantes ou mude a categoria.`}
+                description={`Não há motoristas de ${selected.name} disponíveis para ${destination?.title} agora. Tente de novo em instantes ou mude a categoria.`}
                 action={
                   <>
                     <Button size="sm" onClick={() => setPhase("searching")}>
@@ -180,15 +180,10 @@ export function RideView() {
                 }
               />
             )}
-            <div className="rounded-xl bg-subtle-99 p-4 text-sm text-secondary-99">
-              <p>
-                <strong className="text-black-99">{origin?.title}</strong> até{" "}
-                <strong className="text-black-99">{destination?.title}</strong>
-              </p>
-              <p>
-                {formatKm(km)} · {duration} min · {formatBRL(fare)}
-              </p>
-            </div>
+            <RoutePair origin={origin && { title: origin.title }} destination={destination && { title: destination.title }} />
+            <p className="text-[15px] text-secondary-99">
+              {formatKm(km)} · {duration} min · <span className="font-bold text-black-99">{formatBRL(fare)}</span>
+            </p>
             {phase === "searching" && (
               <Button variant="ghost" full onClick={() => setPhase("form")}>
                 Cancelar
@@ -200,153 +195,210 @@ export function RideView() {
     );
   }
 
+  const searching = editing !== null || !destination;
+
   return (
     <MapPanelLayout
       map={map}
       panel={
-        <div className="flex flex-col gap-8">
-          <div>
-            <h1 className="text-[28px] font-semibold">Para onde vamos?</h1>
-            <p className="text-sm text-secondary-99">Escolha origem, destino e categoria. O preço é estimado.</p>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <AddressSearch
-              label="Origem"
-              icon="target"
-              placeholder="De onde você sai?"
-              value={origin}
-              onChange={(p) => {
-                setOriginTouched(true);
-                setOrigin(p);
-              }}
-              currentLocation={current.place}
-              currentLoading={current.status === "loading"}
-            />
-            <AddressSearch
-              label="Destino"
-              icon="flag"
-              placeholder="Para onde você vai?"
-              value={destination}
-              onChange={(p) => {
-                setDestination(p);
-                setAttempts(0);
-              }}
-            />
-            {current.status === "denied" && !originTouched && (
-              <InfoNote>
-                Sem acesso à sua localização. A origem começa em Vila Madalena, São Paulo. Você pode
-                mudar no campo acima.
-              </InfoNote>
-            )}
-            {notCovered && (
-              <ErrorNote
-                title="Endereço fora da área de cobertura"
-                description={`Ainda não operamos em ${notCovered.city || notCovered.title}. Escolha um endereço no Brasil.`}
-              />
-            )}
-          </div>
-
-          {routeReady && (
-            <section className="flex flex-col gap-3" aria-labelledby="cat-title">
-              <div className="flex items-baseline justify-between">
-                <h2 id="cat-title" className="text-[22px] font-semibold">
-                  Escolha a categoria
-                </h2>
-                <span className="text-[13px] text-muted-99" aria-live="polite">
-                  {route ? formatKm(km) : "Calculando trajeto…"}
-                </span>
-              </div>
-              <ul className="flex flex-col gap-2" role="list">
-                {rideCategories.map((c) => {
-                  const checked = category === c.id;
-                  return (
-                    <li key={c.id}>
-                      <button
-                        type="button"
-                        aria-pressed={checked}
-                        onClick={() => setCategory(c.id)}
-                        className={cx(
-                          "flex w-full items-center gap-4 rounded-xl border px-4 py-3 text-left transition-colors",
-                          checked ? "border-black-99 bg-subtle-99" : "border-border-99 hover:bg-subtle-99",
-                        )}
-                      >
-                        <span
-                          className={cx(
-                            "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
-                            checked ? "bg-yellow-99 text-black-99" : "bg-offwhite-99 text-black-99",
-                          )}
-                        >
-                          <Icon name={categoryIcon[c.id]} size={24} />
-                        </span>
-                        <span className="flex min-w-0 flex-1 flex-col">
-                          <span className="flex items-center gap-2 font-semibold">
-                            {c.name}
-                            <span className="flex items-center gap-1 text-[13px] font-medium text-muted-99">
-                              <Icon name="user" size={12} />
-                              {c.seats}
-                            </span>
-                          </span>
-                          <span className="truncate text-[13px] text-muted-99">
-                            {c.description} · chega em {c.etaMin} min
-                          </span>
-                        </span>
-                        <span className="shrink-0 text-right">
-                          <span className="block font-bold">{route ? formatBRL(rideFare(c, km)) : "—"}</span>
-                          <span className="block text-[13px] text-muted-99">
-                            {route ? `${rideDurationMin(km, c.id, route.durationMin)} min` : ""}
-                          </span>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          )}
-
-          {routeReady && category && (
-            <section className="flex flex-col gap-4" aria-labelledby="pay-title">
-              <h2 id="pay-title" className="text-[22px] font-semibold">
-                Pagamento
-              </h2>
-              <PaymentPicker value={payment} onChange={setPayment} allowed={["pix", "cartao", "dinheiro"]} compact />
-              {payment === "cartao" && (
-                <CardForm
-                  value={card}
-                  onChange={setCard}
-                  touched={cardTouched}
-                  onTouch={(k) => setCardTouched((t) => ({ ...t, [k]: true }))}
+        <div className="flex flex-col gap-6">
+          {searching ? (
+            <>
+              <h1 className="sr-only">Corrida</h1>
+              {editing === "origin" ? (
+                <AddressSearch
+                  placeholder="De onde você sai?"
+                  ariaLabel="Origem"
+                  value={origin}
+                  autoFocus
+                  currentLocation={current.place}
+                  currentLoading={current.status === "loading"}
+                  onChange={(p) => {
+                    setOriginTouched(true);
+                    setOrigin(p);
+                    if (p) setEditing(null);
+                  }}
+                />
+              ) : (
+                <AddressSearch
+                  placeholder="Para onde vamos?"
+                  ariaLabel="Destino"
+                  value={destination}
+                  autoFocus={editing === "destination"}
+                  onChange={(p) => {
+                    setDestination(p);
+                    setAttempts(0);
+                    if (p) setEditing(null);
+                  }}
                 />
               )}
+              {origin && editing !== "origin" && (
+                <button
+                  type="button"
+                  onClick={() => setEditing("origin")}
+                  className="flex items-center gap-3 rounded-xl py-2 text-left hover:bg-subtle-99"
+                >
+                  <span className="h-4 w-4 shrink-0 rounded-full border-[3px] border-success-99 bg-white" aria-hidden="true" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[13px] text-secondary-99">Origem</span>
+                    <span className="block truncate text-[17px] font-bold">{origin.title}</span>
+                  </span>
+                  <Icon name="chevronRight" size={20} className="text-muted-99" />
+                </button>
+              )}
+              {current.status === "denied" && !originTouched && (
+                <InfoNote>Sem acesso à sua localização. A origem começa em Vila Madalena, São Paulo. Toque em Origem para mudar.</InfoNote>
+              )}
+              {notCovered && (
+                <ErrorNote
+                  title="Endereço fora da área de cobertura"
+                  description={`Ainda não operamos em ${notCovered.city || notCovered.title}. Escolha um endereço no Brasil.`}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <h1 className="sr-only">Corrida</h1>
+              <RoutePair
+                origin={origin && { title: origin.title }}
+                destination={destination && { title: destination.title }}
+                onEditOrigin={() => setEditing("origin")}
+                onEditDestination={() => setEditing("destination")}
+              />
+
+              {notCovered ? (
+                <ErrorNote
+                  title="Endereço fora da área de cobertura"
+                  description={`Ainda não operamos em ${notCovered.city || notCovered.title}. Escolha um endereço no Brasil.`}
+                />
+              ) : (
+                <ul className="flex flex-col" role="list" aria-label="Categorias">
+                  {rideCategories.map((c) => {
+                    const checked = category === c.id;
+                    const price = route ? rideFare(c, km) : 0;
+                    const mins = route ? rideDurationMin(km, c.id, route.durationMin) : 0;
+                    return (
+                      <li key={c.id} className="border-b border-border-99 last:border-b-0">
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          aria-pressed={checked}
+                          onClick={() => setCategory(c.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              setCategory(c.id);
+                            }
+                          }}
+                          className={cx(
+                            "flex w-full cursor-pointer items-center gap-3 rounded-xl px-1 py-3 text-left transition-colors",
+                            checked ? "bg-subtle-99" : "hover:bg-subtle-99",
+                          )}
+                        >
+                          <VehicleArt kind={c.art} size={64} />
+                          <span className="flex min-w-0 flex-1 flex-col">
+                            <span className="flex items-center gap-1.5 text-[17px] font-bold">
+                              {c.name}
+                              {c.seats > 0 ? (
+                                <span className="flex items-center gap-0.5 text-[13px] font-medium text-secondary-99">
+                                  <Icon name="user" size={13} />
+                                  {c.seats}
+                                </span>
+                              ) : (
+                                <Icon name="info" size={14} className="text-secondary-99" />
+                              )}
+                            </span>
+                            <span className="truncate text-sm text-secondary-99">
+                              {route ? `${arrivalLabel(c.etaMin + mins)} · ${mins} min` : c.description}
+                            </span>
+                          </span>
+                          {c.negotiable ? (
+                            <span className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                type="button"
+                                aria-label="Diminuir valor"
+                                disabled={!route}
+                                onClick={() => setNegotiated(Math.max(Math.round((rideFare(c, km) * 0.7) * 100) / 100, (negotiated ?? price) - 1))}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-border-99 text-black-99 hover:bg-subtle-99 disabled:text-disabled-99"
+                              >
+                                <Icon name="minus" size={16} />
+                              </button>
+                              <span className="min-w-[72px] text-center text-[17px] font-bold tabular-nums">
+                                {route ? formatBRL(negotiated ?? price) : "—"}
+                              </span>
+                              <button
+                                type="button"
+                                aria-label="Aumentar valor"
+                                disabled={!route}
+                                onClick={() => setNegotiated((negotiated ?? price) + 1)}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-border-99 text-black-99 hover:bg-subtle-99 disabled:text-disabled-99"
+                              >
+                                <Icon name="plus" size={16} />
+                              </button>
+                            </span>
+                          ) : (
+                            <span className="shrink-0 text-[17px] font-bold tabular-nums">{route ? formatBRL(price) : "—"}</span>
+                          )}
+                          <span
+                            className={cx(
+                              "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2",
+                              checked ? "border-black-99 bg-black-99 text-white" : "border-border-99 bg-white text-transparent",
+                            )}
+                            aria-hidden="true"
+                          >
+                            <Icon name="check" size={14} strokeWidth={3} />
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+
               <Textarea
                 label="Observação para o motorista"
                 placeholder="Ex.: estou no portão lateral, de camisa azul"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 maxLength={120}
-                hint={`${note.length}/120 · opcional`}
-                className="min-h-20"
+                className="min-h-10"
               />
-            </section>
+            </>
           )}
         </div>
       }
       footer={
-        <div className="flex flex-col gap-2">
-          {selected && routeReady && route && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-secondary-99">
-                {selected.name} · {duration} min
-              </span>
-              <span className="text-lg font-bold">{formatBRL(fare)}</span>
-            </div>
-          )}
-          <Button size="lg" full disabled={blocked} onClick={() => setPhase("searching")}>
-            Confirmar corrida
-          </Button>
-          {!notCovered && <BlockedHint items={missing} />}
-        </div>
+        !searching ? (
+          <>
+            <ActionBar
+              left={
+                <PaymentBlock
+                  icon={paymentIcon[payment]}
+                  label={paymentLabel(payment)}
+                  detail={payment === "cartao" && card.number ? `•••• ${card.number.replace(/\s/g, "").slice(-4)}` : undefined}
+                  onClick={() => setPayOpen(true)}
+                />
+              }
+              action={
+                <Button size="lg" full disabled={blocked} price={route ? formatBRL(fare) : undefined} onClick={() => setPhase("searching")}>
+                  Solicitar {selected.name}
+                </Button>
+              }
+              hint={!notCovered ? <BlockedHint items={missing} /> : null}
+            />
+            <Modal open={payOpen} onClose={() => setPayOpen(false)} title="Métodos de pagamento" width="sm">
+              <div className="flex flex-col gap-4">
+                <PaymentPicker value={payment} onChange={setPayment} allowed={["pix", "cartao", "dinheiro"]} compact />
+                {payment === "cartao" && (
+                  <CardForm value={card} onChange={setCard} touched={cardTouched} onTouch={(k) => setCardTouched((t) => ({ ...t, [k]: true }))} />
+                )}
+                <Button full onClick={() => setPayOpen(false)}>
+                  Confirmar
+                </Button>
+              </div>
+            </Modal>
+          </>
+        ) : undefined
       }
     />
   );
