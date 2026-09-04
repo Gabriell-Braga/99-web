@@ -56,7 +56,7 @@ export const demoOrders: Record<string, Order> = {
     origin: { label: "Rua Harmonia, 480", lat: -23.5535, lng: -46.6889 },
     destination: { label: "Av. Paulista, 1578", lat: -23.5614, lng: -46.656 },
     category: "pop",
-    categoryName: "99Pop",
+    categoryName: "Pop",
     distanceKm: 5.8,
     durationMin: 22,
     driver: {
@@ -98,8 +98,7 @@ export const demoOrders: Record<string, Order> = {
       phone: "11987654321",
     },
     content: "Pedido #4821 · 2 lanches e 1 bebida",
-    size: "pequeno",
-    declaredValue: 60,
+    size: "moto",
     distanceKm: 4.1,
     courier: { name: "Diego Nascimento", vehicle: "Honda CG 160", plate: "DKT-7F31", rating: 4.88 },
   },

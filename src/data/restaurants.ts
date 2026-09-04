@@ -19,7 +19,7 @@ const adicionaisBurger: OptionGroup = {
   required: false,
   max: 4,
   choices: [
-    { id: "bacon", label: "Bacon crocante", price: 6 },
+    { id: "bacon", label: "Bacon crocante", price: 6, hot: true },
     { id: "cheddar", label: "Cheddar extra", price: 4 },
     { id: "ovo", label: "Ovo", price: 3 },
     { id: "cebola", label: "Cebola caramelizada", price: 4.5 },
@@ -45,7 +45,7 @@ const bordaPizza: OptionGroup = {
   required: false,
   choices: [
     { id: "sem", label: "Sem borda", price: 0 },
-    { id: "catupiry", label: "Catupiry", price: 9 },
+    { id: "catupiry", label: "Catupiry", price: 9, hot: true },
     { id: "cheddar", label: "Cheddar", price: 9 },
   ],
 };
@@ -72,7 +72,7 @@ const complementosAcai: OptionGroup = {
     { id: "granola", label: "Granola", price: 0 },
     { id: "banana", label: "Banana", price: 0 },
     { id: "leite-po", label: "Leite em pó", price: 2 },
-    { id: "nutella", label: "Nutella", price: 5 },
+    { id: "nutella", label: "Nutella", price: 5, hot: true },
     { id: "morango", label: "Morango", price: 4 },
     { id: "pacoca", label: "Paçoca", price: 2 },
   ],
@@ -96,6 +96,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FFE8CC",
     address: "Rua Aspicuelta, 312 · Vila Madalena",
     location: { lat: -23.5569, lng: -46.6913 },
+    cuisine: "Hambúrguer",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 9.99,
     menu: [
       {
         id: "destaques",
@@ -104,6 +107,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "smash-duplo",
             name: "Smash duplo",
+            promoPrice: 27.9,
             description:
               "Dois discos de 90 g, queijo prato, cebola na chapa e maionese da casa no pão brioche.",
             price: 34.9,
@@ -207,6 +211,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FFD9CF",
     address: "Rua Fradique Coutinho, 1140 · Pinheiros",
     location: { lat: -23.5622, lng: -46.6905 },
+    cuisine: "Pizza",
+    deliveredBy: "Entrega pela loja",
+    deliveryFeeFull: 12.99,
     menu: [
       {
         id: "tradicionais",
@@ -215,6 +222,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "margherita",
             name: "Margherita",
+            promoPrice: 46.9,
             description: "Molho de tomate San Marzano, mozzarella de búfala e manjericão fresco.",
             price: 58,
             art: "pizza",
@@ -284,6 +292,9 @@ export const restaurants: Restaurant[] = [
     tint: "#E8D8F5",
     address: "Rua dos Pinheiros, 248 · Pinheiros",
     location: { lat: -23.5648, lng: -46.6822 },
+    cuisine: "Açaí",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 5.99,
     menu: [
       {
         id: "copos",
@@ -292,6 +303,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "acai-tradicional",
             name: "Açaí tradicional",
+            promoPrice: 14.9,
             description: "Açaí batido com banana. Escolha os complementos.",
             price: 18.9,
             art: "acai",
@@ -342,6 +354,9 @@ export const restaurants: Restaurant[] = [
     tint: "#E5F0D8",
     address: "Rua Girassol, 67 · Vila Madalena",
     location: { lat: -23.5547, lng: -46.6902 },
+    cuisine: "Marmita",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 7.99,
     menu: [
       {
         id: "do-dia",
@@ -405,6 +420,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FBE0E0",
     address: "Rua Tomás Gonzaga, 85 · Liberdade",
     location: { lat: -23.5588, lng: -46.6352 },
+    cuisine: "Japonesa",
+    deliveredBy: "Entrega pela loja",
+    deliveryFeeFull: 14.99,
     menu: [
       {
         id: "combinados",
@@ -413,6 +431,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "combo-20",
             name: "Combinado 20 peças",
+            promoPrice: 64.9,
             description: "8 sashimis de salmão, 6 niguiris, 6 uramakis.",
             price: 79.9,
             art: "sushi",
@@ -473,6 +492,9 @@ export const restaurants: Restaurant[] = [
     tint: "#DDF2E4",
     address: "Rua Wisard, 400 · Vila Madalena",
     location: { lat: -23.5513, lng: -46.6924 },
+    cuisine: "Saudável",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 8.99,
     menu: [
       {
         id: "bowls",
@@ -481,6 +503,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "bowl-frango",
             name: "Bowl de frango com quinoa",
+            promoPrice: 32.9,
             description: "Quinoa, frango desfiado, abacate, grão-de-bico e molho de tahine.",
             price: 38.9,
             art: "salad",
@@ -529,6 +552,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FFE3C4",
     address: "Rua Cardeal Arcoverde, 1870 · Pinheiros",
     location: { lat: -23.5595, lng: -46.6863 },
+    cuisine: "Brasileira",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 10.99,
     menu: [
       {
         id: "galetos",
@@ -537,6 +563,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "galeto-inteiro",
             name: "Galeto inteiro",
+            promoPrice: 54.9,
             description: "Serve 2 pessoas. Acompanha polenta frita e maionese.",
             price: 64.9,
             art: "chicken",
@@ -572,6 +599,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FFF0C2",
     address: "Rua Mourato Coelho, 950 · Vila Madalena",
     location: { lat: -23.5577, lng: -46.6947 },
+    cuisine: "Salgados",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 5.99,
     menu: [
       {
         id: "salgados",
@@ -614,6 +644,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FADDE8",
     address: "Rua Oscar Freire, 1120 · Jardins",
     location: { lat: -23.5651, lng: -46.6702 },
+    cuisine: "Doces",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 9.99,
     menu: [
       {
         id: "fatias",
@@ -670,6 +703,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FFEBD1",
     address: "Rua Purpurina, 240 · Vila Madalena",
     location: { lat: -23.5558, lng: -46.6906 },
+    cuisine: "Italiana",
+    deliveredBy: "Entrega pela loja",
+    deliveryFeeFull: 12.99,
     menu: [
       {
         id: "massas",
@@ -713,6 +749,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FFE0D6",
     address: "Rua Teodoro Sampaio, 2200 · Pinheiros",
     location: { lat: -23.5641, lng: -46.6926 },
+    cuisine: "Pizza",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 8.99,
     menu: [
       {
         id: "pizzas",
@@ -748,6 +787,9 @@ export const restaurants: Restaurant[] = [
     tint: "#FCE4E4",
     address: "Rua Augusta, 1500 · Consolação",
     location: { lat: -23.5565, lng: -46.6586 },
+    cuisine: "Japonesa",
+    deliveredBy: "Entregador 99",
+    deliveryFeeFull: 6.99,
     menu: [
       {
         id: "hot",

@@ -46,6 +46,8 @@ export interface OptionChoice {
   id: string;
   label: string;
   price: number;
+  /** Selo "Em alta" com ícone de chama. */
+  hot?: boolean;
 }
 
 export interface OptionGroup {
@@ -63,6 +65,8 @@ export interface MenuItem {
   name: string;
   description: string;
   price: number;
+  /** Preço promocional em verde; o cheio aparece riscado. */
+  promoPrice?: number;
   art: ArtKind;
   available: boolean;
   options?: OptionGroup[];
@@ -92,6 +96,11 @@ export interface Restaurant {
   tint: string;
   address: string;
   location: LatLng;
+  /** Tipo de cozinha, como o app mostra na linha de metadados. */
+  cuisine: string;
+  /** Taxa cheia riscada ao lado da promocional. */
+  deliveryFeeFull?: number;
+  deliveredBy: "Entregador 99" | "Entrega pela loja";
   menu: MenuSection[];
 }
 
@@ -110,18 +119,23 @@ export interface Bag {
   lines: BagLine[];
 }
 
+export type VehicleArt = "car" | "moto" | "box";
+
 export interface RideCategory {
-  id: "pop" | "comfort" | "moto" | "taxi";
+  id: "pop" | "moto" | "pop-expresso" | "negocia" | "taxi" | "entrega-moto";
   name: string;
   description: string;
+  art: VehicleArt;
   seats: number;
   perKm: number;
   base: number;
   minFare: number;
   etaMin: number;
+  /** Linha "Negocia": o usuário propõe o valor com um stepper. */
+  negotiable?: boolean;
 }
 
-export type PackageSize = "envelope" | "pequeno" | "medio" | "grande";
+export type PackageSize = "moto" | "carro";
 
 export interface ContactPoint {
   street: string;
@@ -196,7 +210,6 @@ export interface DeliveryOrder extends OrderBase {
   dropoff: ContactPoint;
   content: string;
   size: PackageSize;
-  declaredValue: number;
   distanceKm: number;
   courier: { name: string; vehicle: string; plate: string; rating: number };
 }
