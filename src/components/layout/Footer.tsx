@@ -4,7 +4,7 @@ import { author } from "@/data/author";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border-99 bg-subtle-99">
+    <footer className="border-t border-border-99 bg-subtle-99 pb-24">
       <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 md:grid-cols-[1.2fr_1fr_1fr] md:px-8 xl:px-16">
         <div className="flex max-w-xl items-start gap-4">
           <Logo size={32} />
@@ -17,11 +17,11 @@ export function Footer() {
 
         <nav aria-label="Rodapé" className="flex flex-col gap-2 text-sm font-semibold">
           <span className="text-[13px] font-medium text-muted-99">Serviços</span>
-          <Link href="/comida" className="w-fit rounded hover:underline">
-            Comida
-          </Link>
           <Link href="/corrida" className="w-fit rounded hover:underline">
             Corrida
+          </Link>
+          <Link href="/comida" className="w-fit rounded hover:underline">
+            Food
           </Link>
           <Link href="/entrega" className="w-fit rounded hover:underline">
             Entrega

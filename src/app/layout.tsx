@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppProvider } from "@/context/AppProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { BottomNav } from "@/components/layout/BottomNav";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -18,21 +19,25 @@ export const metadata: Metadata = {
     template: "%s · 99 Web",
   },
   description:
-    "Conceito independente de interface web para corrida, entrega e comida. Sem vínculo com a 99. Nenhum pedido é real.",
+    "Conceito independente de interface web para corrida, Food, entrega e Pay. Sem vínculo com a 99. Nenhum pedido é real.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${montserrat.variable} h-full antialiased`}>
       <head>
-        <link rel="preconnect" href="https://tile.openstreetmap.org" crossOrigin="" />
-        <link rel="preconnect" href="https://nominatim.openstreetmap.org" crossOrigin="" />
+        <link rel="preconnect" href="https://tile.openstreetmap.org" />
+        <link rel="preconnect" href="https://nominatim.openstreetmap.org" />
       </head>
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col bg-yellow-99">
         <AppProvider>
           <Header />
-          <main className="flex flex-1 flex-col">{children}</main>
+          {/* O conteúdo branco sobe por cima da faixa amarela com raio de 24px, como no app. */}
+          <main className="relative -mt-6 flex flex-1 flex-col rounded-t-[24px] bg-white">
+            {children}
+          </main>
           <Footer />
+          <BottomNav />
         </AppProvider>
       </body>
     </html>

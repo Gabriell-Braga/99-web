@@ -2,87 +2,120 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cx } from "@/lib/cx";
+import { useState } from "react";
 import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
-import { useApp } from "@/context/AppProvider";
-import { useState } from "react";
+import { bagCount, useApp } from "@/context/AppProvider";
 import { AddressPicker } from "@/components/comida/AddressPicker";
+import { SideMenu } from "@/components/layout/SideMenu";
+import { user } from "@/data/menu";
+import { cx } from "@/lib/cx";
 
-const nav = [
-  { href: "/comida", label: "Comida" },
-  { href: "/corrida", label: "Corrida" },
-  { href: "/entrega", label: "Entrega" },
-] as const;
+function HeaderAction({
+  label,
+  icon,
+  href,
+  count,
+  onClick,
+}: {
+  label: string;
+  icon: "coupon" | "receipt" | "cart" | "qr";
+  href?: string;
+  count?: number;
+  onClick?: () => void;
+}) {
+  const cls =
+    "relative flex h-11 w-11 items-center justify-center rounded-full text-black-99 transition-colors hover:bg-black-99/10";
+  const inner = (
+    <>
+      <Icon name={icon} size={24} strokeWidth={2} />
+      {count ? (
+        <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-black-99 px-1 text-[11px] font-bold text-white">
+          {count}
+        </span>
+      ) : null}
+    </>
+  );
+  if (href) {
+    return (
+      <Link href={href} aria-label={label} title={label} className={cls}>
+        {inner}
+      </Link>
+    );
+  }
+  return (
+    <button type="button" aria-label={label} title={label} onClick={onClick} className={cls}>
+      {inner}
+    </button>
+  );
+}
 
+/**
+ * Cabeçalho amarelo do app: avatar à esquerda, saudação ou endereço ao lado,
+ * ações à direita. Em Food são cupom, pedidos e carrinho; em corrida e
+ * entrega é o leitor de QR.
+ */
 export function Header() {
   const pathname = usePathname();
-  const { address } = useApp();
+  const { address, bag } = useApp();
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const inFood = pathname.startsWith("/comida");
-  const accent = "bg-yellow-99";
+  const inFlow = pathname.startsWith("/corrida") || pathname.startsWith("/entrega");
+  const count = bagCount(bag);
 
   return (
-    <header className="sticky top-0 z-40 h-[72px] bg-white shadow-header">
-      <div className="mx-auto flex h-full max-w-[1440px] items-center gap-3 px-4 md:gap-6 md:px-8 xl:px-16">
-        <Link href="/" className="flex shrink-0 items-center gap-3 rounded-lg">
-          <Logo decorative={false} />
-          <span className="hidden text-lg font-semibold sm:inline">Web</span>
+    <header className="bg-yellow-99 pb-6">
+      <div className="mx-auto flex h-[72px] max-w-[1440px] items-center gap-3 px-4 md:gap-4 md:px-8 xl:px-16">
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Abrir menu"
+          aria-haspopup="dialog"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black-99 transition-colors hover:bg-white/80"
+        >
+          <Icon name="user" size={24} strokeWidth={2} />
+        </button>
+
+        {inFood ? (
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="flex min-w-0 items-center gap-2 rounded-xl text-left text-black-99"
+            aria-haspopup="dialog"
+          >
+            <span className="flex min-w-0 flex-col leading-tight">
+              <span className="text-[13px] font-medium">Entregar em</span>
+              <span className="truncate text-[17px] font-bold">{address.line1}</span>
+            </span>
+            <Icon name="chevronDown" size={18} className="shrink-0" strokeWidth={2.2} />
+          </button>
+        ) : (
+          <p className="min-w-0 truncate text-[22px] font-bold text-black-99">Olá, {user.name}!</p>
+        )}
+
+        <Link
+          href="/"
+          className="ml-auto hidden items-center gap-2 rounded-xl text-black-99 md:flex"
+          aria-label="99 Web, início"
+        >
+          <Logo size={32} />
+          <span className="text-[17px] font-bold">Web</span>
         </Link>
 
-        <nav aria-label="Serviços" className="flex h-full items-stretch gap-1">
-          {nav.map((n) => {
-            const isActive = pathname.startsWith(n.href);
-            return (
-              <Link
-                key={n.href}
-                href={n.href}
-                aria-current={isActive ? "page" : undefined}
-                className={cx(
-                  "relative flex items-center rounded-lg px-2 text-sm font-semibold transition-colors md:px-4 md:text-base",
-                  isActive ? "text-black-99" : "text-secondary-99 hover:text-black-99",
-                )}
-              >
-                {n.label}
-                {isActive && (
-                  <span
-                    aria-hidden="true"
-                    className={cx("absolute inset-x-2 bottom-0 h-1 rounded-t-full md:inset-x-4", accent)}
-                  />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-3">
+        <div className={cx("flex items-center gap-1", inFood || inFlow ? "ml-auto md:ml-4" : "ml-auto md:ml-4")}>
           {inFood && (
-            <button
-              type="button"
-              onClick={() => setPickerOpen(true)}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-offwhite-99 text-left text-sm font-semibold text-black-99 hover:bg-border-99 sm:h-12 sm:w-auto sm:max-w-[280px] sm:justify-start sm:gap-2 sm:px-4"
-              aria-haspopup="dialog"
-            >
-              <Icon name="pin" className="shrink-0 text-black-99" />
-              <span className="sr-only sm:hidden">Trocar endereço de entrega</span>
-              <span className="hidden min-w-0 flex-col leading-tight sm:flex">
-                <span className="text-xs font-medium text-muted-99">Entregar em</span>
-                <span className="truncate">{address.line1}</span>
-              </span>
-              <Icon name="chevronDown" size={16} className="hidden shrink-0 text-muted-99 sm:block" />
-            </button>
+            <>
+              <HeaderAction label="Cupons de desconto" icon="coupon" href="/comida/checkout" />
+              <HeaderAction label="Pedidos" icon="receipt" href="/pedido/demo-comida" />
+              <HeaderAction label="Carrinho" icon="cart" href="/comida/checkout" count={count} />
+            </>
           )}
-          <span
-            className="hidden h-10 w-10 items-center justify-center rounded-full bg-offwhite-99 text-black-99 md:flex"
-            role="img"
-            aria-label="Conta de demonstração"
-            title="Conta de demonstração"
-          >
-            <Icon name="user" />
-          </span>
+          {inFlow && <HeaderAction label="Ler código QR" icon="qr" />}
         </div>
       </div>
       {inFood && <AddressPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />}
+      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
   );
 }
