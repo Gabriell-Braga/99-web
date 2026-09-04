@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getRestaurant, restaurants } from "@/data/restaurants";
 import { RestaurantView } from "@/components/comida/RestaurantView";
@@ -17,5 +18,9 @@ export default async function RestaurantPage(props: PageProps<"/comida/[slug]">)
   const { slug } = await props.params;
   const restaurant = getRestaurant(slug);
   if (!restaurant) notFound();
-  return <RestaurantView restaurant={restaurant} />;
+  return (
+    <Suspense>
+      <RestaurantView restaurant={restaurant} />
+    </Suspense>
+  );
 }

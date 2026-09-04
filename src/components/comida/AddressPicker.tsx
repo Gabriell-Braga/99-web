@@ -12,7 +12,7 @@ const icons: Record<string, IconName> = { casa: "home", trabalho: "briefcase", s
 export function AddressPicker({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { address, setAddress } = useApp();
   return (
-    <Modal open={open} onClose={onClose} title="Onde você está?" width="sm">
+    <Modal open={open} onClose={onClose} title="Entregar em" width="sm">
       <ul className="flex flex-col gap-3" role="list">
         {savedAddresses.map((a) => {
           const selected = a.id === address.id;
