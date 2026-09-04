@@ -31,7 +31,7 @@ export function EmptyState({ icon, title, description, action, className, compac
     >
       <Icon name={icon} size={compact ? 48 : 64} className="text-border-99" strokeWidth={1.4} />
       <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="text-[17px] font-bold">{title}</h2>
         <p className="max-w-sm text-sm text-muted-99">{description}</p>
       </div>
       <div className="mt-2">{action}</div>
@@ -55,7 +55,7 @@ export function ErrorNote({ title, description, action, className }: ErrorNotePr
       <Icon name="alert" className="mt-0.5 shrink-0" />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div>
-          <p className="font-semibold">{title}</p>
+          <p className="font-bold">{title}</p>
           <p className="text-sm text-secondary-99">{description}</p>
         </div>
         {action && <div className="flex flex-wrap gap-2">{action}</div>}

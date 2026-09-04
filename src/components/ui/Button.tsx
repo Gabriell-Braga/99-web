@@ -5,14 +5,18 @@ import { cx } from "@/lib/cx";
 type Variant = "primary" | "secondary" | "ghost" | "icon" | "text";
 type Size = "sm" | "md" | "lg";
 
+/**
+ * Botão do 99 Web. Primário é amarelo com texto preto bold, raio de 12px, nunca
+ * pílula. Laranja não é fundo de botão.
+ */
 const base =
-  "inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none transition-colors duration-150 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 font-bold whitespace-nowrap select-none transition-colors duration-150 disabled:cursor-not-allowed";
 
 const variants: Record<Variant, string> = {
   primary:
     "bg-yellow-99 text-black-99 hover:bg-yellow-99-hover active:bg-yellow-99-deep disabled:bg-offwhite-99 disabled:text-disabled-99",
   secondary:
-    "bg-black-99 text-white hover:bg-secondary-99 active:bg-black-99 disabled:bg-offwhite-99 disabled:text-disabled-99",
+    "bg-black-99 text-white hover:bg-[#3a3a3a] active:bg-black-99 disabled:bg-offwhite-99 disabled:text-disabled-99",
   ghost:
     "bg-white text-black-99 border border-border-99 hover:bg-subtle-99 active:bg-offwhite-99 disabled:text-disabled-99",
   icon: "bg-offwhite-99 text-black-99 hover:bg-border-99 active:bg-placeholder-99 disabled:text-disabled-99",
@@ -20,9 +24,9 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-10 px-5 text-sm rounded-xl",
-  md: "h-12 px-6 text-base rounded-xl",
-  lg: "h-14 px-8 text-base rounded-xl",
+  sm: "h-10 px-4 text-[15px] rounded-xl",
+  md: "h-12 px-5 text-base rounded-xl",
+  lg: "h-14 px-6 text-[17px] rounded-xl",
 };
 
 const iconSizes: Record<Size, string> = {
@@ -31,10 +35,49 @@ const iconSizes: Record<Size, string> = {
   lg: "h-12 w-12 rounded-full",
 };
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface CommonProps {
   variant?: Variant;
   size?: Size;
   full?: boolean;
+  /** Valor em uma linha e a ação em outra, como em "R$ 70,40 / Solicitar Pop". */
+  price?: string;
+  /** Contador em círculo preto à direita, como em "Continuar (2)". */
+  count?: number;
+}
+
+function Content({
+  price,
+  count,
+  variant,
+  children,
+}: CommonProps & { children?: ReactNode }) {
+  if (price) {
+    return (
+      <span className="flex flex-col items-center leading-tight">
+        <span className="text-[15px] font-bold">{price}</span>
+        <span className="text-[15px] font-bold">{children}</span>
+      </span>
+    );
+  }
+  if (count !== undefined) {
+    return (
+      <>
+        <span>{children}</span>
+        <span
+          className={cx(
+            "flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-bold",
+            variant === "secondary" ? "bg-white text-black-99" : "bg-black-99 text-white",
+          )}
+        >
+          {count}
+        </span>
+      </>
+    );
+  }
+  return <>{children}</>;
+}
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, CommonProps {
   children?: ReactNode;
 }
 
@@ -42,6 +85,8 @@ export function Button({
   variant = "primary",
   size = "md",
   full,
+  price,
+  count,
   className,
   type = "button",
   children,
@@ -59,16 +104,15 @@ export function Button({
       )}
       {...rest}
     >
-      {children}
+      <Content price={price} count={count} variant={variant}>
+        {children}
+      </Content>
     </button>
   );
 }
 
-interface LinkButtonProps {
+interface LinkButtonProps extends CommonProps {
   href: string;
-  variant?: Variant;
-  size?: Size;
-  full?: boolean;
   className?: string;
   children: ReactNode;
   ariaLabel?: string;
@@ -79,6 +123,8 @@ export function LinkButton({
   variant = "primary",
   size = "md",
   full,
+  price,
+  count,
   className,
   children,
   ariaLabel,
@@ -95,7 +141,9 @@ export function LinkButton({
         className,
       )}
     >
-      {children}
+      <Content price={price} count={count} variant={variant}>
+        {children}
+      </Content>
     </Link>
   );
 }

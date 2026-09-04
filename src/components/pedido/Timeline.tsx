@@ -50,7 +50,7 @@ export function Timeline({ stages, current }: TimelineProps) {
               )}
             </div>
             <div className={cx("pb-6", last && "pb-0")}>
-              <p className={cx("font-semibold leading-8", !done && !active && "text-muted-99")}>
+              <p className={cx("text-[17px] font-bold leading-8", !done && !active && "text-muted-99")}>
                 {s.title}
               </p>
               {active && (

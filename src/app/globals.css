@@ -3,40 +3,50 @@
 @theme {
   --font-sans: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif;
 
+  /* Base */
   --color-yellow-99: #ffdd00;
-  --color-yellow-99-light: #ffeb66;
+  --color-yellow-99-light: #fff8e1; /* yellow-tint: bloco "No Horário" */
   --color-yellow-99-hover: #ffe433;
   --color-yellow-99-border: #f8c400;
   --color-yellow-99-deep: #f1b500;
 
+  /* Laranja é acento pontual: aba ativa, pino de destino, ranking, selo "Em alta". Nunca fundo de botão. */
   --color-orange-99: #fc4c02;
   --color-orange-99-hover: #ff7b1c;
   --color-orange-99-pressed: #e05e00;
   --color-orange-99-soft: #ff9447;
   --color-orange-99-bg: #fff4f0;
-  /* Laranja para texto pequeno: #fc4c02 fica em 3,4:1 sobre branco; este tom garante 4,5:1. */
   --color-orange-99-text: #c43c00;
 
   --color-black-99: #212121;
-  --color-offwhite-99: #f1f1f1;
-  --color-subtle-99: #f9f9f9;
-  --color-border-99: #e9e8e9;
-  --color-placeholder-99: #b3b3b3;
-  --color-disabled-99: #9c9c9c;
-  /* DESIGN.md indica #858585, mas ele fica em 3,7:1 sobre branco. #6b6b6b garante 4,5:1 em texto pequeno. */
-  --color-muted-99: #6b6b6b;
-  --color-secondary-99: #4a4b4a;
+  --color-offwhite-99: #f7f7f8; /* panel: card interno, grupo de opções, stepper */
+  --color-subtle-99: #f2f3f5; /* page: fundo de checkout e detalhe */
+  --color-border-99: #eaeaea;
+  --color-placeholder-99: #9e9e9e; /* text-3 */
+  --color-disabled-99: #9e9e9e;
+  /* DESIGN.md indica #757575 para text-2, mas ele fica em 4,1:1 sobre o fundo page. #6f6f6f garante 4,5:1. */
+  --color-muted-99: #6f6f6f;
+  --color-secondary-99: #6f6f6f;
 
-  --color-success-99: #00e070;
-  --color-success-99-deep: #00a854;
-  --color-success-99-bg: #e6fbf0;
-  --color-info-99: #1085d4;
+  /* Verde: preço promocional, economia, cupom, frete grátis */
+  /* DESIGN.md indica #00a650, mas em texto pequeno ele fica em 3:1. #00803d garante 4,5:1 e mantém o verde. */
+  --color-green-99: #00803d;
+  --color-green-99-bar: #17b26a;
+  --color-green-99-tint: #e6f7ee;
+  --color-green-99-ink: #0b7a46;
+
+  --color-success-99: #00c853; /* pin-origin, rota no mapa */
+  --color-success-99-deep: #0b7a46;
+  --color-success-99-bg: #e6f7ee;
+  --color-info-99: #2e7bff;
   --color-warning-99: #f1b500;
+  --color-alert-99: #e53935;
 
-  --shadow-low: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-mid: 0 4px 8px rgba(0, 0, 0, 0.12);
-  --shadow-high: 0 8px 16px rgba(0, 0, 0, 0.16);
-  --shadow-header: 0 0 10px rgba(0, 0, 0, 0.23);
+  /* Card se separa por cor de fundo, não por sombra. Sombra só na pílula de navegação e na folha sobre o mapa. */
+  --shadow-low: none;
+  --shadow-mid: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-high: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-header: none;
 
   --radius-pill: 72px;
 
@@ -128,7 +138,11 @@ body {
 /* Mapa (Leaflet) */
 .leaflet-container {
   font-family: var(--font-sans);
-  background: #f1f1f1;
+  background: #edeff2;
+}
+/* Mapa claro e dessaturado, para o amarelo e o verde se destacarem sobre ele. */
+.leaflet-tile-pane {
+  filter: saturate(0.12) brightness(1.04) contrast(0.92);
 }
 .leaflet-tooltip.map-tip {
   border: 0;
