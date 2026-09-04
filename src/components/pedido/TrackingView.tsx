@@ -16,7 +16,7 @@ import { Button, LinkButton } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Badge } from "@/components/ui/Chip";
 import { paymentLabel } from "@/components/payment/PaymentPicker";
-import { packageSizes } from "@/lib/pricing";
+import { deliveryCategories } from "@/data/rides";
 
 const verticalName = { comida: "Pedido", corrida: "Corrida", entrega: "Entrega" } as const;
 
@@ -85,7 +85,7 @@ function Tracking({ order }: { order: Order }) {
           progress={showVehicle ? current.progress : undefined}
           vehicle={vehicle}
           searching={searching}
-          accent="yellow"
+          accent="orange"
         />
       }
       panel={
@@ -96,7 +96,7 @@ function Tracking({ order }: { order: Order }) {
                 {verticalName[order.vertical]} {order.id}
               </Badge>
             </div>
-            <h1 className="text-[28px] font-semibold leading-tight" aria-live="polite">
+            <h1 className="text-[22px] font-bold leading-tight" aria-live="polite">
               {current.title}
             </h1>
             <p className="flex items-center gap-2 text-secondary-99">
@@ -243,10 +243,7 @@ function Summary({ order }: { order: Order }) {
             value={`${order.dropoff.street}, ${order.dropoff.number}${order.dropoff.complement ? `, ${order.dropoff.complement}` : ""} · ${order.dropoff.name} · ${formatPhone(order.dropoff.phone)}`}
           />
           <Row label="Conteúdo" value={order.content} />
-          <Row
-            label="Pacote"
-            value={`${packageSizes.find((s) => s.id === order.size)?.label ?? order.size}${order.declaredValue ? ` · valor declarado ${formatBRL(order.declaredValue)}` : ""}`}
-          />
+          <Row label="Categoria" value={deliveryCategories.find((c) => c.id === order.size)?.name ?? order.size} />
           <Row label="Distância" value={formatKm(order.distanceKm)} />
         </>
       )}
