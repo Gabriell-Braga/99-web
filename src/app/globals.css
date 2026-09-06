@@ -94,10 +94,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Foco visível e consistente em tudo que é interativo. */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-black-99);
-  outline-offset: 2px;
+@layer base {
+  /* Foco visível e consistente em tudo que é interativo. Na camada base para
+     que o campo sem borda possa trocar a caixa preta pelo próprio divisor. */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-black-99);
+    outline-offset: 2px;
+  }
 }
 
 /* Na camada base para que utilitários como text-white vençam. */

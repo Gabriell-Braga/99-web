@@ -35,8 +35,9 @@ function FieldShell({ label, hint, error, required, id, children, className, tra
     <div
       className={cx(
         "flex min-w-0 flex-col",
-        variant === "plain" ? "gap-1 border-b py-2" : "gap-2",
-        variant === "plain" && (error ? "border-orange-99" : "border-border-99"),
+        variant === "plain" ? "gap-1 border-b py-2 transition-colors duration-150" : "gap-2",
+        // O campo sem borda marca o foco escurecendo o divisor, sem caixa em volta.
+        variant === "plain" && (error ? "border-orange-99" : "border-border-99 focus-within:border-black-99"),
         className,
       )}
     >
@@ -73,7 +74,7 @@ const boxedBase =
   "w-full rounded-xl border bg-white px-4 text-base text-black-99 transition-[border-color,box-shadow] duration-150 focus:outline-none focus:border-black-99 focus:ring-2 focus:ring-black-99/10 disabled:bg-subtle-99 disabled:text-disabled-99";
 
 const plainBase =
-  "w-full bg-transparent px-0 text-[17px] text-black-99 focus:outline-none disabled:text-disabled-99";
+  "w-full bg-transparent px-0 text-[17px] text-black-99 outline-none focus:outline-none focus-visible:outline-none disabled:text-disabled-99";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
