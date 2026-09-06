@@ -3,7 +3,7 @@ import type { ReactElement, SVGProps } from "react";
 import Add from "@material-symbols/svg-400/rounded/add.svg";
 import ArrowBack from "@material-symbols/svg-400/rounded/arrow_back.svg";
 import ArrowForward from "@material-symbols/svg-400/rounded/arrow_forward.svg";
-import Bolt from "@material-symbols/svg-400/rounded/bolt.svg";
+import BoltFill from "@material-symbols/svg-400/rounded/bolt-fill.svg";
 import Check from "@material-symbols/svg-400/rounded/check.svg";
 import ChevronLeft from "@material-symbols/svg-400/rounded/chevron_left.svg";
 import ChevronRight from "@material-symbols/svg-400/rounded/chevron_right.svg";
@@ -14,7 +14,7 @@ import CreditCard from "@material-symbols/svg-400/rounded/credit_card.svg";
 import Delete from "@material-symbols/svg-400/rounded/delete.svg";
 import DirectionsCar from "@material-symbols/svg-400/rounded/directions_car.svg";
 import ErrorIcon from "@material-symbols/svg-400/rounded/error.svg";
-import Handshake from "@material-symbols/svg-400/rounded/handshake.svg";
+import HandshakeFill from "@material-symbols/svg-400/rounded/handshake-fill.svg";
 import Home from "@material-symbols/svg-400/rounded/home.svg";
 import Info from "@material-symbols/svg-400/rounded/info.svg";
 import KeyboardArrowDown from "@material-symbols/svg-400/rounded/keyboard_arrow_down.svg";
@@ -44,13 +44,14 @@ type Glyph = (props: SVGProps<SVGSVGElement>) => ReactElement;
 /**
  * Material Symbols Rounded, peso 400, grau 0, tamanho óptico 24, sem
  * preenchimento. Uma família só em todo o projeto, sem ícone desenhado à mão.
- * "coupon" usa `sell`, nome atual do antigo `local_offer`.
+ * "coupon" usa `sell`, nome atual do antigo `local_offer`. Os selos de
+ * categoria usam a variante preenchida.
  */
 const icons = {
   alert: ErrorIcon,
   arrowLeft: ArrowBack,
   arrowRight: ArrowForward,
-  bolt: Bolt,
+  boltFill: BoltFill,
   box: Package2,
   briefcase: Work,
   car: DirectionsCar,
@@ -65,7 +66,7 @@ const icons = {
   copy: ContentCopy,
   coupon: Sell,
   flame: LocalFireDepartment,
-  handshake: Handshake,
+  handshakeFill: HandshakeFill,
   home: Home,
   info: Info,
   minus: Remove,

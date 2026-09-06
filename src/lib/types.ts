@@ -122,7 +122,7 @@ export interface Bag {
 export type VehicleArt = "car" | "moto" | "box";
 
 export interface RideCategory {
-  id: "pop" | "moto" | "pop-expresso" | "negocia" | "taxi" | "entrega-moto";
+  id: "pop" | "moto" | "pop-expresso" | "negocia" | "taxi" | "entrega-moto" | "entrega-carro";
   name: string;
   description: string;
   art: VehicleArt;

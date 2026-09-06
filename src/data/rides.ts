@@ -69,6 +69,17 @@ export const rideCategories: RideCategory[] = [
     minFare: 9.9,
     etaMin: 5,
   },
+  {
+    id: "entrega-carro",
+    name: "Entrega Carro",
+    description: "Envie um volume de até 30 kg",
+    art: "car",
+    seats: 0,
+    base: 11.9,
+    perKm: 2.4,
+    minFare: 14.9,
+    etaMin: 8,
+  },
 ];
 
 export const drivers: Record<RideCategory["id"], { name: string; rating: number; vehicle: string; color: string; plate: string; trips: number }> = {
@@ -78,6 +89,7 @@ export const drivers: Record<RideCategory["id"], { name: string; rating: number;
   negocia: { name: "Marcos Vinícius", rating: 4.85, vehicle: "Fiat Argo", color: "cinza", plate: "GJK-5D08", trips: 2104 },
   taxi: { name: "Antônio Ferreira", rating: 4.95, vehicle: "Fiat Cronos", color: "branco", plate: "TXI-4B90", trips: 8764 },
   "entrega-moto": { name: "Diego Nascimento", rating: 4.88, vehicle: "Honda CG 160", color: "vermelha", plate: "DKT-7F31", trips: 1980 },
+  "entrega-carro": { name: "Marcos Vinícius", rating: 4.85, vehicle: "Fiat Argo", color: "cinza", plate: "GJK-5D08", trips: 2104 },
 };
 
 /** Categorias reais da 99 Entrega. */
