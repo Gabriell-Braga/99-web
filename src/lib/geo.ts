@@ -129,9 +129,10 @@ export async function fetchRoute(a: LatLng, b: LatLng, signal?: AbortSignal): Pr
     };
   } catch (e) {
     if ((e as Error).name === "AbortError") throw e;
-    // Sem rota: linha reta com fator urbano, para a demonstração não travar.
+    // Sem rota do OSRM: estima distância e prazo, mas não devolve geometria.
+    // Reta entre dois pontos nunca é desenhada no mapa.
     const km = Math.round(haversineKm(a, b) * 1.3 * 10) / 10;
-    return { points: [a, b], distanceKm: km, durationMin: Math.max(3, Math.round((km / 22) * 60)) };
+    return { points: [], distanceKm: km, durationMin: Math.max(3, Math.round((km / 22) * 60)) };
   }
 }
 
