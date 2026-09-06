@@ -7,7 +7,7 @@ const verticals: { href: string; title: string; description: string; cta: string
   {
     href: "/corrida",
     title: "Corrida",
-    description: "Pop, Moto, Pop Expresso, Negocia, Táxi e Entrega Moto, com mapa e painel lado a lado.",
+    description: "Pop, Moto, Pop Expresso, Negocia, Táxi, Entrega Moto e Entrega Carro, com mapa e painel lado a lado.",
     cta: "Para onde vamos?",
     icon: "car",
   },
@@ -99,20 +99,20 @@ export default function HomePage() {
           <ul className="grid gap-4 sm:grid-cols-2 lg:col-span-2" role="list">
             {[
               {
-                t: "A loja no horário de pico",
-                d: "O endereço já está na tela. Solicitar a entrega deveria acontecer ali, não no celular.",
+                t: "O endereço já está na tela",
+                d: "Ele chegou por mensagem, e-mail ou planilha. Copiar e colar evita digitar tudo de novo e errar o número.",
               },
               {
-                t: "O escritório na hora do almoço",
-                d: "Quem passa o dia no computador pede comida com o celular na mão em vez de resolver na aba do lado.",
+                t: "Mapa e painel lado a lado",
+                d: "A tela grande mostra rota, categorias e preço de uma vez. Escolher deixa de ser uma etapa por tela.",
               },
               {
-                t: "O carrinho que não some",
-                d: "Com largura de sobra, o carrinho vira coluna fixa. Dá para comparar lojas sem perder o que já escolheu.",
+                t: "Quem despacha o dia inteiro",
+                d: "Loja, portaria e recepção pedem corrida e entrega em série. Com teclado, cada pedido custa segundos.",
               },
               {
-                t: "Estados de verdade",
-                d: "Carregamento, vazio, erro e bloqueio existem em cada fluxo. É o que separa protótipo de tela de apresentação.",
+                t: "O carrinho vira coluna fixa",
+                d: "Dá para comparar lojas sem perder o que já escolheu. No celular, sair da loja é recomeçar.",
               },
             ].map((b) => (
               <li key={b.t} className="flex flex-col gap-1 rounded-2xl bg-white p-5">

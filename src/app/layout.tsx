@@ -15,7 +15,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: {
-    default: "99 Web · conceito",
+    default: "99 Web",
     template: "%s · 99 Web",
   },
   description:
