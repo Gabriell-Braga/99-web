@@ -54,8 +54,6 @@ export function useSavedAddresses(current: CurrentLocation): SavedAddress[] {
           } catch {
             place = null;
           }
-          // Nominatim pede no máximo uma consulta por segundo.
-          await new Promise((r) => setTimeout(r, 1100));
         }
         if (cancelled) return;
         const fallback = savedAddresses[Math.min(i, savedAddresses.length - 1)];

@@ -65,8 +65,7 @@ export function useRecents(position: LatLng | null): RecentAddress[] {
         } catch {
           // segue para o próximo ponto
         }
-        // Nominatim pede no máximo uma consulta por segundo.
-        await new Promise((r) => setTimeout(r, 1100));
+        // O espaçamento entre consultas fica por conta da fila em lib/geo.
         if (cancelled) return;
       }
       cache.set(key, out);

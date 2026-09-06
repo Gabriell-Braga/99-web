@@ -79,11 +79,27 @@ function toPlace(r: NominatimResult): GeoPlace {
 const BASE = "https://nominatim.openstreetmap.org";
 const SP_VIEWBOX = "-47.2,-23.2,-46.2,-24.1"; // Grande São Paulo, prioridade nos resultados.
 
+/**
+ * O Nominatim é gratuito e pede no máximo uma consulta por segundo. A fila
+ * espaça as chamadas e o cache evita repetir a mesma pergunta, para o
+ * protótipo não ser bloqueado quando a pessoa navega entre as telas.
+ */
+const ESPACO_MS = 1200;
+let ultima = 0;
+async function naVez<T>(fn: () => Promise<T>): Promise<T> {
+  const espera = Math.max(0, ultima + ESPACO_MS - Date.now());
+  ultima = Date.now() + espera;
+  if (espera > 0) await new Promise((r) => setTimeout(r, espera));
+  return fn();
+}
+
+const reverseCache = new Map<string, GeoPlace | null>();
+
 export async function searchAddress(query: string, signal?: AbortSignal): Promise<GeoPlace[]> {
   const q = query.trim();
   if (q.length < 3) return [];
   const url = `${BASE}/search?format=jsonv2&addressdetails=1&limit=6&viewbox=${SP_VIEWBOX}&bounded=0&accept-language=pt-BR&q=${encodeURIComponent(q)}`;
-  const res = await fetch(url, { signal, headers: { Accept: "application/json" } });
+  const res = await naVez(() => fetch(url, { signal, headers: { Accept: "application/json" } }));
   if (!res.ok) throw new Error(`Nominatim ${res.status}`);
   const data = (await res.json()) as NominatimResult[];
   const seen = new Set<string>();
@@ -96,12 +112,19 @@ export async function searchAddress(query: string, signal?: AbortSignal): Promis
 }
 
 export async function reverseGeocode(pos: LatLng, signal?: AbortSignal): Promise<GeoPlace | null> {
+  const chave = `${pos.lat.toFixed(4)},${pos.lng.toFixed(4)}`;
+  const guardado = reverseCache.get(chave);
+  if (guardado !== undefined) return guardado ? { ...guardado, lat: pos.lat, lng: pos.lng, exact: true } : null;
   const url = `${BASE}/reverse?format=jsonv2&addressdetails=1&zoom=18&accept-language=pt-BR&lat=${pos.lat}&lon=${pos.lng}`;
-  const res = await fetch(url, { signal, headers: { Accept: "application/json" } });
+  const res = await naVez(() => fetch(url, { signal, headers: { Accept: "application/json" } }));
   if (!res.ok) return null;
   const data = (await res.json()) as NominatimResult & { error?: string };
-  if (data.error) return null;
+  if (data.error) {
+    reverseCache.set(chave, null);
+    return null;
+  }
   const p = toPlace(data);
+  reverseCache.set(chave, p);
   return { ...p, lat: pos.lat, lng: pos.lng, exact: true };
 }
 
