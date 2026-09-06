@@ -20,13 +20,19 @@ interface RoutePairProps {
   onSwap?: () => void;
 }
 
+/**
+ * Linha de origem ou destino. O hover envolve a linha inteira, com o círculo
+ * colorido dentro da área, padding de 12px por 16px e raio de 12px.
+ */
 function Row({
   point,
   placeholder,
+  color,
   onClick,
 }: {
   point: RoutePoint | null;
   placeholder: string;
+  color: "origin" | "destination";
   onClick?: () => void;
 }) {
   const Tag = onClick ? "button" : "div";
@@ -35,10 +41,17 @@ function Row({
       type={onClick ? "button" : undefined}
       onClick={onClick}
       className={cx(
-        "flex min-h-14 w-full items-center gap-3 py-2 text-left",
-        onClick && "rounded-lg hover:bg-subtle-99",
+        "relative flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left",
+        onClick && "transition-colors duration-[120ms] hover:bg-offwhite-99",
       )}
     >
+      <span
+        className={cx(
+          "relative z-10 h-4 w-4 shrink-0 rounded-full border-[3px] bg-white",
+          color === "origin" ? "border-success-99" : "border-orange-99",
+        )}
+        aria-hidden="true"
+      />
       <span className="min-w-0 flex-1">
         <span className={cx("block truncate text-[17px] font-bold", !point && "text-placeholder-99")}>
           {point?.title ?? placeholder}
@@ -50,7 +63,7 @@ function Row({
   );
 }
 
-/** Par origem e destino: círculo vazado verde, linha, círculo vazado laranja. */
+/** Par origem e destino num card branco de raio 16px e padding 16px, sobre fundo panel. */
 export function RoutePair({
   origin,
   destination,
@@ -61,25 +74,26 @@ export function RoutePair({
   onSwap,
 }: RoutePairProps) {
   return (
-    <div className="flex gap-3">
-      <div className="relative flex w-6 shrink-0 flex-col items-center py-4">
-        <span className="h-4 w-4 shrink-0 rounded-full border-[3px] border-success-99 bg-white" aria-hidden="true" />
-        <span className="w-0.5 flex-1 bg-border-99" aria-hidden="true" />
-        <span className="h-4 w-4 shrink-0 rounded-full border-[3px] border-orange-99 bg-white" aria-hidden="true" />
+    <div className="rounded-2xl bg-offwhite-99 p-2">
+      <div className="relative rounded-2xl bg-white p-4">
+        {/* Linha vertical entre os dois círculos, atrás das linhas. */}
+        <span
+          className="pointer-events-none absolute bottom-[calc(50%+6px)] top-[calc(50%-6px)] left-[35px] w-0.5 bg-border-99"
+          style={{ top: "calc(25% + 8px)", bottom: "calc(25% + 8px)" }}
+          aria-hidden="true"
+        />
+        <Row point={origin} placeholder={originPlaceholder} color="origin" onClick={onEditOrigin} />
+        <Row point={destination} placeholder={destinationPlaceholder} color="destination" onClick={onEditDestination} />
         {onSwap && (
           <button
             type="button"
             onClick={onSwap}
             aria-label="Inverter origem e destino"
-            className="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border-99 bg-white text-black-99 hover:bg-subtle-99"
+            className="absolute left-[24px] top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border-99 bg-white text-black-99 transition-colors duration-[120ms] hover:bg-offwhite-99"
           >
             <Icon name="swap" size={16} strokeWidth={2} />
           </button>
         )}
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col divide-y divide-border-99">
-        <Row point={origin} placeholder={originPlaceholder} onClick={onEditOrigin} />
-        <Row point={destination} placeholder={destinationPlaceholder} onClick={onEditDestination} />
       </div>
     </div>
   );
