@@ -18,7 +18,7 @@ export function discountPercent(price: number, promo: number): number {
  * bloco de preço em verde com o antigo riscado e pílula de percentual.
  * Imagem à direita com botão circular amarelo de adicionar sobreposto.
  */
-export function OfferCard({ offer }: { offer: Offer }) {
+export function OfferCard({ offer, eager }: { offer: Offer; eager?: boolean }) {
   const { restaurant, item } = offer;
   return (
     <Link
@@ -39,7 +39,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
         <p className="truncate text-[12px] text-secondary-99">{restaurant.name}</p>
       </div>
       <div className="relative shrink-0">
-        <FoodArt kind={item.art} tint={restaurant.tint} className="h-24 w-24 rounded-xl" />
+        <FoodArt kind={item.art} tint={restaurant.tint} className="h-24 w-24 rounded-xl" eager={eager} />
         <span
           className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-yellow-99 text-black-99"
           aria-hidden="true"

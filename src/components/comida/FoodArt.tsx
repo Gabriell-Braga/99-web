@@ -1,9 +1,10 @@
 import type { ArtKind } from "@/lib/types";
+import { foodPhoto } from "@/data/foodPhotos";
 import { cx } from "@/lib/cx";
 
 /**
- * Ilustrações planas em SVG para pratos e lojas. Substituem fotos externas
- * para que o protótipo não dependa de serviço de imagem.
+ * Ilustrações planas em SVG para pratos e lojas, usadas onde a foto não cabe,
+ * como o ícone de 24px dos chips de categoria.
  */
 function Art({ kind }: { kind: ArtKind }) {
   switch (kind) {
@@ -157,9 +158,33 @@ interface FoodArtProps {
   className?: string;
   /** Escala da ilustração dentro do quadro. */
   scale?: number;
+  /** Foto real do prato. Desligue onde o quadro é pequeno demais para ela. */
+  photo?: boolean;
+  /** Carrega na hora, para a foto que abre a página não entrar como conteúdo adiado. */
+  eager?: boolean;
 }
 
-export function FoodArt({ kind, tint = "#F1F1F1", className, scale = 1 }: FoodArtProps) {
+/**
+ * Quadro do prato. Por padrão mostra a foto servida de public/food, com a
+ * ilustração como alternativa. As fotos vêm do Wikimedia Commons e os créditos
+ * ficam no rodapé.
+ */
+export function FoodArt({ kind, tint = "#F1F1F1", className, scale = 1, photo = true, eager }: FoodArtProps) {
+  if (photo) {
+    return (
+      <div className={cx("overflow-hidden", className)} style={{ background: tint }} aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={foodPhoto[kind]}
+          alt=""
+          className="h-full w-full object-cover"
+          loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : undefined}
+          decoding="async"
+        />
+      </div>
+    );
+  }
   return (
     <div
       className={cx("flex items-center justify-center overflow-hidden", className)}

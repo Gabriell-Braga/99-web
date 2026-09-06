@@ -51,7 +51,7 @@ export function CategoryRail({ value, onChange }: CategoryRailProps) {
               key={c.id}
               active={value === c.id}
               onClick={() => onChange(value === c.id ? null : c.id)}
-              icon={<FoodArt kind={categoryArt[c.id]} tint="transparent" className="h-6 w-6 rounded-full" scale={1.6} />}
+              icon={<FoodArt kind={categoryArt[c.id]} tint="transparent" className="h-6 w-6 rounded-full" scale={1.6} photo={false} />}
             >
               {c.label}
             </Chip>

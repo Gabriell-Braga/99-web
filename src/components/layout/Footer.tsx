@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { author } from "@/data/author";
+import { photoCredits } from "@/data/foodPhotos";
 
 export function Footer() {
   return (
@@ -50,6 +51,25 @@ export function Footer() {
             ))}
           </ul>
         </div>
+      </div>
+
+      <div className="mx-auto max-w-[1440px] px-4 pb-10 md:px-8 xl:px-16">
+        <details className="text-sm text-secondary-99">
+          <summary className="w-fit rounded font-semibold text-black-99">Créditos das fotos</summary>
+          <p className="mt-2 text-[13px]">
+            As fotos dos pratos vêm do Wikimedia Commons, em licença livre, e são servidas pelo próprio projeto.
+          </p>
+          <ul className="mt-2 flex flex-col gap-1 text-[13px]" role="list">
+            {photoCredits.map((c) => (
+              <li key={c.kind}>
+                {c.label}: {c.autor}, {c.licenca} ·{" "}
+                <a href={c.fonte} target="_blank" rel="noopener noreferrer" className="rounded underline">
+                  original
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
       </div>
     </footer>
   );

@@ -148,9 +148,9 @@ export function FoodListing() {
             <section aria-labelledby="ofertas" className="flex flex-col gap-4">
               <SectionTitle>Ofertas</SectionTitle>
               <ul className="grid gap-4 md:grid-cols-2" role="list">
-                {offers.map((o) => (
+                {offers.map((o, i) => (
                   <li key={`${o.restaurant.slug}-${o.item.id}`}>
-                    <OfferCard offer={o} />
+                    <OfferCard offer={o} eager={i < 2} />
                   </li>
                 ))}
               </ul>
