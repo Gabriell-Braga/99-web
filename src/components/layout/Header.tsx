@@ -9,7 +9,7 @@ import { bagCount, useApp } from "@/context/AppProvider";
 import { AddressPicker } from "@/components/comida/AddressPicker";
 import { SideMenu } from "@/components/layout/SideMenu";
 import { user } from "@/data/menu";
-import { cx } from "@/lib/cx";
+import { CountBubble } from "@/components/ui/CountBubble";
 
 function HeaderAction({
   label,
@@ -19,7 +19,7 @@ function HeaderAction({
   onClick,
 }: {
   label: string;
-  icon: "coupon" | "receipt" | "cart" | "qr";
+  icon: "coupon" | "receipt" | "cart";
   href?: string;
   count?: number;
   onClick?: () => void;
@@ -29,11 +29,7 @@ function HeaderAction({
   const inner = (
     <>
       <Icon name={icon} size={24} strokeWidth={2} />
-      {count ? (
-        <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-black-99 px-1 text-[11px] font-bold text-white">
-          {count}
-        </span>
-      ) : null}
+      {count ? <CountBubble count={count} className="absolute -right-0.5 -top-0.5 h-5 min-w-5 px-1 text-[11px]" /> : null}
     </>
   );
   if (href) {
@@ -52,8 +48,7 @@ function HeaderAction({
 
 /**
  * Cabeçalho amarelo do app: avatar à esquerda, saudação ou endereço ao lado,
- * ações à direita. Em Food são cupom, pedidos e carrinho; em corrida e
- * entrega é o leitor de QR.
+ * ações à direita. Em Food são cupom, pedidos e carrinho.
  */
 export function Header() {
   const pathname = usePathname();
@@ -61,7 +56,6 @@ export function Header() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const inFood = pathname.startsWith("/comida");
-  const inFlow = pathname.startsWith("/corrida") || pathname.startsWith("/entrega");
   const count = bagCount(bag);
 
   return (
@@ -103,7 +97,7 @@ export function Header() {
           <span className="text-[17px] font-bold">Web</span>
         </Link>
 
-        <div className={cx("flex items-center gap-1", inFood || inFlow ? "ml-auto md:ml-4" : "ml-auto md:ml-4")}>
+        <div className="ml-auto flex items-center gap-1 md:ml-4">
           {inFood && (
             <>
               <HeaderAction label="Cupons de desconto" icon="coupon" href="/comida/checkout" />
@@ -111,7 +105,6 @@ export function Header() {
               <HeaderAction label="Carrinho" icon="cart" href="/comida/checkout" count={count} />
             </>
           )}
-          {inFlow && <HeaderAction label="Ler código QR" icon="qr" />}
         </div>
       </div>
       {inFood && <AddressPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />}
