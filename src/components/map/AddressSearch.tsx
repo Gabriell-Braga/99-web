@@ -73,7 +73,8 @@ export function AddressSearch({
   const recentAddresses = useRecents(position);
   const [text, setText] = useState(value ? value.title : "");
   const [prevValue, setPrevValue] = useState(value);
-  const [open, setOpen] = useState(false);
+  // Com foco automático a lista já abre, para o painel mostrar as recomendações sem clique.
+  const [open, setOpen] = useState(Boolean(autoFocus));
   const [results, setResults] = useState<GeoPlace[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [highlight, setHighlight] = useState(0);

@@ -231,7 +231,7 @@ export function RideView() {
                   placeholder="Para onde vamos?"
                   ariaLabel="Destino"
                   value={destination}
-                  autoFocus={editing === "destination"}
+                  autoFocus={editing === "destination" || !destination}
                   position={current.position}
                   onChange={(p) => {
                     setDestination(p);
@@ -240,7 +240,8 @@ export function RideView() {
                   }}
                 />
               )}
-              {origin && editing !== "origin" && (
+              {/* A origem só entra depois que o destino existe; antes disso o painel é só recomendação de destino. */}
+              {origin && destination && editing !== "origin" && (
                 <button
                   type="button"
                   onClick={() => setEditing("origin")}
@@ -255,7 +256,10 @@ export function RideView() {
                 </button>
               )}
               {current.status === "denied" && !originTouched && (
-                <InfoNote>Sem acesso à sua localização. A origem começa em Vila Madalena, São Paulo. Toque em Origem para mudar.</InfoNote>
+                <InfoNote>
+                  Sem acesso à sua localização. A origem começa em Vila Madalena, São Paulo, e pode ser trocada depois de
+                  escolher o destino.
+                </InfoNote>
               )}
               {notCovered && (
                 <ErrorNote
