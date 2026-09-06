@@ -163,7 +163,8 @@ export default function RealMap({
       if (origin) add(dot("#00C853", true), origin);
       if (destination) add(dot("#FC4C02", false), destination);
 
-      const line: LatLng[] = route && route.length > 1 ? route : origin && destination ? [origin, destination] : [];
+      // Só geometria real de rota. Reta entre dois pontos nunca é desenhada.
+      const line: LatLng[] = route && route.length > 1 ? route : [];
       const source = map.getSource(ROUTE_SOURCE) as maplibregl.GeoJSONSource | undefined;
       if (drawRef.current) cancelAnimationFrame(drawRef.current);
       if (source) {
@@ -209,7 +210,8 @@ export default function RealMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    const line: LatLng[] = route && route.length > 1 ? route : origin && destination ? [origin, destination] : [];
+    // Só geometria real de rota. Reta entre dois pontos nunca é desenhada.
+      const line: LatLng[] = route && route.length > 1 ? route : [];
     if (progress === undefined || line.length === 0) {
       vehicleRef.current?.remove();
       vehicleRef.current = null;
