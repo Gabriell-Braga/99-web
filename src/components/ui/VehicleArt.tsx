@@ -1,49 +1,64 @@
-import type { VehicleArt as Kind } from "@/lib/types";
+import type { PackageSize, RideCategory } from "@/lib/types";
 
-/**
- * Ilustrações dos veículos e do pacote, no espírito das isométricas do app:
- * moto e carro brancos com rodas amarelas, caixa marrom com fita amarela.
- */
-export function VehicleArt({ kind, size = 64 }: { kind: Kind; size?: number }) {
+type Category = RideCategory["id"] | PackageSize;
+
+/** Renders em `public/vehicles/`. A sombra já está na imagem. */
+const image: Record<Category, string> = {
+  pop: "/vehicles/car-white.png",
+  "pop-expresso": "/vehicles/car-white.png",
+  negocia: "/vehicles/car-white.png",
+  moto: "/vehicles/moto-white.png",
+  taxi: "/vehicles/car-yellow.png",
+  "entrega-moto": "/vehicles/moto-box.png",
+  carro: "/vehicles/car-box.png",
+};
+
+/** Raio amarelo em círculo preto: Pop Expresso. */
+function BoltBadge() {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" className="shrink-0">
-      {kind === "car" && (
-        <g>
-          <path d="M8 40c0-3 1-5 3-6l7-11c1-2 3-3 5-3h18c2 0 4 1 5 3l7 11c2 1 3 3 3 6v6H8v-6Z" fill="#FFFFFF" stroke="#212121" strokeWidth="2.2" strokeLinejoin="round" />
-          <path d="M13 34h38" stroke="#212121" strokeWidth="2.2" />
-          <path d="M18 34l4-9h20l4 9" fill="#EDEFF2" stroke="#212121" strokeWidth="2" strokeLinejoin="round" />
-          <path d="M32 25v9" stroke="#212121" strokeWidth="2" />
-          <circle cx="19" cy="47" r="6" fill="#FFDD00" stroke="#212121" strokeWidth="2.2" />
-          <circle cx="45" cy="47" r="6" fill="#FFDD00" stroke="#212121" strokeWidth="2.2" />
-          <circle cx="19" cy="47" r="2" fill="#212121" />
-          <circle cx="45" cy="47" r="2" fill="#212121" />
-          <rect x="10" y="38" width="5" height="3" rx="1.5" fill="#FFDD00" stroke="#212121" strokeWidth="1.5" />
-          <rect x="49" y="38" width="5" height="3" rx="1.5" fill="#FC4C02" stroke="#212121" strokeWidth="1.5" />
-        </g>
-      )}
-      {kind === "moto" && (
-        <g>
-          <circle cx="16" cy="44" r="8" fill="#FFDD00" stroke="#212121" strokeWidth="2.2" />
-          <circle cx="48" cy="44" r="8" fill="#FFDD00" stroke="#212121" strokeWidth="2.2" />
-          <circle cx="16" cy="44" r="2.5" fill="#212121" />
-          <circle cx="48" cy="44" r="2.5" fill="#212121" />
-          <path d="M16 44 26 28h12l6 10h4" fill="none" stroke="#212121" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M22 34h16l4 8H18l4-8Z" fill="#FFFFFF" stroke="#212121" strokeWidth="2.2" strokeLinejoin="round" />
-          <path d="M38 28l3-6h5M26 28h-6" stroke="#212121" strokeWidth="2.2" strokeLinecap="round" />
-          <rect x="28" y="18" width="14" height="6" rx="3" fill="#FFFFFF" stroke="#212121" strokeWidth="2" />
-          <path d="M44 34l4 10" stroke="#212121" strokeWidth="2.2" strokeLinecap="round" />
-        </g>
-      )}
-      {kind === "box" && (
-        <g>
-          <path d="M10 22 32 12l22 10v20L32 52 10 42V22Z" fill="#B87333" stroke="#212121" strokeWidth="2.2" strokeLinejoin="round" />
-          <path d="M10 22l22 10 22-10M32 32v20" stroke="#212121" strokeWidth="2.2" strokeLinejoin="round" />
-          <path d="M32 32v20" stroke="#FFDD00" strokeWidth="4" />
-          <path d="M10 22l22 10 22-10" stroke="#FFDD00" strokeWidth="4" />
-          <path d="M10 22 32 12l22 10v20L32 52 10 42V22Z" fill="none" stroke="#212121" strokeWidth="2.2" strokeLinejoin="round" />
-          <path d="M32 32v20M10 22l22 10 22-10" stroke="#212121" strokeWidth="1.2" strokeLinejoin="round" />
-        </g>
-      )}
-    </svg>
+    <span
+      className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black-99"
+      aria-hidden="true"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFDD00">
+        <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
+      </svg>
+    </span>
+  );
+}
+
+/** Aperto de mãos verde com cifrão: Negocia. */
+function HandshakeBadge() {
+  return (
+    <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path d="M2 8.5 6.5 5l5 2.5 2-1.5L18 8l4 1.5v6l-3 1.5-4.5 3.5-3-1-3 1L2 14.5v-6Z" fill="#00803D" />
+        <path d="M11.5 7.5 8 11l2.5 2 3.5-3M12 13l3 2.5M9.5 14.5l2.5 2" stroke="#fff" strokeWidth="1.1" strokeLinecap="round" fill="none" />
+        <circle cx="17.5" cy="17.5" r="5.5" fill="#00803D" stroke="#fff" strokeWidth="1" />
+        <text x="17.5" y="20.3" textAnchor="middle" fontSize="7.5" fontWeight="700" fill="#fff" fontFamily="Montserrat, sans-serif">
+          $
+        </text>
+      </svg>
+    </span>
+  );
+}
+
+/** Imagem da categoria com 64px de largura, mais o selo de Pop Expresso ou Negocia. */
+export function VehicleArt({ category, width = 64 }: { category: Category; width?: number }) {
+  return (
+    <span className="relative inline-block shrink-0" style={{ width, height: width }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={image[category]}
+        alt=""
+        width={width}
+        height={width}
+        className="block h-full w-full object-contain"
+        loading="lazy"
+        decoding="async"
+      />
+      {category === "pop-expresso" && <BoltBadge />}
+      {category === "negocia" && <HandshakeBadge />}
+    </span>
   );
 }
