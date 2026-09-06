@@ -43,18 +43,16 @@ export function BottomNav() {
         {items.map((it) => {
           const active = pathname.startsWith(it.href);
           const inner = (
-            <span className="flex h-14 w-16 flex-col items-center justify-center gap-1 text-black-99">
-              <span className="relative flex h-7 w-7 items-center justify-center">
-                {active && (
-                  <motion.span
-                    layoutId={reduce ? undefined : "nav-ativo"}
-                    transition={transition}
-                    className="absolute -inset-1.5 rounded-full bg-yellow-99"
-                    aria-hidden="true"
-                  />
-                )}
-                <Icon name={it.icon} size={24} className="relative" />
-              </span>
+            <span className="relative isolate flex h-14 w-[72px] flex-col items-center justify-center gap-1 text-black-99">
+              {active && (
+                <motion.span
+                  layoutId={reduce ? undefined : "nav-ativo"}
+                  transition={transition}
+                  className="absolute inset-0 -z-10 rounded-full bg-yellow-99"
+                  aria-hidden="true"
+                />
+              )}
+              <Icon name={it.icon} size={24} />
               <span className="text-[11px] font-medium leading-none">{it.label}</span>
             </span>
           );
