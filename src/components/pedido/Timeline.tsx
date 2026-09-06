@@ -36,7 +36,7 @@ export function Timeline({ stages, current }: TimelineProps) {
                 style={active && !reduce ? { ["--tw-shadow-color" as string]: pulse } : undefined}
               >
                 {done ? (
-                  <Icon name="check" size={16} strokeWidth={2.5} />
+                  <Icon name="check" size={16} />
                 ) : (
                   <span className={cx("block h-2.5 w-2.5 shrink-0 rounded-full", active ? "bg-black-99" : "bg-border-99")} />
                 )}

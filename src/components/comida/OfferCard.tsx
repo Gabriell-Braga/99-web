@@ -44,7 +44,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
           className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-yellow-99 text-black-99"
           aria-hidden="true"
         >
-          <Icon name="plus" size={18} strokeWidth={2.5} />
+          <Icon name="plus" size={18} />
         </span>
       </div>
     </Link>

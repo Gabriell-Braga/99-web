@@ -51,7 +51,7 @@ function OptionGroupBlock({ group, value, onChange }: { group: OptionGroup; valu
                 <span className="block text-[15px]">{c.label}</span>
                 {c.hot && (
                   <span className="mt-0.5 flex w-fit items-center gap-1 text-[12px] font-bold text-orange-99">
-                    <Icon name="flame" size={12} strokeWidth={2.2} />
+                    <Icon name="flame" size={12} />
                     Em alta
                   </span>
                 )}

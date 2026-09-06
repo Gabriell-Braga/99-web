@@ -356,7 +356,7 @@ export function RideView() {
                             )}
                             aria-hidden="true"
                           >
-                            <Icon name="check" size={14} strokeWidth={3} />
+                            <Icon name="check" size={14} />
                           </span>
                         </div>
                       </li>

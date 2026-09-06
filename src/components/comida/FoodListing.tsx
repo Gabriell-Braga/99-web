@@ -77,7 +77,7 @@ export function FoodListing() {
       <div className="flex flex-col gap-8">
         <h1 className="sr-only">Food</h1>
         <div className="relative">
-          <Icon name="search" size={22} strokeWidth={2.2} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
+          <Icon name="search" size={22} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
           <input
             type="search"
             placeholder="O que você quer comer hoje?"

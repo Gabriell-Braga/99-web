@@ -90,7 +90,7 @@ export function RoutePair({
             aria-label="Inverter origem e destino"
             className="absolute left-[24px] top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border-99 bg-white text-black-99 transition-colors duration-[120ms] hover:bg-offwhite-99"
           >
-            <Icon name="swap" size={16} strokeWidth={2} />
+            <Icon name="swap" size={16} />
           </button>
         )}
       </div>

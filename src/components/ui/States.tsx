@@ -29,7 +29,7 @@ export function EmptyState({ icon, title, description, action, className, compac
         className,
       )}
     >
-      <Icon name={icon} size={compact ? 48 : 64} className="text-border-99" strokeWidth={1.4} />
+      <Icon name={icon} size={compact ? 48 : 64} className="text-border-99" />
       <div className="flex flex-col gap-1">
         <h2 className="text-[17px] font-bold">{title}</h2>
         <p className="max-w-sm text-sm text-muted-99">{description}</p>

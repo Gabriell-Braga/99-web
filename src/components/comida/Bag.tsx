@@ -161,7 +161,7 @@ export function CartFloating() {
     <>
       <div className="fixed inset-x-4 bottom-24 z-30 lg:hidden">
         <Button full size="lg" onClick={() => setOpen(true)} className="shadow-high" aria-haspopup="dialog">
-          <Icon name="cart" strokeWidth={2.2} />
+          <Icon name="cart" />
           <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-black-99 px-1.5 text-xs font-bold text-white">{count}</span>
           <span className="flex-1 text-left">Ver carrinho</span>
           <span className="tabular-nums">{formatBRL(subtotal)}</span>

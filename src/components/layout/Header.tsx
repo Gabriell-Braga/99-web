@@ -7,7 +7,6 @@ import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
 import { bagCount, useApp } from "@/context/AppProvider";
 import { AddressPicker } from "@/components/comida/AddressPicker";
-import { SideMenu } from "@/components/layout/SideMenu";
 import { user } from "@/data/menu";
 import { CountBubble } from "@/components/ui/CountBubble";
 
@@ -28,7 +27,7 @@ function HeaderAction({
     "relative flex h-11 w-11 items-center justify-center rounded-full text-black-99 transition-colors hover:bg-black-99/10";
   const inner = (
     <>
-      <Icon name={icon} size={24} strokeWidth={2} />
+      <Icon name={icon} size={24} />
       {count ? <CountBubble count={count} className="absolute -right-0.5 -top-0.5 h-5 min-w-5 px-1 text-[11px]" /> : null}
     </>
   );
@@ -54,22 +53,16 @@ export function Header() {
   const pathname = usePathname();
   const { address, bag } = useApp();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const inFood = pathname.startsWith("/comida");
   const count = bagCount(bag);
 
   return (
     <header className="bg-yellow-99 pb-6">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center gap-3 px-4 md:gap-4 md:px-8 xl:px-16">
-        <button
-          type="button"
-          onClick={() => setMenuOpen(true)}
-          aria-label="Abrir menu"
-          aria-haspopup="dialog"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black-99 transition-colors hover:bg-white/80"
-        >
-          <Icon name="user" size={24} strokeWidth={2} />
-        </button>
+        {/* Avatar decorativo: o menu do perfil está fora do escopo. */}
+        <span className="flex h-11 w-11 shrink-0 cursor-default items-center justify-center rounded-full bg-white text-black-99" aria-hidden="true">
+          <Icon name="user" size={24} />
+        </span>
 
         {inFood ? (
           <button
@@ -82,7 +75,7 @@ export function Header() {
               <span className="text-[13px] font-medium">Entregar em</span>
               <span className="truncate text-[17px] font-bold">{address.line1}</span>
             </span>
-            <Icon name="chevronDown" size={18} className="shrink-0" strokeWidth={2.2} />
+            <Icon name="chevronDown" size={18} className="shrink-0" />
           </button>
         ) : (
           <p className="min-w-0 truncate text-[22px] font-bold text-black-99">Olá, {user.name}!</p>
@@ -108,7 +101,6 @@ export function Header() {
         </div>
       </div>
       {inFood && <AddressPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />}
-      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
   );
 }

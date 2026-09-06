@@ -42,13 +42,13 @@ export function Stepper({
         aria-label={atMin && removeAtMin ? "Remover" : "Diminuir"}
         className={btn}
       >
-        <Icon name={atMin && removeAtMin ? "trash" : "minus"} size={size === "sm" ? 16 : 18} strokeWidth={2.2} />
+        <Icon name={atMin && removeAtMin ? "trash" : "minus"} size={size === "sm" ? 16 : 18} />
       </button>
       <span className={cx("min-w-5 text-center font-bold tabular-nums", size === "sm" ? "text-[15px]" : "text-[17px]")} aria-live="polite">
         {value}
       </span>
       <button type="button" onClick={() => onChange(value + 1)} disabled={value >= max} aria-label="Aumentar" className={btn}>
-        <Icon name="plus" size={size === "sm" ? 16 : 18} strokeWidth={2.2} />
+        <Icon name="plus" size={size === "sm" ? 16 : 18} />
       </button>
     </div>
   );

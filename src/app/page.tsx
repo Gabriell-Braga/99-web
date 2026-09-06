@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { MapView } from "@/components/map/MapView";
+import { HomeMap } from "@/components/map/HomeMap";
 
 const verticals: { href: string; title: string; description: string; cta: string; icon: IconName }[] = [
   {
@@ -56,13 +56,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="relative h-[280px] min-w-0 overflow-hidden rounded-2xl border border-border-99 lg:h-[360px]">
-          <MapView
-            origin={{ lat: -23.5535, lng: -46.6889, label: "Vila Madalena" }}
-            destination={{ lat: -23.5614, lng: -46.656, label: "Av. Paulista" }}
-            progress={0.55}
-            vehicle="moto"
-            interactive={false}
-          />
+          <HomeMap />
         </div>
       </Container>
 
@@ -79,7 +73,7 @@ export default function HomePage() {
               className="group flex flex-col gap-4 rounded-2xl border border-border-99 bg-white p-5 transition-colors hover:bg-subtle-99"
             >
               <span className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-99 text-black-99">
-                <Icon name={v.icon} size={24} strokeWidth={2} />
+                <Icon name={v.icon} size={24} />
               </span>
               <div className="flex flex-col gap-1">
                 <h3 className="text-[20px] font-bold">{v.title}</h3>

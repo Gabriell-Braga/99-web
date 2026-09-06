@@ -188,7 +188,7 @@ export function AddressSearch({
   return (
     <div ref={wrapRef} className="relative">
       <div className="relative">
-        <Icon name="search" size={22} strokeWidth={2.2} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
+        <Icon name="search" size={22} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
         <input
           ref={inputRef}
           type="text"
@@ -290,7 +290,7 @@ export function AddressSearch({
                 <Icon
                   name={it.kind === "current" ? "target" : it.kind === "recent" ? "clock" : "pin"}
                   size={22}
-                  strokeWidth={2}
+                 
                   className={cx("mt-0.5 shrink-0", it.kind === "current" ? "text-info-99" : "text-black-99")}
                 />
                 <span className="min-w-0 flex-1">
