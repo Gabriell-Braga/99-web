@@ -22,7 +22,8 @@ import { Textarea } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { BlockedHint, ErrorNote, InfoNote } from "@/components/ui/States";
 import { PaymentPicker, paymentLabel } from "@/components/payment/PaymentPicker";
-import { CardForm, cardIsValid, emptyCard, type CardData } from "@/components/payment/CardForm";
+import { CardForm, cardIsValid, demoCard, type CardData } from "@/components/payment/CardForm";
+import { usePriceSkeleton, PriceSkeleton } from "@/components/ui/PriceSkeleton";
 import { PaymentFlow } from "@/components/payment/PaymentFlow";
 import { cx } from "@/lib/cx";
 
@@ -54,9 +55,9 @@ export function RideView() {
   const [routeState, setRouteState] = useState<{ key: string; route: RouteResult } | null>(null);
   const [category, setCategory] = useState<RideCategory["id"]>("pop");
   const [negotiated, setNegotiated] = useState<number | null>(null);
-  const [payment, setPayment] = useState<PaymentMethod>("pix");
+  const [payment, setPayment] = useState<PaymentMethod>("cartao");
   const [payOpen, setPayOpen] = useState(false);
-  const [card, setCard] = useState<CardData>(emptyCard);
+  const [card, setCard] = useState<CardData>(demoCard);
   const [cardTouched, setCardTouched] = useState<Partial<Record<keyof CardData, boolean>>>({});
   const [note, setNote] = useState("");
   const [phase, setPhase] = useState<Phase>("form");
@@ -82,6 +83,7 @@ export function RideView() {
   }, [origin, destination, routeKey]);
 
   const km = route?.distanceKm ?? 0;
+  const pricing = usePriceSkeleton(routeKey, Boolean(route));
   const notCovered = [origin, destination].find((p) => p && !p.covered);
   const selected = rideCategories.find((c) => c.id === category)!;
   const suggested = route ? rideFare(selected, km) : 0;
@@ -207,12 +209,14 @@ export function RideView() {
               <h1 className="sr-only">Corrida</h1>
               {editing === "origin" ? (
                 <AddressSearch
+                  key="origin"
                   placeholder="De onde você sai?"
                   ariaLabel="Origem"
                   value={origin}
                   autoFocus
                   currentLocation={current.place}
                   currentLoading={current.status === "loading"}
+                  position={current.position}
                   onChange={(p) => {
                     setOriginTouched(true);
                     setOrigin(p);
@@ -221,10 +225,12 @@ export function RideView() {
                 />
               ) : (
                 <AddressSearch
+                  key="destination"
                   placeholder="Para onde vamos?"
                   ariaLabel="Destino"
                   value={destination}
                   autoFocus={editing === "destination"}
+                  position={current.position}
                   onChange={(p) => {
                     setDestination(p);
                     setAttempts(0);
@@ -236,7 +242,7 @@ export function RideView() {
                 <button
                   type="button"
                   onClick={() => setEditing("origin")}
-                  className="flex items-center gap-3 rounded-xl py-2 text-left hover:bg-subtle-99"
+                  className="flex items-center gap-4 rounded-xl px-4 py-3 text-left transition-colors duration-[120ms] hover:bg-offwhite-99"
                 >
                   <span className="h-4 w-4 shrink-0 rounded-full border-[3px] border-success-99 bg-white" aria-hidden="true" />
                   <span className="min-w-0 flex-1">
@@ -291,14 +297,14 @@ export function RideView() {
                             }
                           }}
                           className={cx(
-                            "flex w-full cursor-pointer items-center gap-3 rounded-xl px-1 py-3 text-left transition-colors",
-                            checked ? "bg-subtle-99" : "hover:bg-subtle-99",
+                            "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors duration-150 ease-out hover:duration-[120ms]",
+                            checked ? "bg-offwhite-99" : "hover:bg-offwhite-99",
                           )}
                         >
-                          <VehicleArt kind={c.art} size={64} />
+                          <VehicleArt category={c.id} />
                           <span className="flex min-w-0 flex-1 flex-col">
-                            <span className="flex items-center gap-1.5 text-[17px] font-bold">
-                              {c.name}
+                            <span className="flex min-w-0 items-center gap-1.5 text-[17px] font-bold">
+                              <span className="truncate">{c.name}</span>
                               {c.seats > 0 ? (
                                 <span className="flex items-center gap-0.5 text-[13px] font-medium text-secondary-99">
                                   <Icon name="user" size={13} />
@@ -308,22 +314,25 @@ export function RideView() {
                                 <Icon name="info" size={14} className="text-secondary-99" />
                               )}
                             </span>
-                            <span className="truncate text-sm text-secondary-99">
+                            <span className="whitespace-nowrap text-sm text-secondary-99">
                               {route ? `${arrivalLabel(c.etaMin + mins)} · ${mins} min` : c.description}
                             </span>
                           </span>
-                          {c.negotiable ? (
+                          <span className="flex w-[128px] shrink-0 items-center justify-end">
+                          {pricing.loading ? (
+                            <PriceSkeleton />
+                          ) : c.negotiable ? (
                             <span className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
                               <button
                                 type="button"
                                 aria-label="Diminuir valor"
                                 disabled={!route}
                                 onClick={() => setNegotiated(Math.max(Math.round((rideFare(c, km) * 0.7) * 100) / 100, (negotiated ?? price) - 1))}
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-border-99 text-black-99 hover:bg-subtle-99 disabled:text-disabled-99"
+                                className="flex h-7 w-7 items-center justify-center rounded-full border border-border-99 text-black-99 transition-colors duration-[120ms] hover:bg-offwhite-99 disabled:text-disabled-99"
                               >
                                 <Icon name="minus" size={16} />
                               </button>
-                              <span className="min-w-[72px] text-center text-[17px] font-bold tabular-nums">
+                              <span className="min-w-[64px] text-center text-[17px] font-bold tabular-nums">
                                 {route ? formatBRL(negotiated ?? price) : "—"}
                               </span>
                               <button
@@ -331,7 +340,7 @@ export function RideView() {
                                 aria-label="Aumentar valor"
                                 disabled={!route}
                                 onClick={() => setNegotiated((negotiated ?? price) + 1)}
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-border-99 text-black-99 hover:bg-subtle-99 disabled:text-disabled-99"
+                                className="flex h-7 w-7 items-center justify-center rounded-full border border-border-99 text-black-99 transition-colors duration-[120ms] hover:bg-offwhite-99 disabled:text-disabled-99"
                               >
                                 <Icon name="plus" size={16} />
                               </button>
@@ -339,6 +348,7 @@ export function RideView() {
                           ) : (
                             <span className="shrink-0 text-[17px] font-bold tabular-nums">{route ? formatBRL(price) : "—"}</span>
                           )}
+                          </span>
                           <span
                             className={cx(
                               "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2",
@@ -380,7 +390,7 @@ export function RideView() {
                 />
               }
               action={
-                <Button size="lg" full disabled={blocked} price={route ? formatBRL(fare) : undefined} onClick={() => setPhase("searching")}>
+                <Button size="lg" full disabled={blocked || pricing.loading} price={route && !pricing.loading ? formatBRL(fare) : undefined} onClick={() => setPhase("searching")}>
                   Solicitar {selected.name}
                 </Button>
               }

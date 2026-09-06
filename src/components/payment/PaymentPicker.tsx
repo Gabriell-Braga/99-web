@@ -3,8 +3,9 @@
 import type { PaymentMethod } from "@/lib/types";
 import { cx } from "@/lib/cx";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { PaymentIcon } from "@/components/payment/PaymentIcon";
 
-const methods: { id: PaymentMethod; label: string; hint: string; icon: IconName }[] = [
+const methods: { id: PaymentMethod; label: string; hint: string; icon: IconName | "pix" }[] = [
   { id: "pix", label: "Pix", hint: "Aprovação na hora", icon: "pix" },
   { id: "cartao", label: "Cartão de crédito", hint: "Visa, Master, Elo", icon: "card" },
   { id: "dinheiro", label: "Dinheiro na entrega", hint: "Informe se precisa de troco", icon: "cash" },
@@ -30,8 +31,8 @@ export function PaymentPicker({ value, onChange, allowed, compact }: PaymentPick
             <label
               key={m.id}
               className={cx(
-                "flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-colors",
-                checked ? "border-black-99 bg-subtle-99" : "border-border-99 hover:bg-subtle-99",
+                "flex cursor-pointer items-center gap-3 rounded-xl border border-border-99 px-4 py-3 transition-colors duration-150 ease-out",
+                checked ? "bg-offwhite-99" : "hover:bg-offwhite-99",
               )}
             >
               <input
@@ -48,7 +49,7 @@ export function PaymentPicker({ value, onChange, allowed, compact }: PaymentPick
                   checked ? "bg-black-99 text-white" : "bg-offwhite-99 text-black-99",
                 )}
               >
-                <Icon name={m.icon} />
+                <PaymentIcon name={m.icon} />
               </span>
               <span className="flex min-w-0 flex-col">
                 <span className="font-semibold">{m.label}</span>

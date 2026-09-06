@@ -17,7 +17,7 @@ import { Icon } from "@/components/ui/Icon";
 import { EmptyState, BlockedHint, ErrorNote } from "@/components/ui/States";
 import { AddressPicker } from "@/components/comida/AddressPicker";
 import { PaymentPicker } from "@/components/payment/PaymentPicker";
-import { CardForm, cardIsValid, emptyCard, type CardData } from "@/components/payment/CardForm";
+import { CardForm, cardIsValid, demoCard, type CardData } from "@/components/payment/CardForm";
 import { PaymentFlow } from "@/components/payment/PaymentFlow";
 import { cx } from "@/lib/cx";
 
@@ -46,8 +46,8 @@ export function CheckoutView() {
   const restaurant = bag.restaurantSlug ? getRestaurant(bag.restaurantSlug) : undefined;
 
   const [mode, setMode] = useState<DeliveryMode>("padrao");
-  const [payment, setPayment] = useState<PaymentMethod | null>(null);
-  const [card, setCard] = useState<CardData>(emptyCard);
+  const [payment, setPayment] = useState<PaymentMethod | null>("cartao");
+  const [card, setCard] = useState<CardData>(demoCard);
   const [cardTouched, setCardTouched] = useState<Partial<Record<keyof CardData, boolean>>>({});
   const [couponInput, setCouponInput] = useState("");
   const [coupon, setCoupon] = useState<string | null>(null);
@@ -194,8 +194,8 @@ export function CheckoutView() {
                     <label
                       key={m.id}
                       className={cx(
-                        "flex cursor-pointer flex-col gap-0.5 rounded-xl border px-4 py-3 transition-colors",
-                        checked ? "border-black-99 bg-offwhite-99" : "border-border-99 hover:bg-subtle-99",
+                        "flex cursor-pointer flex-col gap-0.5 rounded-xl border border-border-99 px-4 py-3 transition-colors duration-150 ease-out",
+                        checked ? "bg-offwhite-99" : "hover:bg-offwhite-99",
                       )}
                     >
                       <input type="radio" name="entrega" className="sr-only" checked={checked} onChange={() => setMode(m.id)} />

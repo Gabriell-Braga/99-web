@@ -26,8 +26,8 @@ export function AddressPicker({ open, onClose }: { open: boolean; onClose: () =>
                 }}
                 aria-pressed={selected}
                 className={cx(
-                  "flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors",
-                  selected ? "border-black-99 bg-subtle-99" : "border-border-99 hover:bg-subtle-99",
+                  "flex w-full items-start gap-4 rounded-xl border border-border-99 p-4 text-left transition-colors duration-150 ease-out",
+                  selected ? "bg-offwhite-99" : "hover:bg-offwhite-99",
                 )}
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-offwhite-99">

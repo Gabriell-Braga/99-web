@@ -22,7 +22,8 @@ import { Modal } from "@/components/ui/Modal";
 import { Icon } from "@/components/ui/Icon";
 import { BlockedHint, ErrorNote, InfoNote } from "@/components/ui/States";
 import { PaymentPicker, paymentLabel } from "@/components/payment/PaymentPicker";
-import { CardForm, cardIsValid, emptyCard, type CardData } from "@/components/payment/CardForm";
+import { CardForm, cardIsValid, demoCard, type CardData } from "@/components/payment/CardForm";
+import { usePriceSkeleton, PriceSkeleton } from "@/components/ui/PriceSkeleton";
 import { PaymentFlow } from "@/components/payment/PaymentFlow";
 import { cx } from "@/lib/cx";
 
@@ -92,9 +93,9 @@ export function DeliveryView() {
   const [routeState, setRouteState] = useState<{ key: string; route: RouteResult } | null>(null);
   const [content, setContent] = useState("");
   const [size, setSize] = useState<PackageSize>("moto");
-  const [payment, setPayment] = useState<PaymentMethod>("pix");
+  const [payment, setPayment] = useState<PaymentMethod>("cartao");
   const [payOpen, setPayOpen] = useState(false);
-  const [card, setCard] = useState<CardData>(emptyCard);
+  const [card, setCard] = useState<CardData>(demoCard);
   const [cardTouched, setCardTouched] = useState<Partial<Record<keyof CardData, boolean>>>({});
   const [paying, setPaying] = useState(false);
   const [orderId] = useState(() => newOrderId("entrega"));
@@ -121,6 +122,7 @@ export function DeliveryView() {
   }, [a, b, routeKey]);
 
   const km = route?.distanceKm ?? 0;
+  const pricing = usePriceSkeleton(routeKey, Boolean(route));
   const fare = deliveryFare(km, size);
   const eta = deliveryEtaMin(km, route?.durationMin);
   const notCovered = [pickup.place, dropoff.place].find((p) => p && !p.covered);
@@ -233,22 +235,26 @@ export function DeliveryView() {
         <>
           {editing === "pickup" || (editing === null && !pickup.place) ? (
             <AddressSearch
+              key="pickup"
               placeholder={tab === "enviar" ? "Coletar em" : "Coletar de"}
               ariaLabel="Endereço de coleta"
               value={pickup.place}
               autoFocus
               currentLocation={current.place}
               currentLoading={current.status === "loading"}
+              position={current.position}
               onChange={(p, extras) => applyPlace("pickup", p, extras)}
             />
           ) : (
             <AddressSearch
+              key="dropoff"
               placeholder="Entregar para"
               ariaLabel="Endereço de entrega"
               value={dropoff.place}
               autoFocus
               currentLocation={tab === "receber" ? current.place : undefined}
               currentLoading={tab === "receber" && current.status === "loading"}
+              position={current.position}
               onChange={(p, extras) => applyPlace("dropoff", p, extras)}
             />
           )}
@@ -256,7 +262,7 @@ export function DeliveryView() {
             <button
               type="button"
               onClick={() => setEditing(tab === "enviar" ? "pickup" : "dropoff")}
-              className="flex items-center gap-3 rounded-xl py-2 text-left hover:bg-subtle-99"
+              className="flex items-center gap-4 rounded-xl px-4 py-3 text-left transition-colors duration-[120ms] hover:bg-offwhite-99"
             >
               <span
                 className={cx("h-4 w-4 shrink-0 rounded-full border-[3px] bg-white", tab === "enviar" ? "border-success-99" : "border-orange-99")}
@@ -329,20 +335,22 @@ export function DeliveryView() {
                     type="button"
                     aria-pressed={checked}
                     onClick={() => setSize(c.id)}
-                    className={cx("flex w-full items-center gap-3 rounded-xl px-1 py-3 text-left transition-colors", checked ? "bg-subtle-99" : "hover:bg-subtle-99")}
+                    className={cx("flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors duration-150 ease-out hover:duration-[120ms]", checked ? "bg-offwhite-99" : "hover:bg-offwhite-99")}
                   >
-                    <VehicleArt kind={c.art} size={64} />
+                    <VehicleArt category={c.id} />
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="flex items-center gap-1.5 text-[17px] font-bold">
-                        {c.name}
+                      <span className="flex min-w-0 items-center gap-1.5 text-[17px] font-bold">
+                        <span className="truncate">{c.name}</span>
                         <Icon name="info" size={14} className="text-secondary-99" />
                       </span>
-                      <span className="text-sm text-secondary-99">
+                      <span className="whitespace-nowrap text-sm text-secondary-99">
                         {c.dims} · {c.weight}
                         {route ? ` · ${eta.min}–${eta.max} min` : ""}
                       </span>
                     </span>
-                    <span className="shrink-0 text-[17px] font-bold tabular-nums">{route ? formatBRL(price) : "—"}</span>
+                    <span className="flex w-[100px] shrink-0 items-center justify-end text-[17px] font-bold tabular-nums">
+                      {pricing.loading ? <PriceSkeleton /> : route ? formatBRL(price) : "—"}
+                    </span>
                     <span
                       className={cx("flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", checked ? "border-black-99" : "border-border-99")}
                       aria-hidden="true"
@@ -377,7 +385,7 @@ export function DeliveryView() {
                 />
               }
               action={
-                <Button size="lg" full disabled={blocked} price={route ? `${formatBRL(fare)} · ${formatKm(km)}` : undefined} onClick={() => setPaying(true)}>
+                <Button size="lg" full disabled={blocked || pricing.loading} price={route && !pricing.loading ? `${formatBRL(fare)} · ${formatKm(km)}` : undefined} onClick={() => setPaying(true)}>
                   Confirmar
                 </Button>
               }
