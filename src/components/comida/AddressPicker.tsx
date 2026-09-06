@@ -1,20 +1,35 @@
 "use client";
 
-import { savedAddresses } from "@/data/addresses";
 import { useApp } from "@/context/AppProvider";
 import { Modal } from "@/components/ui/Modal";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Badge } from "@/components/ui/Chip";
 import { cx } from "@/lib/cx";
 
-const icons: Record<string, IconName> = { casa: "home", trabalho: "briefcase", sitio: "tree" };
+const icons: Record<string, IconName> = { atual: "target", casa: "home", trabalho: "briefcase", sitio: "tree" };
 
 export function AddressPicker({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { address, setAddress } = useApp();
+  const { address, addresses, setAddress } = useApp();
+  // Enquanto a posição não chega, a lista é a de exemplo e a localização atual ainda não entrou.
+  const localizando = !addresses.some((a) => a.id === "atual");
+
   return (
     <Modal open={open} onClose={onClose} title="Entregar em" width="sm">
       <ul className="flex flex-col gap-3" role="list">
-        {savedAddresses.map((a) => {
+        {localizando && (
+          <li>
+            <span className="flex w-full items-center gap-4 rounded-xl border border-border-99 p-4 opacity-70">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-offwhite-99">
+                <Icon name="target" className="text-info-99" />
+              </span>
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span className="font-semibold">Localização atual</span>
+                <span className="text-sm text-secondary-99">Obtendo sua posição…</span>
+              </span>
+            </span>
+          </li>
+        )}
+        {addresses.map((a) => {
           const selected = a.id === address.id;
           return (
             <li key={a.id}>
@@ -31,7 +46,7 @@ export function AddressPicker({ open, onClose }: { open: boolean; onClose: () =>
                 )}
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-offwhite-99">
-                  <Icon name={icons[a.id] ?? "pin"} />
+                  <Icon name={icons[a.id] ?? "pin"} className={a.id === "atual" ? "text-info-99" : undefined} />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="flex items-center gap-2">
@@ -50,7 +65,8 @@ export function AddressPicker({ open, onClose }: { open: boolean; onClose: () =>
         })}
       </ul>
       <p className="mt-4 text-[13px] text-muted-99">
-        Protótipo: os endereços são fixos. O último serve para demonstrar o aviso de endereço fora do raio de entrega.
+        Protótipo: os endereços saem da sua localização atual. O último fica longe para demonstrar o aviso de endereço
+        fora do raio de entrega.
       </p>
     </Modal>
   );

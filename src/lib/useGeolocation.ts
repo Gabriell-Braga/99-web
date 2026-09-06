@@ -13,7 +13,7 @@ export interface CurrentLocation {
  * Localização atual do navegador com endereço reverso. Se o usuário negar
  * ou o navegador não suportar, usa um ponto padrão em São Paulo e informa.
  */
-export function useCurrentLocation(): CurrentLocation {
+export function useCurrentLocation(enabled = true): CurrentLocation {
   const [state, setState] = useState<CurrentLocation>({
     status: "loading",
     position: DEFAULT_LOCATION,
@@ -21,6 +21,7 @@ export function useCurrentLocation(): CurrentLocation {
   });
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
     const controller = new AbortController();
 
@@ -49,7 +50,7 @@ export function useCurrentLocation(): CurrentLocation {
       cancelled = true;
       controller.abort();
     };
-  }, []);
+  }, [enabled]);
 
   return state;
 }

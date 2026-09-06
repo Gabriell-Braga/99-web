@@ -8,12 +8,17 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import type { Bag, BagLine, Order, SavedAddress } from "@/lib/types";
 import { savedAddresses } from "@/data/addresses";
+import { useCurrentLocation } from "@/lib/useGeolocation";
+import { useSavedAddresses } from "@/lib/useSavedAddresses";
 import { demoOrders } from "@/data/demoOrders";
 
 interface AppState {
   address: SavedAddress;
+  /** Endereços de entrega, montados em volta da posição atual. */
+  addresses: SavedAddress[];
   setAddress: (a: SavedAddress) => void;
   bag: Bag;
   addLine: (restaurantSlug: string, line: Omit<BagLine, "lineId">) => "added" | "conflict";
@@ -35,7 +40,14 @@ function nextLineId() {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [address, setAddress] = useState<SavedAddress>(savedAddresses[0]);
+  // Só o fluxo de comida precisa do endereço, então a posição é pedida ali.
+  const pathname = usePathname();
+  const current = useCurrentLocation(pathname.startsWith("/comida"));
+  const located = useSavedAddresses(current);
+  const addresses = located.length > 0 ? located : savedAddresses;
+  const [chosenId, setChosenId] = useState<string>(savedAddresses[0].id);
+  const address = addresses.find((a) => a.id === chosenId) ?? addresses[0];
+  const setAddress = useCallback((a: SavedAddress) => setChosenId(a.id), []);
   const [bag, setBag] = useState<Bag>({ restaurantSlug: null, lines: [] });
   const [orders, setOrders] = useState<Record<string, Order>>({});
 
@@ -87,6 +99,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AppState>(
     () => ({
       address,
+      addresses,
       setAddress,
       bag,
       addLine,
@@ -98,7 +111,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       saveOrder,
       getOrder,
     }),
-    [address, bag, addLine, replaceBag, updateQuantity, removeLine, clearBag, orders, saveOrder, getOrder],
+    [address, addresses, setAddress, bag, addLine, replaceBag, updateQuantity, removeLine, clearBag, orders, saveOrder, getOrder],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
