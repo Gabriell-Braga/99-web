@@ -81,6 +81,7 @@ export default function RealMap({
   searching,
   userLocation,
   interactive = true,
+  attribution = true,
   center,
   zoom = 14,
 }: MapViewProps) {
@@ -105,7 +106,7 @@ export default function RealMap({
       interactive,
       attributionControl: false,
     });
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    if (attribution) map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
 
     map.on("load", () => {
       const style = map.getStyle();
@@ -181,16 +182,20 @@ export default function RealMap({
         markersRef.current.push(m);
       };
 
-      // O ponto azul some quando a origem está no mesmo lugar, para não cobrir o círculo verde.
-      const userIsOrigin = Boolean(userLocation && origin && haversineKm(userLocation, origin) < 0.03);
-      if (userLocation && !userIsOrigin) add(userDot(), userLocation);
-      if (origin && searching) add(pulse(), origin);
-
-      const ends = map.getSource(ENDS_SOURCE) as maplibregl.GeoJSONSource | undefined;
-      ends?.setData(endpointsData(origin, destination));
-
       // Só geometria real de rota. Reta entre dois pontos nunca é desenhada.
       const line: LatLng[] = route && route.length > 1 ? route : [];
+      // A rota começa e termina onde a rua permite parar, alguns metros do endereço.
+      // Os círculos seguem a ponta da linha, senão a bolinha fica solta longe dela.
+      const startPoint = line.length > 1 ? line[0] : origin;
+      const endPoint = line.length > 1 ? line[line.length - 1] : destination;
+
+      // O ponto azul some quando a origem está no mesmo lugar, para não cobrir o círculo verde.
+      const userIsOrigin = Boolean(userLocation && startPoint && haversineKm(userLocation, startPoint) < 0.03);
+      if (userLocation && !userIsOrigin) add(userDot(), userLocation);
+      if (startPoint && searching) add(pulse(), startPoint);
+
+      const ends = map.getSource(ENDS_SOURCE) as maplibregl.GeoJSONSource | undefined;
+      ends?.setData(endpointsData(startPoint, endPoint));
       const source = map.getSource(ROUTE_SOURCE) as maplibregl.GeoJSONSource | undefined;
       if (drawRef.current) cancelAnimationFrame(drawRef.current);
       if (source) {

@@ -11,7 +11,7 @@ export function Footer() {
           <p className="text-sm text-secondary-99">
             Conceito independente, sem vínculo com a 99 ou com a DiDi. Criado para fim
             demonstrativo e de portfólio. Nenhum pedido, corrida, entrega ou pagamento nesta
-            página é real. Mapa por OpenStreetMap.
+            página é real. Mapa por OpenStreetMap e OpenFreeMap.
           </p>
         </div>
 

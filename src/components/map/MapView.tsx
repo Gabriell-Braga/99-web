@@ -23,6 +23,8 @@ export interface MapViewProps {
   /** Ponto azul da localização atual do usuário. */
   userLocation?: LatLng | null;
   interactive?: boolean;
+  /** Crédito do mapa sobre o canvas. Desligado onde a página já credita no rodapé. */
+  attribution?: boolean;
   center?: LatLng;
   zoom?: number;
   className?: string;
