@@ -106,12 +106,6 @@ const paths: Record<string, React.ReactNode> = {
     </>
   ),
   skipForward: <path d="M6 5v14l9-7-9-7ZM18 5v14" />,
-  pix: (
-    <>
-      <path d="m12 3 3.5 3.5h2L21 10v4l-3.5 3.5h-2L12 21l-3.5-3.5h-2L3 14v-4l3.5-3.5h2L12 3Z" />
-      <path d="m8.5 8.5 3.5 3.5 3.5-3.5M8.5 15.5l3.5-3.5 3.5 3.5" />
-    </>
-  ),
   card: (
     <>
       <rect x="3" y="6" width="18" height="13" rx="2" />

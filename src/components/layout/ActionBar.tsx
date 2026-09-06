@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Icon } from "@/components/ui/Icon";
+import { PaymentIcon } from "@/components/payment/PaymentIcon";
 
 interface ActionBarProps {
   /** Coluna esquerda: meio de pagamento ou valor total. */
@@ -65,7 +66,7 @@ export function PaymentBlock({
       aria-label={`Pagamento: ${label}${detail ? ` ${detail}` : ""}. Trocar`}
     >
       <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-offwhite-99 text-black-99">
-        <Icon name={icon} size={20} />
+        <PaymentIcon name={icon} size={20} />
       </span>
       <span className="flex flex-col leading-tight">
         <span className="text-[15px] font-bold">{label}</span>
