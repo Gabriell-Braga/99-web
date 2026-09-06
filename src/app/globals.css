@@ -116,6 +116,22 @@ body {
   }
 }
 
+/* Barra de rolagem do painel lateral: fina e discreta, sem a nativa do sistema. */
+.panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #eaeaea transparent;
+}
+.panel-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.panel-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: #eaeaea;
+  border-radius: 3px;
+}
+
 /* Trilho horizontal sem barra de rolagem visível. */
 .scroll-rail {
   scrollbar-width: none;
@@ -135,33 +151,17 @@ body {
   }
 }
 
-/* Mapa (Leaflet) */
-.leaflet-container {
+/* Mapa (MapLibre) */
+.maplibregl-map {
   font-family: var(--font-sans);
   background: #edeff2;
 }
-/* Mapa claro e dessaturado, para o amarelo e o verde se destacarem sobre ele. */
-.leaflet-tile-pane {
-  filter: saturate(0.12) brightness(1.04) contrast(0.92);
-}
-.leaflet-tooltip.map-tip {
-  border: 0;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #212121;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-}
-.leaflet-tooltip.map-tip::before {
-  display: none;
-}
-.leaflet-control-attribution {
+.maplibregl-ctrl-attrib {
   font-size: 10px;
   background: rgba(255, 255, 255, 0.8);
 }
-.leaflet-bar a {
-  color: #212121;
+.maplibregl-ctrl-attrib a {
+  color: #6f6f6f;
 }
 .map-pulse {
   display: block;

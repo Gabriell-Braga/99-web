@@ -1,64 +1,73 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { pointAlong, type LatLng } from "@/lib/geo";
+import * as maplibregl from "maplibre-gl";
+import type { Map as MLMap, Marker } from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+import { haversineKm, pointAlong, type LatLng } from "@/lib/geo";
 import type { MapViewProps } from "@/components/map/MapView";
 
-const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+/** Estilo Positron servido pelo OpenFreeMap, sem chave. */
+const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
-function originIcon() {
-  return L.divIcon({
-    className: "",
-    html: '<svg width="24" height="24" viewBox="0 0 24 24" overflow="visible" style="display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))"><circle cx="12" cy="12" r="8" fill="#fff" stroke="#00C853" stroke-width="3.5"/></svg>',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-  });
-}
+const ROUTE_SOURCE = "route";
+const ROUTE_LAYER = "route-line";
 
-function destinationIcon(accent: string) {
-  return L.divIcon({
-    className: "",
-    // Pino com margem interna: traço e sombra nunca encostam na borda do SVG.
-    html: `<svg width="40" height="48" viewBox="0 0 40 48" overflow="visible" style="display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))"><path d="M20 44 C 9.5 31.5, 6 24, 6 18 A 14 14 0 0 1 34 18 C 34 24, 30.5 31.5, 20 44 Z" fill="${accent}" stroke="#212121" stroke-width="2.5" stroke-linejoin="round"/><circle cx="20" cy="18" r="5" fill="#212121"/></svg>`,
-    iconSize: [40, 48],
-    iconAnchor: [20, 44],
-  });
-}
+/** Camadas escondidas em todos os zooms: POIs, rótulos de edifício, números de endereço, transporte e comércio. */
+const HIDDEN_LAYER = /poi|housenumber|house_number|transit|shop|building.*(label|name)|(label|name).*building/i;
+/** Rótulos de rua só a partir do zoom 15. */
+const ROAD_LABEL = /^highway-name|road.*(name|label)/i;
 
-function userIcon() {
-  return L.divIcon({
-    className: "",
-    html: '<svg width="32" height="32" viewBox="0 0 32 32" overflow="visible" style="display:block"><circle cx="16" cy="16" r="14" fill="rgba(16,133,212,.2)"/><circle cx="16" cy="16" r="7" fill="#1085D4" stroke="#fff" stroke-width="3"/></svg>',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-  });
-}
-
-const vehiclePaths: Record<NonNullable<MapViewProps["vehicle"]>, string> = {
-  car: '<path d="M4 15l1.5-5.5A2 2 0 0 1 7.4 8h9.2a2 2 0 0 1 1.9 1.5L20 15v4H4v-4Z"/><path d="M4 15h16"/><circle cx="8" cy="15.5" r="1"/><circle cx="16" cy="15.5" r="1"/>',
-  moto: '<circle cx="5.5" cy="16.5" r="3"/><circle cx="18.5" cy="16.5" r="3"/><path d="M5.5 16.5 9 10h4l2.5 6.5M13 10l2-3h3M9 10H6.5"/>',
-  bag: '<path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+const vehicleImage: Record<NonNullable<MapViewProps["vehicle"]>, string> = {
+  car: "/vehicles/car-white.png",
+  moto: "/vehicles/moto-white.png",
+  bag: "/vehicles/moto-box.png",
 };
 
-function vehicleIcon(kind: NonNullable<MapViewProps["vehicle"]>) {
-  return L.divIcon({
-    className: "",
-    html: `<svg width="48" height="48" viewBox="0 0 48 48" overflow="visible" style="display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.2))"><circle cx="24" cy="24" r="20" fill="#fff" stroke="#212121" stroke-width="2.5"/><g transform="translate(12 12)" fill="none" stroke="#212121" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${vehiclePaths[kind]}</g></svg>`,
-    iconSize: [48, 48],
-    iconAnchor: [24, 24],
-  });
+function dot(color: string, halo: boolean): HTMLElement {
+  const el = document.createElement("span");
+  el.style.cssText = "position:relative;display:block;width:32px;height:32px;pointer-events:none";
+  if (halo) {
+    const h = document.createElement("span");
+    h.style.cssText = "position:absolute;inset:0;border-radius:50%;background:rgba(0,200,83,.2)";
+    el.appendChild(h);
+  }
+  const c = document.createElement("span");
+  c.style.cssText = `position:absolute;left:8px;top:8px;width:16px;height:16px;border-radius:50%;background:${color};box-shadow:0 0 0 3px #fff`;
+  el.appendChild(c);
+  return el;
 }
 
-function searchingIcon(accent: string) {
-  return L.divIcon({
-    className: "",
-    html: `<span class="map-pulse" style="--pulse:${accent}"></span>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-  });
+function pulse(): HTMLElement {
+  const el = document.createElement("span");
+  el.className = "map-pulse";
+  el.style.setProperty("--pulse", "#FFDD00");
+  return el;
+}
+
+function userDot(): HTMLElement {
+  const el = document.createElement("span");
+  el.style.cssText =
+    "display:block;width:14px;height:14px;border-radius:50%;background:#2E7BFF;box-shadow:0 0 0 3px #fff,0 0 0 9px rgba(46,123,255,.2);pointer-events:none";
+  return el;
+}
+
+function vehicleEl(kind: NonNullable<MapViewProps["vehicle"]>): HTMLElement {
+  const img = document.createElement("img");
+  img.src = vehicleImage[kind];
+  img.alt = "";
+  img.width = 48;
+  img.height = 48;
+  img.style.cssText = "display:block;width:48px;height:48px;object-fit:contain;pointer-events:none";
+  return img;
+}
+
+function lineFeature(points: LatLng[]): GeoJSON.Feature<GeoJSON.LineString> {
+  return {
+    type: "Feature",
+    properties: {},
+    geometry: { type: "LineString", coordinates: points.map((p) => [p.lng, p.lat]) },
+  };
 }
 
 export default function RealMap({
@@ -67,7 +76,6 @@ export default function RealMap({
   route,
   progress,
   vehicle = "car",
-  accent = "orange",
   searching,
   userLocation,
   interactive = true,
@@ -75,36 +83,60 @@ export default function RealMap({
   zoom = 14,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const layersRef = useRef<L.LayerGroup | null>(null);
-  const vehicleRef = useRef<L.Marker | null>(null);
+  const mapRef = useRef<MLMap | null>(null);
+  const readyRef = useRef(false);
+  const markersRef = useRef<Marker[]>([]);
+  const vehicleRef = useRef<Marker | null>(null);
   const animRef = useRef<number | null>(null);
+  const drawRef = useRef<number | null>(null);
   const currentRef = useRef(0);
-  const accentHex = accent === "yellow" ? "#FFDD00" : "#FC4C02";
+  const pendingRef = useRef<(() => void) | null>(null);
 
   // Cria o mapa uma vez.
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
-    const map = L.map(containerRef.current, {
-      zoomControl: interactive,
-      dragging: interactive,
-      scrollWheelZoom: interactive,
-      doubleClickZoom: interactive,
-      touchZoom: interactive,
-      keyboard: interactive,
-      attributionControl: true,
-    }).setView([center?.lat ?? -23.5535, center?.lng ?? -46.6889], zoom);
-    L.tileLayer(TILES, { attribution: ATTRIBUTION, maxZoom: 19 }).addTo(map);
-    if (interactive) map.zoomControl.setPosition("bottomright");
-    layersRef.current = L.layerGroup().addTo(map);
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: STYLE,
+      center: [center?.lng ?? -46.6889, center?.lat ?? -23.5535],
+      zoom,
+      interactive,
+      attributionControl: false,
+    });
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    map.on("error", (e) => console.error("[mapa]", e.error?.message ?? e));
+
+    map.on("load", () => {
+      const style = map.getStyle();
+      for (const layer of style.layers ?? []) {
+        if (HIDDEN_LAYER.test(layer.id)) map.setLayoutProperty(layer.id, "visibility", "none");
+        if (ROAD_LABEL.test(layer.id) && layer.type === "symbol") map.setLayerZoomRange(layer.id, 15, 24);
+      }
+      map.addSource(ROUTE_SOURCE, { type: "geojson", data: lineFeature([]) });
+      map.addLayer({
+        id: ROUTE_LAYER,
+        type: "line",
+        source: ROUTE_SOURCE,
+        layout: { "line-cap": "round", "line-join": "round" },
+        paint: { "line-color": "#00C853", "line-width": 6 },
+      });
+      readyRef.current = true;
+      containerRef.current?.setAttribute("data-map-ready", "true");
+      pendingRef.current?.();
+      pendingRef.current = null;
+    });
+
     mapRef.current = map;
-    const ro = new ResizeObserver(() => map.invalidateSize());
+    const ro = new ResizeObserver(() => map.resize());
     ro.observe(containerRef.current);
     return () => {
       ro.disconnect();
+      if (drawRef.current) cancelAnimationFrame(drawRef.current);
+      if (animRef.current) cancelAnimationFrame(animRef.current);
       map.remove();
       mapRef.current = null;
-      layersRef.current = null;
+      readyRef.current = false;
+      markersRef.current = [];
       vehicleRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,76 +145,90 @@ export default function RealMap({
   // Marcadores, rota e enquadramento.
   const routeKey = route ? `${route.length}:${route[0]?.lat},${route[0]?.lng}:${route[route.length - 1]?.lat}` : "";
   useEffect(() => {
-    const map = mapRef.current;
-    const group = layersRef.current;
-    if (!map || !group) return;
-    group.clearLayers();
-    vehicleRef.current = null;
+    const apply = () => {
+      const map = mapRef.current;
+      if (!map) return;
+      markersRef.current.forEach((m) => m.remove());
+      markersRef.current = [];
+      vehicleRef.current?.remove();
+      vehicleRef.current = null;
 
-    const bounds: L.LatLngExpression[] = [];
+      const add = (el: HTMLElement, p: LatLng) => {
+        const m = new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([p.lng, p.lat]).addTo(map);
+        markersRef.current.push(m);
+      };
 
-    if (userLocation) {
-      L.marker([userLocation.lat, userLocation.lng], { icon: userIcon(), interactive: false, keyboard: false, zIndexOffset: -10 }).addTo(group);
-      if (!origin && !destination) bounds.push([userLocation.lat, userLocation.lng]);
-    }
+      if (userLocation) add(userDot(), userLocation);
+      if (origin && searching) add(pulse(), origin);
+      if (origin) add(dot("#00C853", true), origin);
+      if (destination) add(dot("#FC4C02", false), destination);
 
-    const line: LatLng[] = route && route.length > 1 ? route : origin && destination ? [origin, destination] : [];
-    if (line.length > 1) {
-      const latlngs = line.map((p) => [p.lat, p.lng] as L.LatLngExpression);
-      L.polyline(latlngs, { color: "#ffffff", weight: 10, opacity: 0.9, lineCap: "round", lineJoin: "round" }).addTo(group);
-      L.polyline(latlngs, { color: "#00C853", weight: 6, lineCap: "round", lineJoin: "round" }).addTo(group);
-      bounds.push(...latlngs);
-    }
-
-    if (origin) {
-      if (searching) {
-        L.marker([origin.lat, origin.lng], { icon: searchingIcon("#FFDD00"), interactive: false, keyboard: false }).addTo(group);
+      const line: LatLng[] = route && route.length > 1 ? route : origin && destination ? [origin, destination] : [];
+      const source = map.getSource(ROUTE_SOURCE) as maplibregl.GeoJSONSource | undefined;
+      if (drawRef.current) cancelAnimationFrame(drawRef.current);
+      if (source) {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (line.length < 2 || reduce) {
+          source.setData(lineFeature(line));
+        } else {
+          // A linha desenha do início ao fim em 500ms, por distância percorrida.
+          const cum: number[] = [0];
+          for (let i = 1; i < line.length; i++) cum.push(cum[i - 1] + haversineKm(line[i - 1], line[i]));
+          const total = cum[cum.length - 1] || 1;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const t = Math.min(1, (now - start) / 500);
+            const reach = total * t;
+            const partial = line.filter((_, i) => cum[i] <= reach);
+            if (t < 1) partial.push(pointAlong(line, t));
+            source.setData(lineFeature(partial.length >= 2 ? partial : line.slice(0, 2)));
+            if (t < 1) drawRef.current = requestAnimationFrame(tick);
+          };
+          drawRef.current = requestAnimationFrame(tick);
+        }
       }
-      L.marker([origin.lat, origin.lng], { icon: originIcon(), interactive: false, keyboard: false })
-        .addTo(group)
-        .bindTooltip(origin.label ?? "Origem", { direction: "top", offset: [0, -14], className: "map-tip" });
-      bounds.push([origin.lat, origin.lng]);
-    }
-    if (destination) {
-      L.marker([destination.lat, destination.lng], { icon: destinationIcon(accentHex), interactive: false, keyboard: false })
-        .addTo(group)
-        .bindTooltip(destination.label ?? "Destino", { direction: "top", offset: [0, -44], className: "map-tip" });
-      bounds.push([destination.lat, destination.lng]);
-    }
 
-    if (bounds.length >= 2) {
-      map.fitBounds(L.latLngBounds(bounds), { padding: [56, 56], maxZoom: 16 });
-    } else if (bounds.length === 1) {
-      map.setView(bounds[0], 15);
-    }
+      const pts: LatLng[] = [...line];
+      if (origin) pts.push(origin);
+      if (destination) pts.push(destination);
+      if (pts.length === 0 && userLocation) pts.push(userLocation);
+      if (pts.length >= 2) {
+        const b = new maplibregl.LngLatBounds();
+        pts.forEach((p) => b.extend([p.lng, p.lat]));
+        map.fitBounds(b, { padding: 80, duration: 600, maxZoom: 16 });
+      } else if (pts.length === 1) {
+        map.easeTo({ center: [pts[0].lng, pts[0].lat], zoom: 15, duration: 600 });
+      }
+    };
+    if (readyRef.current) apply();
+    else pendingRef.current = apply;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin?.lat, origin?.lng, origin?.label, destination?.lat, destination?.lng, destination?.label, routeKey, searching, userLocation?.lat, userLocation?.lng, accentHex]);
+  }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, routeKey, searching, userLocation?.lat, userLocation?.lng]);
 
   // Veículo percorrendo o trajeto.
   useEffect(() => {
     const map = mapRef.current;
-    const group = layersRef.current;
-    if (!map || !group) return;
+    if (!map) return;
     const line: LatLng[] = route && route.length > 1 ? route : origin && destination ? [origin, destination] : [];
     if (progress === undefined || line.length === 0) {
-      if (vehicleRef.current) {
-        group.removeLayer(vehicleRef.current);
-        vehicleRef.current = null;
-      }
+      vehicleRef.current?.remove();
+      vehicleRef.current = null;
       return;
     }
     if (!vehicleRef.current) {
       const start = pointAlong(line, currentRef.current);
-      vehicleRef.current = L.marker([start.lat, start.lng], { icon: vehicleIcon(vehicle), interactive: false, keyboard: false, zIndexOffset: 100 }).addTo(group);
+      vehicleRef.current = new maplibregl.Marker({ element: vehicleEl(vehicle), anchor: "center" })
+        .setLngLat([start.lng, start.lat])
+        .addTo(map);
     }
-    const marker = vehicleRef.current;
+    const marker = vehicleRef.current!;
     const target = Math.max(0, Math.min(1, progress));
     const from = currentRef.current;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce || Math.abs(target - from) < 0.001) {
       currentRef.current = target;
       const p = pointAlong(line, target);
-      marker.setLatLng([p.lat, p.lng]);
+      marker.setLngLat([p.lng, p.lat]);
       return;
     }
     const duration = 1800;
@@ -193,7 +239,7 @@ export default function RealMap({
       const v = from + (target - from) * ease(t);
       currentRef.current = v;
       const p = pointAlong(line, v);
-      marker.setLatLng([p.lat, p.lng]);
+      marker.setLngLat([p.lng, p.lat]);
       if (t < 1) animRef.current = requestAnimationFrame(tick);
     };
     animRef.current = requestAnimationFrame(tick);
