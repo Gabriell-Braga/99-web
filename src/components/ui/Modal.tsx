@@ -28,7 +28,6 @@ export function Modal({
   children,
   footer,
   width = "md",
-  sheetOnMobile = true,
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
@@ -79,6 +78,7 @@ export function Modal({
   }, [open, onClose]);
 
   const transition = { duration: reduce ? 0 : 0.2, ease: [0.4, 0, 0.2, 1] as const };
+  const scrim = { duration: reduce ? 0 : 0.15 };
 
   return (
     <AnimatePresence>
@@ -88,7 +88,7 @@ export function Modal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={transition}
+          transition={scrim}
         >
           <button
             type="button"
@@ -103,9 +103,9 @@ export function Modal({
             aria-modal="true"
             aria-labelledby={titleId}
             tabIndex={-1}
-            initial={reduce ? false : { y: sheetOnMobile ? 40 : 12, opacity: 0 }}
+            initial={reduce ? false : { y: 8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: sheetOnMobile ? 40 : 12, opacity: 0 }}
+            exit={{ y: 8, opacity: 0 }}
             transition={transition}
             className={cx(
               "relative flex max-h-[92dvh] w-full flex-col bg-white shadow-high focus:outline-none",

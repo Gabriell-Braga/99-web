@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cx } from "@/lib/cx";
+import { CountBubble } from "@/components/ui/CountBubble";
 
 type Variant = "primary" | "secondary" | "ghost" | "icon" | "text";
 type Size = "sm" | "md" | "lg";
@@ -10,7 +11,7 @@ type Size = "sm" | "md" | "lg";
  * pílula. Laranja não é fundo de botão.
  */
 const base =
-  "inline-flex items-center justify-center gap-2 font-bold whitespace-nowrap select-none transition-colors duration-150 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 font-bold whitespace-nowrap select-none transition-[background-color,transform] duration-150 active:scale-[0.98] active:duration-100 disabled:cursor-not-allowed motion-reduce:active:scale-100";
 
 const variants: Record<Variant, string> = {
   primary:
@@ -63,14 +64,7 @@ function Content({
     return (
       <>
         <span>{children}</span>
-        <span
-          className={cx(
-            "flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-bold",
-            variant === "secondary" ? "bg-white text-black-99" : "bg-black-99 text-white",
-          )}
-        >
-          {count}
-        </span>
+        <CountBubble count={count} className={cx("h-6 min-w-6 px-1.5 text-xs", variant === "secondary" && "bg-white text-black-99")} />
       </>
     );
   }
