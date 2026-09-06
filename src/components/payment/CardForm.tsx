@@ -11,6 +11,9 @@ export interface CardData {
 
 export const emptyCard: CardData = { number: "", name: "", expiry: "", cvv: "" };
 
+/** Cartão de demonstração já salvo, terminado em 4321. */
+export const demoCard: CardData = { number: "4111 1111 1111 4321", name: "Gabriel Braga", expiry: "12/30", cvv: "123" };
+
 export function cardErrors(c: CardData, touched: Partial<Record<keyof CardData, boolean>>) {
   const digits = c.number.replace(/\D/g, "");
   const errors: Partial<Record<keyof CardData, string>> = {};

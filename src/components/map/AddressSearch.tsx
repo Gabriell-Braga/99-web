@@ -3,7 +3,9 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { searchAddress, type GeoPlace } from "@/lib/geo";
 import { parseAddress, type ParsedAddress } from "@/lib/parseAddress";
-import { recentAddresses, type RecentAddress } from "@/data/addresses";
+import type { RecentAddress } from "@/data/addresses";
+import { useRecents } from "@/lib/useRecents";
+import type { LatLng } from "@/lib/geo";
 import { formatPhone } from "@/lib/format";
 import { Icon } from "@/components/ui/Icon";
 import { cx } from "@/lib/cx";
@@ -27,6 +29,8 @@ interface AddressSearchProps {
   autoFocus?: boolean;
   /** Mostra os endereços recentes antes de digitar. */
   showRecents?: boolean;
+  /** Posição atual: os recentes são gerados a 3–6 km dela. */
+  position?: LatLng | null;
 }
 
 type Status = "idle" | "loading" | "error";
@@ -63,7 +67,9 @@ export function AddressSearch({
   currentLoading,
   autoFocus,
   showRecents = true,
+  position = null,
 }: AddressSearchProps) {
+  const recentAddresses = useRecents(position);
   const [text, setText] = useState(value ? value.title : "");
   const [prevValue, setPrevValue] = useState(value);
   const [open, setOpen] = useState(false);
@@ -258,7 +264,7 @@ export function AddressSearch({
           className="absolute left-0 right-0 top-full z-20 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-border-99 bg-white py-2"
         >
           {!typing && recents.length > 0 && (
-            <li className="px-4 pb-1 pt-2 text-[13px] text-secondary-99" role="presentation">
+            <li className="px-6 pb-1 pt-2 text-[13px] text-secondary-99" role="presentation">
               Endereços recentes
             </li>
           )}
@@ -276,8 +282,8 @@ export function AddressSearch({
                 onClick={() => choose(i)}
                 onMouseEnter={() => setHighlight(i)}
                 className={cx(
-                  "flex cursor-pointer items-start gap-3 px-4 py-3",
-                  active && "bg-subtle-99",
+                  "mx-2 flex cursor-pointer items-start gap-3 rounded-xl px-4 py-3 transition-colors duration-[120ms]",
+                  active && "bg-offwhite-99",
                   it.kind === "current" && !it.place && "cursor-default opacity-70",
                 )}
               >
