@@ -12,6 +12,9 @@ const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
 const ROUTE_SOURCE = "route";
 const ROUTE_LAYER = "route-line";
+const ENDS_SOURCE = "endpoints";
+const ENDS_HALO_LAYER = "endpoint-halo";
+const ENDS_DOT_LAYER = "endpoint-dot";
 
 /** Camadas escondidas em todos os zooms: POIs, rótulos de edifício, números de endereço, transporte e comércio. */
 const HIDDEN_LAYER = /poi|housenumber|house_number|transit|shop|building.*(label|name)|(label|name).*building/i;
@@ -23,20 +26,6 @@ const vehicleImage: Record<NonNullable<MapViewProps["vehicle"]>, string> = {
   moto: "/vehicles/moto-white.png",
   bag: "/vehicles/moto-box.png",
 };
-
-function dot(color: string, halo: boolean): HTMLElement {
-  const el = document.createElement("span");
-  el.style.cssText = "position:relative;display:block;width:32px;height:32px;pointer-events:none";
-  if (halo) {
-    const h = document.createElement("span");
-    h.style.cssText = "position:absolute;inset:0;border-radius:50%;background:rgba(0,200,83,.2)";
-    el.appendChild(h);
-  }
-  const c = document.createElement("span");
-  c.style.cssText = `position:absolute;left:8px;top:8px;width:16px;height:16px;border-radius:50%;background:${color};box-shadow:0 0 0 3px #fff`;
-  el.appendChild(c);
-  return el;
-}
 
 function pulse(): HTMLElement {
   const el = document.createElement("span");
@@ -68,6 +57,19 @@ function lineFeature(points: LatLng[]): GeoJSON.Feature<GeoJSON.LineString> {
     properties: {},
     geometry: { type: "LineString", coordinates: points.map((p) => [p.lng, p.lat]) },
   };
+}
+
+/**
+ * Origem e destino como pontos do próprio mapa, no mesmo espaço da linha da
+ * rota. Assim o círculo cai exatamente na ponta do traçado em qualquer zoom.
+ */
+function endpointsData(origin?: LatLng | null, destination?: LatLng | null): GeoJSON.FeatureCollection<GeoJSON.Point> {
+  const features: GeoJSON.Feature<GeoJSON.Point>[] = [];
+  const add = (p: LatLng, role: "origin" | "destination") =>
+    features.push({ type: "Feature", properties: { role }, geometry: { type: "Point", coordinates: [p.lng, p.lat] } });
+  if (origin) add(origin, "origin");
+  if (destination) add(destination, "destination");
+  return { type: "FeatureCollection", features };
 }
 
 export default function RealMap({
@@ -104,7 +106,6 @@ export default function RealMap({
       attributionControl: false,
     });
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
-    map.on("error", (e) => console.error("[mapa]", e.error?.message ?? e));
 
     map.on("load", () => {
       const style = map.getStyle();
@@ -112,6 +113,7 @@ export default function RealMap({
         if (HIDDEN_LAYER.test(layer.id)) map.setLayoutProperty(layer.id, "visibility", "none");
         if (ROAD_LABEL.test(layer.id) && layer.type === "symbol") map.setLayerZoomRange(layer.id, 15, 24);
       }
+
       map.addSource(ROUTE_SOURCE, { type: "geojson", data: lineFeature([]) });
       map.addLayer({
         id: ROUTE_LAYER,
@@ -120,6 +122,27 @@ export default function RealMap({
         layout: { "line-cap": "round", "line-join": "round" },
         paint: { "line-color": "#00C853", "line-width": 6 },
       });
+
+      map.addSource(ENDS_SOURCE, { type: "geojson", data: endpointsData() });
+      map.addLayer({
+        id: ENDS_HALO_LAYER,
+        type: "circle",
+        source: ENDS_SOURCE,
+        filter: ["==", ["get", "role"], "origin"],
+        paint: { "circle-radius": 16, "circle-color": "#00C853", "circle-opacity": 0.2 },
+      });
+      map.addLayer({
+        id: ENDS_DOT_LAYER,
+        type: "circle",
+        source: ENDS_SOURCE,
+        paint: {
+          "circle-radius": 8,
+          "circle-color": ["match", ["get", "role"], "origin", "#00C853", "#FC4C02"],
+          "circle-stroke-width": 3,
+          "circle-stroke-color": "#ffffff",
+        },
+      });
+
       readyRef.current = true;
       containerRef.current?.setAttribute("data-map-ready", "true");
       pendingRef.current?.();
@@ -142,7 +165,7 @@ export default function RealMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Marcadores, rota e enquadramento.
+  // Pontas, rota e enquadramento.
   const routeKey = route ? `${route.length}:${route[0]?.lat},${route[0]?.lng}:${route[route.length - 1]?.lat}` : "";
   useEffect(() => {
     const apply = () => {
@@ -158,10 +181,13 @@ export default function RealMap({
         markersRef.current.push(m);
       };
 
-      if (userLocation) add(userDot(), userLocation);
+      // O ponto azul some quando a origem está no mesmo lugar, para não cobrir o círculo verde.
+      const userIsOrigin = Boolean(userLocation && origin && haversineKm(userLocation, origin) < 0.03);
+      if (userLocation && !userIsOrigin) add(userDot(), userLocation);
       if (origin && searching) add(pulse(), origin);
-      if (origin) add(dot("#00C853", true), origin);
-      if (destination) add(dot("#FC4C02", false), destination);
+
+      const ends = map.getSource(ENDS_SOURCE) as maplibregl.GeoJSONSource | undefined;
+      ends?.setData(endpointsData(origin, destination));
 
       // Só geometria real de rota. Reta entre dois pontos nunca é desenhada.
       const line: LatLng[] = route && route.length > 1 ? route : [];
@@ -211,7 +237,7 @@ export default function RealMap({
     const map = mapRef.current;
     if (!map) return;
     // Só geometria real de rota. Reta entre dois pontos nunca é desenhada.
-      const line: LatLng[] = route && route.length > 1 ? route : [];
+    const line: LatLng[] = route && route.length > 1 ? route : [];
     if (progress === undefined || line.length === 0) {
       vehicleRef.current?.remove();
       vehicleRef.current = null;
