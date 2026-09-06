@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="border-t border-border-99 bg-subtle-99 pb-24">
       <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 md:grid-cols-[1.2fr_1fr_1fr] md:px-8 xl:px-16">
         <div className="flex max-w-xl items-start gap-4">
-          <Logo size={32} />
+          <Logo variant="amarelo" size={32} />
           <p className="text-sm text-secondary-99">
             Conceito independente, sem vínculo com a 99 ou com a DiDi. Criado para fim
             demonstrativo e de portfólio. Nenhum pedido, corrida, entrega ou pagamento nesta

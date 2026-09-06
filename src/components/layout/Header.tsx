@@ -86,7 +86,7 @@ export function Header() {
           className="ml-auto hidden items-center gap-2 rounded-xl text-black-99 md:flex"
           aria-label="99 Web, início"
         >
-          <Logo size={32} />
+          <Logo variant="glifoPreto" size={32} />
           <span className="text-[17px] font-bold">Web</span>
         </Link>
 

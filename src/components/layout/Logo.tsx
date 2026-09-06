@@ -1,21 +1,37 @@
-/** Logotipo oficial da 99 (dois noves em forma de pino) sobre o quadrado amarelo. */
-export function Logo({ size = 40, decorative = true }: { size?: number; decorative?: boolean }) {
+/** Logotipos oficiais da 99, em `public/logos/`. */
+const file = {
+  /** Selo amarelo com os noves pretos. Para fundo claro. */
+  amarelo: "/logos/Amarelo.svg",
+  /** Selo preto com os noves claros. */
+  preto: "/logos/Preto.svg",
+  /** Selo branco com os noves pretos. */
+  branco: "/logos/Branco.svg",
+  /** Só os noves, em preto, sem selo. Para fundo amarelo. */
+  glifoPreto: "/logos/Null_Preto.svg",
+  /** Só os noves, em branco, sem selo. Para fundo escuro. */
+  glifoBranco: "/logos/Null_branco.svg",
+} as const;
+
+export type LogoVariant = keyof typeof file;
+
+interface LogoProps {
+  variant?: LogoVariant;
+  size?: number;
+  /** Decorativo por padrão; passe false quando for o único conteúdo do link. */
+  decorative?: boolean;
+}
+
+export function Logo({ variant = "amarelo", size = 40, decorative = true }: LogoProps) {
   return (
-    <svg
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={file[variant]}
+      alt={decorative ? "" : "99"}
       width={size}
       height={size}
-      viewBox="0 0 384 384"
-      shapeRendering="geometricPrecision"
-      role={decorative ? undefined : "img"}
+      className="block shrink-0"
+      style={{ width: size, height: size }}
       aria-hidden={decorative ? "true" : undefined}
-      aria-label={decorative ? undefined : "99"}
-      className="shrink-0"
-    >
-      <rect width="384" height="384" rx="86" fill="#FFDD00" />
-      <g fill="#212121">
-        <path d="M 122.65 101.39 c -18.2 0.95 -34.81 9.82 -45.91 24.54 -9.72 12.88 -14.15 29.24 -12.33 45.52 2.58 23.11 17.6 42.93 38.94 51.4 2.4 0.96 5.44 1.93 7.48 2.41 0.42 0.1 0.77 0.21 0.77 0.26 0 0.04 -7.55 11.83 -16.77 26.2 -9.22 14.37 -16.94 26.4 -17.15 26.74 -0.92 1.46 -0.58 3.08 0.82 3.88 l 0.55 0.31 21.6 0 21.6 0 0.51 -0.23 c 0.28 -0.13 0.69 -0.42 0.92 -0.65 0.31 -0.32 52.06 -80.81 54.24 -84.37 4.09 -6.67 7 -14.5 8.32 -22.45 0.68 -4.06 0.81 -5.82 0.81 -10.95 0 -4.76 -0.06 -5.66 -0.61 -9.3 -2.06 -13.75 -8.64 -26.57 -18.5 -36.1 -10.27 -9.91 -23.26 -15.86 -37.24 -17.04 -2.19 -0.19 -6.08 -0.27 -8.05 -0.17 z m 5.47 37.76 c 4.27 0.5 8.37 2.26 11.68 5.03 4.45 3.72 7.29 8.95 8.11 14.92 0.2 1.42 0.17 4.69 -0.05 6.15 -0.53 3.51 -1.62 6.42 -3.51 9.3 -1.41 2.17 -2.51 3.46 -4.1 4.84 -3.45 2.98 -7.04 4.66 -11.5 5.37 -1.53 0.25 -4.77 0.25 -6.33 0.01 -5.59 -0.88 -10.47 -3.64 -14.07 -7.97 -2.75 -3.31 -4.62 -7.71 -5.15 -12.1 -0.16 -1.39 -0.14 -4.34 0.05 -5.7 1.15 -8.25 6.23 -15.04 13.6 -18.2 3.53 -1.52 7.47 -2.1 11.27 -1.65 z" />
-        <path d="M 255.5 101.4 c -13.27 0.67 -25.72 5.55 -36 14.12 -11.87 9.89 -19.72 23.98 -21.95 39.4 -0.43 3 -0.56 4.71 -0.62 8.23 -0.06 3.61 0.03 5.62 0.37 8.6 1.62 13.91 7.81 26.9 17.55 36.84 7.8 7.95 17.08 13.45 27.65 16.36 1.07 0.29 1.94 0.58 1.93 0.64 -0.02 0.06 -7.62 11.93 -16.9 26.38 -9.28 14.46 -17 26.52 -17.16 26.8 -0.74 1.35 -0.25 2.98 1.11 3.65 l 0.47 0.23 21.6 0 21.6 0 0.55 -0.27 c 0.3 -0.15 0.69 -0.42 0.87 -0.6 0.36 -0.38 53.53 -83.2 54.81 -85.38 5 -8.52 7.89 -18.18 8.52 -28.5 1.28 -21.01 -8.07 -41.44 -24.8 -54.19 -9.09 -6.93 -20.15 -11.2 -31.5 -12.15 -2.26 -0.19 -6 -0.26 -8.1 -0.16 z m 5.11 37.7 c 5.09 0.52 9.87 2.78 13.48 6.39 1.95 1.95 3.17 3.64 4.4 6.12 1.65 3.31 2.42 6.6 2.42 10.39 -0.01 4.7 -1.2 8.74 -3.73 12.6 -1.22 1.87 -1.89 2.69 -3.32 4.07 -7.92 7.68 -19.98 8.45 -28.79 1.82 -4.92 -3.69 -8.11 -9.23 -8.98 -15.59 -0.2 -1.4 -0.17 -4.69 0.04 -6.1 0.4 -2.61 1.07 -4.78 2.17 -7.05 3.18 -6.56 9.28 -11.18 16.4 -12.44 1.68 -0.3 4.14 -0.38 5.91 -0.21 z" />
-      </g>
-    </svg>
+    />
   );
 }
