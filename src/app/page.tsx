@@ -21,7 +21,7 @@ const verticals: { href: string; title: string; description: string; cta: string
   {
     href: "/entrega",
     title: "Entrega",
-    description: "Entrega Moto ou Entrega Carro. Origem e destino num campo só, com endereços recentes.",
+    description: "Origem, destino e categoria no mesmo painel, sem trocar de aparelho no meio da operação.",
     cta: "Enviar",
     icon: "box",
   },
@@ -106,7 +106,7 @@ export default function HomePage() {
             {[
               {
                 t: "A loja no horário de pico",
-                d: "O pedido chega pelo cardápio web com o endereço na tela. Informar a entrega na aba do lado leva segundos, sem pegar o celular.",
+                d: "O endereço já está na tela. Solicitar a entrega deveria acontecer ali, não no celular.",
               },
               {
                 t: "O escritório na hora do almoço",
