@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 import { drivers, rideCategories } from "@/data/rides";
 import { rideDurationMin, rideFare } from "@/lib/pricing";
 import { formatBRL, formatKm } from "@/lib/format";
@@ -46,6 +47,7 @@ function arrivalLabel(minutes: number): string {
 
 export function RideView() {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const { saveOrder } = useApp();
   const current = useCurrentLocation();
   const [origin, setOrigin] = useState<GeoPlace | null>(null);
@@ -297,10 +299,18 @@ export function RideView() {
                             }
                           }}
                           className={cx(
-                            "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors duration-150 ease-out hover:duration-[120ms]",
-                            checked ? "bg-offwhite-99" : "hover:bg-offwhite-99",
+                            "relative isolate flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors duration-150 ease-out hover:duration-[120ms]",
+                            !checked && "hover:bg-offwhite-99",
                           )}
                         >
+                          {checked && (
+                            <motion.span
+                              layoutId={reduceMotion ? undefined : "categoria-corrida"}
+                              transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] }}
+                              className="absolute inset-0 -z-10 rounded-xl bg-offwhite-99"
+                              aria-hidden="true"
+                            />
+                          )}
                           <VehicleArt category={c.id} />
                           <span className="flex min-w-0 flex-1 flex-col">
                             <span className="flex min-w-0 items-center gap-1.5 text-[17px] font-bold">

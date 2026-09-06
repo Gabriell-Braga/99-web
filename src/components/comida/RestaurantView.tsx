@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { BagLine, MenuItem, Restaurant } from "@/lib/types";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/context/AppProvider";
@@ -23,6 +24,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
   const [item, setItem] = useState<MenuItem | null>(null);
   const [pending, setPending] = useState<Omit<BagLine, "lineId"> | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const reduceMotion = useReducedMotion();
 
   // Card de oferta abre direto o item (ajuste de estado durante a renderização).
   const wanted = params.get("item");
@@ -190,12 +192,20 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
       </Modal>
 
       <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-44 z-30 flex justify-center px-4 lg:bottom-28">
-        {toast && (
-          <span className="flex items-center gap-2 rounded-full bg-black-99 px-4 py-2 text-sm font-bold text-white shadow-high">
-            <Icon name="check" size={16} className="text-success-99" />
-            {toast}
-          </span>
-        )}
+        <AnimatePresence>
+          {toast && (
+            <motion.span
+              initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+              transition={{ duration: reduceMotion ? 0 : 0.2, ease: [0.4, 0, 0.2, 1] }}
+              className="flex items-center gap-2 rounded-full bg-black-99 px-4 py-2 text-sm font-bold text-white shadow-high"
+            >
+              <Icon name="check" size={16} className="text-success-99" />
+              {toast}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
     </FoodShell>
   );

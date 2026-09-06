@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 import type { ContactPoint, DeliveryOrder, PackageSize, PaymentMethod } from "@/lib/types";
 import { deliveryCategories } from "@/data/rides";
 import { deliveryEtaMin, deliveryFare } from "@/lib/pricing";
@@ -86,6 +87,7 @@ export function DeliveryView() {
   const { saveOrder } = useApp();
   const current = useCurrentLocation();
   const [tab, setTab] = useState<"enviar" | "receber">("enviar");
+  const reduceMotion = useReducedMotion();
   const [pickup, setPickup] = useState<PointState>(emptyPoint);
   const [pickupTouched, setPickupTouched] = useState(false);
   const [dropoff, setDropoff] = useState<PointState>(emptyPoint);
@@ -221,11 +223,19 @@ export function DeliveryView() {
                 setEditing(null);
               }}
               className={cx(
-                "-mb-px border-b-2 pb-2 text-[15px] font-bold capitalize transition-colors",
-                tab === t ? "border-orange-99 text-black-99" : "border-transparent text-secondary-99 hover:text-black-99",
+                "relative -mb-px pb-2 text-[15px] font-bold capitalize transition-colors duration-150",
+                tab === t ? "text-black-99" : "text-secondary-99 hover:text-black-99",
               )}
             >
               {t === "enviar" ? "Enviar" : "Receber"}
+              {tab === t && (
+                <motion.span
+                  layoutId={reduceMotion ? undefined : "aba-entrega"}
+                  transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] }}
+                  className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-orange-99"
+                  aria-hidden="true"
+                />
+              )}
             </button>
           ))}
         </div>
@@ -335,9 +345,21 @@ export function DeliveryView() {
                     type="button"
                     aria-pressed={checked}
                     onClick={() => setSize(c.id)}
-                    className={cx("flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors duration-150 ease-out hover:duration-[120ms]", checked ? "bg-offwhite-99" : "hover:bg-offwhite-99")}
+                    className={cx(
+                      "relative isolate flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors duration-150 ease-out hover:duration-[120ms]",
+                      !checked && "hover:bg-offwhite-99",
+                    )}
                   >
-                    <VehicleArt category={c.id} />
+                    {checked && (
+                      <motion.span
+                        layoutId={reduceMotion ? undefined : "categoria-entrega"}
+                        transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] }}
+                        className="absolute inset-0 -z-10 rounded-xl bg-offwhite-99"
+                        aria-hidden="true"
+                      />
+                    )}
+                    {/* No fluxo de entrega a moto também aparece com a caixa. */}
+                    <VehicleArt category={c.id === "moto" ? "entrega-moto" : "entrega-carro"} />
                     <span className="flex min-w-0 flex-1 flex-col">
                       <span className="flex min-w-0 items-center gap-1.5 text-[17px] font-bold">
                         <span className="truncate">{c.name}</span>

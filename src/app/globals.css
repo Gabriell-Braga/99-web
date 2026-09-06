@@ -102,6 +102,18 @@ body {
 
 /* Na camada base para que utilitários como text-white vençam. */
 @layer base {
+  /* O Tailwind v4 deixa botão com cursor padrão. Tudo que clica mostra a mãozinha. */
+  button:not(:disabled),
+  summary,
+  a[href],
+  [role="button"]:not([aria-disabled="true"]),
+  [role="option"]:not([aria-disabled="true"]),
+  [role="tab"],
+  label:has(> input:not(:disabled)),
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+
   input,
   textarea,
   select,

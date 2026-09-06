@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { cx } from "@/lib/cx";
 
@@ -19,13 +20,16 @@ const hiddenRoutes = ["/comida/checkout"];
 
 /**
  * Pílula branca flutuante no rodapé, centralizada, em todas as larguras.
- * Corrida, Food, Entrega e Pay nesta ordem; o item ativo vira círculo amarelo
- * de 48px sem rótulo.
+ * Corrida, Food, Entrega e Pay nesta ordem; o círculo amarelo desliza para o
+ * item ativo em 220ms.
  */
 export function BottomNav() {
   const pathname = usePathname();
+  const reduce = useReducedMotion();
   const inFlow = flowRoutes.some((r) => pathname.startsWith(r));
   if (hiddenRoutes.some((r) => pathname.startsWith(r))) return null;
+
+  const transition = { duration: reduce ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] as const };
 
   return (
     <nav
@@ -38,20 +42,25 @@ export function BottomNav() {
       <ul className="pointer-events-auto flex h-16 items-center gap-1 rounded-full bg-white px-2 shadow-high" role="list">
         {items.map((it) => {
           const active = pathname.startsWith(it.href);
-          const inner = active ? (
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-99 text-black-99">
-              <Icon name={it.icon} size={24} />
-              <span className="sr-only">{it.label}</span>
-            </span>
-          ) : (
-            <span className="flex h-12 w-16 flex-col items-center justify-center gap-0.5 text-black-99">
-              <Icon name={it.icon} size={24} />
+          const inner = (
+            <span className="flex h-14 w-16 flex-col items-center justify-center gap-1 text-black-99">
+              <span className="relative flex h-7 w-7 items-center justify-center">
+                {active && (
+                  <motion.span
+                    layoutId={reduce ? undefined : "nav-ativo"}
+                    transition={transition}
+                    className="absolute -inset-1.5 rounded-full bg-yellow-99"
+                    aria-hidden="true"
+                  />
+                )}
+                <Icon name={it.icon} size={24} className="relative" />
+              </span>
               <span className="text-[11px] font-medium leading-none">{it.label}</span>
             </span>
           );
-          return (
-            <li key={it.href}>
-              {it.disabled ? (
+          if (it.disabled) {
+            return (
+              <li key={it.href}>
                 <span
                   className="block cursor-not-allowed rounded-full opacity-60"
                   title="Fora do escopo do conceito"
@@ -59,15 +68,23 @@ export function BottomNav() {
                 >
                   {inner}
                 </span>
-              ) : (
+              </li>
+            );
+          }
+          return (
+            <li key={it.href}>
+              <motion.div whileTap={reduce ? undefined : { scale: 0.94 }} transition={{ duration: 0.1 }}>
                 <Link
                   href={it.href}
                   aria-current={active ? "page" : undefined}
-                  className="block rounded-full transition-colors hover:bg-subtle-99"
+                  className={cx(
+                    "block rounded-full transition-colors duration-150 ease-out",
+                    !active && "hover:bg-offwhite-99",
+                  )}
                 >
                   {inner}
                 </Link>
-              )}
+              </motion.div>
             </li>
           );
         })}

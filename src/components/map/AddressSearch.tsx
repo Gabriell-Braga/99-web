@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { searchAddress, type GeoPlace } from "@/lib/geo";
 import { parseAddress, type ParsedAddress } from "@/lib/parseAddress";
 import type { RecentAddress } from "@/data/addresses";
@@ -76,6 +77,7 @@ export function AddressSearch({
   const [results, setResults] = useState<GeoPlace[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [highlight, setHighlight] = useState(0);
+  const reduceMotion = useReducedMotion();
   const listId = useId();
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -256,12 +258,17 @@ export function AddressSearch({
         ) : null}
       </div>
 
-      {listOpen && (
-        <ul
+      <AnimatePresence>
+        {listOpen && (
+        <motion.ul
           id={listId}
           role="listbox"
           aria-label={typing ? "Resultados" : "Endereços recentes"}
-          className="absolute left-0 right-0 top-full z-20 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-border-99 bg-white py-2"
+          initial={reduceMotion ? false : { opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
+          transition={{ duration: reduceMotion ? 0 : 0.16, ease: [0.4, 0, 0.2, 1] }}
+          className="panel-scroll absolute left-0 right-0 top-full z-20 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-border-99 bg-white py-2 shadow-high"
         >
           {!typing && recents.length > 0 && (
             <li className="px-6 pb-1 pt-2 text-[13px] text-secondary-99" role="presentation">
@@ -330,8 +337,9 @@ export function AddressSearch({
               Nenhum endereço encontrado. Tente rua e número.
             </li>
           )}
-        </ul>
-      )}
+        </motion.ul>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

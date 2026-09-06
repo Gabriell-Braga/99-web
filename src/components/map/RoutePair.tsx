@@ -41,7 +41,7 @@ function Row({
       type={onClick ? "button" : undefined}
       onClick={onClick}
       className={cx(
-        "relative flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left",
+        "relative flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left",
         onClick && "transition-colors duration-[120ms] hover:bg-offwhite-99",
       )}
     >
