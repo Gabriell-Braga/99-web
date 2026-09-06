@@ -343,7 +343,7 @@ export function DeliveryView() {
                         <span className="truncate">{c.name}</span>
                         <Icon name="info" size={14} className="text-secondary-99" />
                       </span>
-                      <span className="whitespace-nowrap text-sm text-secondary-99">
+                      <span className={cx("text-sm text-secondary-99", route ? "whitespace-nowrap" : "truncate")}>
                         {c.dims} · {c.weight}
                         {route ? ` · ${eta.min}–${eta.max} min` : ""}
                       </span>

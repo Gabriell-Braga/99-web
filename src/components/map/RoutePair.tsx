@@ -76,10 +76,9 @@ export function RoutePair({
   return (
     <div className="rounded-2xl bg-offwhite-99 p-2">
       <div className="relative rounded-2xl bg-white p-4">
-        {/* Linha vertical entre os dois círculos, atrás das linhas. */}
+        {/* Linha vertical ligando os dois círculos, no eixo deles (centro em 40px). */}
         <span
-          className="pointer-events-none absolute bottom-[calc(50%+6px)] top-[calc(50%-6px)] left-[35px] w-0.5 bg-border-99"
-          style={{ top: "calc(25% + 8px)", bottom: "calc(25% + 8px)" }}
+          className="pointer-events-none absolute left-[39px] top-[calc(25%+8px)] bottom-[calc(25%+8px)] w-0.5 bg-border-99"
           aria-hidden="true"
         />
         <Row point={origin} placeholder={originPlaceholder} color="origin" onClick={onEditOrigin} />

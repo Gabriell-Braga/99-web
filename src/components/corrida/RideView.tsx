@@ -314,7 +314,7 @@ export function RideView() {
                                 <Icon name="info" size={14} className="text-secondary-99" />
                               )}
                             </span>
-                            <span className="whitespace-nowrap text-sm text-secondary-99">
+                            <span className={cx("text-sm text-secondary-99", route ? "whitespace-nowrap" : "truncate")}>
                               {route ? `${arrivalLabel(c.etaMin + mins)} · ${mins} min` : c.description}
                             </span>
                           </span>
