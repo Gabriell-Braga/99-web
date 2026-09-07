@@ -36,6 +36,8 @@ interface AddressSearchProps {
   variant?: "pill" | "row";
   /** Cor do círculo na variante "row". */
   ponto?: "origem" | "destino";
+  /** Mostra a lista no fluxo, embaixo do campo, sem precisar de foco. */
+  listaFixa?: boolean;
 }
 
 type Status = "idle" | "loading" | "error";
@@ -75,6 +77,7 @@ export function AddressSearch({
   position = null,
   variant = "pill",
   ponto = "destino",
+  listaFixa = false,
 }: AddressSearchProps) {
   const recentAddresses = useRecents(position);
   const [text, setText] = useState(value ? value.title : "");
@@ -192,7 +195,8 @@ export function AddressSearch({
     }
   }
 
-  const listOpen = open && (items.length > 0 || status === "error" || (typing && text.trim().length >= 3 && status !== "loading"));
+  const listOpen =
+    (open || listaFixa) && (items.length > 0 || status === "error" || (typing && text.trim().length >= 3 && status !== "loading"));
 
   return (
     <div ref={wrapRef} className="relative">
@@ -290,7 +294,12 @@ export function AddressSearch({
           animate={{ opacity: 1, y: 0 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
           transition={{ duration: reduceMotion ? 0 : 0.16, ease: [0.4, 0, 0.2, 1] }}
-          className="panel-scroll absolute left-0 right-0 top-full z-20 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-border-99 bg-white py-2 shadow-high"
+          className={cx(
+            "panel-scroll bg-white py-2",
+            listaFixa
+              ? "mt-2 rounded-2xl"
+              : "absolute left-0 right-0 top-full z-20 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-border-99 shadow-high",
+          )}
         >
           {!typing && recents.length > 0 && (
             <li className="px-6 pb-1 pt-2 text-[13px] text-secondary-99" role="presentation">

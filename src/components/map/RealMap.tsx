@@ -94,6 +94,9 @@ export default function RealMap({
   const drawRef = useRef<number | null>(null);
   const currentRef = useRef(0);
   const pendingRef = useRef<(() => void) | null>(null);
+  // Últimos pontos enquadrados: quando o painel entra, o mapa encolhe e o
+  // enquadramento precisa ser refeito, senão a origem some atrás do painel.
+  const fitRef = useRef<LatLng[]>([]);
 
   // Cria o mapa uma vez.
   useEffect(() => {
@@ -151,7 +154,20 @@ export default function RealMap({
     });
 
     mapRef.current = map;
-    const ro = new ResizeObserver(() => map.resize());
+    const enquadrar = () => {
+      const pts = fitRef.current;
+      if (pts.length >= 2) {
+        const b = new maplibregl.LngLatBounds();
+        pts.forEach((p) => b.extend([p.lng, p.lat]));
+        map.fitBounds(b, { padding: 80, duration: 0, maxZoom: 16 });
+      } else if (pts.length === 1) {
+        map.easeTo({ center: [pts[0].lng, pts[0].lat], zoom: 15, duration: 0 });
+      }
+    };
+    const ro = new ResizeObserver(() => {
+      map.resize();
+      enquadrar();
+    });
     ro.observe(containerRef.current);
     return () => {
       ro.disconnect();
@@ -189,8 +205,9 @@ export default function RealMap({
       const startPoint = line.length > 1 ? line[0] : origin;
       const endPoint = line.length > 1 ? line[line.length - 1] : destination;
 
-      // O ponto azul some quando a origem está no mesmo lugar, para não cobrir o círculo verde.
-      const userIsOrigin = Boolean(userLocation && startPoint && haversineKm(userLocation, startPoint) < 0.03);
+      // O ponto azul some quando a origem é o mesmo lugar, para não cobrir o
+      // círculo verde. A rota começa na rua mais próxima, então a folga é maior.
+      const userIsOrigin = Boolean(userLocation && startPoint && haversineKm(userLocation, startPoint) < 0.15);
       if (userLocation && !userIsOrigin) add(userDot(), userLocation);
       if (startPoint && searching) add(pulse(), startPoint);
 
@@ -224,6 +241,7 @@ export default function RealMap({
       if (origin) pts.push(origin);
       if (destination) pts.push(destination);
       if (pts.length === 0 && userLocation) pts.push(userLocation);
+      fitRef.current = pts;
       if (pts.length >= 2) {
         const b = new maplibregl.LngLatBounds();
         pts.forEach((p) => b.extend([p.lng, p.lat]));

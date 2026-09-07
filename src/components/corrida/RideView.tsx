@@ -136,7 +136,7 @@ export function RideView() {
   const map = useMemo(
     () => (
       <MapView
-        origin={origin ? { lat: origin.lat, lng: origin.lng, label: origin.title } : null}
+        origin={origin && destination ? { lat: origin.lat, lng: origin.lng, label: origin.title } : null}
         destination={destination ? { lat: destination.lat, lng: destination.lng, label: destination.title } : null}
         route={route?.points}
         userLocation={current.status === "ready" ? current.position : null}
@@ -234,6 +234,7 @@ export function RideView() {
                   ariaLabel="Destino"
                   value={destination}
                   autoFocus={editing === "destination" || !destination}
+                  listaFixa={!destination && editing === null}
                   position={current.position}
                   onChange={(p) => {
                     setDestination(p);
