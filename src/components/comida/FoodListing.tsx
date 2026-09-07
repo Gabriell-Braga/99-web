@@ -97,11 +97,11 @@ export function FoodListing() {
             <FilterChips />
             <span
               aria-hidden="true"
-              className="absolute bottom-0 right-full h-4 w-4 bg-white [mask-image:radial-gradient(circle_16px_at_0_0,transparent_98%,#000_100%)]"
+              className="absolute bottom-0 right-full h-6 w-6 bg-white [mask-image:radial-gradient(circle_24px_at_0_0,transparent_98%,#000_100%)]"
             />
             <span
               aria-hidden="true"
-              className="absolute bottom-0 left-full h-4 w-4 bg-white [mask-image:radial-gradient(circle_16px_at_100%_0,transparent_98%,#000_100%)]"
+              className="absolute bottom-0 left-full h-6 w-6 bg-white [mask-image:radial-gradient(circle_24px_at_100%_0,transparent_98%,#000_100%)]"
             />
           </div>
         </Container>
