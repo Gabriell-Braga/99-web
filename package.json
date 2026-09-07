@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@material-design-icons/svg": "^0.14.15",
     "@material-symbols/svg-400": "^0.47.1",
     "@material-symbols/svg-500": "^0.47.1",
     "@material-symbols/svg-600": "^0.47.1",

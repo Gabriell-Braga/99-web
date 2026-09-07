@@ -1,5 +1,12 @@
 import type { ReactElement, SVGProps } from "react";
 
+// Material Icons (família antiga, estilo redondo): carro, carrinho, prancheta e
+// moto com caixa. Os Symbols deixam esses quatro desenhos angulosos demais.
+import CarRound from "@material-design-icons/svg/outlined/directions_car.svg";
+import CartRound from "@material-design-icons/svg/outlined/shopping_cart.svg";
+import AssignmentRound from "@material-design-icons/svg/outlined/assignment.svg";
+import DeliveryDining from "@material-design-icons/svg/outlined/delivery_dining.svg";
+
 import Add from "@material-symbols/svg-600/rounded/add.svg";
 import ArrowBack from "@material-symbols/svg-600/rounded/arrow_back.svg";
 import ArrowForward from "@material-symbols/svg-600/rounded/arrow_forward.svg";
@@ -12,7 +19,7 @@ import ConfirmationNumber from "@material-symbols/svg-600/rounded/confirmation_n
 import ContentCopy from "@material-symbols/svg-600/rounded/content_copy.svg";
 import CreditCard from "@material-symbols/svg-600/rounded/credit_card.svg";
 import Delete from "@material-symbols/svg-600/rounded/delete.svg";
-import DirectionsCar from "@material-symbols/svg-600/rounded/directions_car.svg";
+
 import ErrorIcon from "@material-symbols/svg-600/rounded/error.svg";
 import ErrorFill from "@material-symbols/svg-600/rounded/error-fill.svg";
 import HandshakeFill from "@material-symbols/svg-600/rounded/handshake-fill.svg";
@@ -28,16 +35,17 @@ import AttachMoney from "@material-symbols/svg-600/rounded/attach_money.svg";
 import Park from "@material-symbols/svg-600/rounded/park.svg";
 import Payments from "@material-symbols/svg-600/rounded/payments.svg";
 import Person from "@material-symbols/svg-600/rounded/person.svg";
-import ListAlt from "@material-symbols/svg-600/rounded/list_alt.svg";
+
 import Refresh from "@material-symbols/svg-600/rounded/refresh.svg";
 import Remove from "@material-symbols/svg-600/rounded/remove.svg";
 import Restaurant from "@material-symbols/svg-600/rounded/restaurant.svg";
 import Schedule from "@material-symbols/svg-600/rounded/schedule.svg";
 import Search from "@material-symbols/svg-600/rounded/search.svg";
-import Sell from "@material-symbols/svg-600/rounded/sell.svg";
-import Moped from "@material-symbols/svg-600/rounded/moped.svg";
-import SellFill from "@material-symbols/svg-600/rounded/sell-fill.svg";
-import ShoppingCart from "@material-symbols/svg-600/rounded/shopping_cart.svg";
+import PercentDiscount from "@material-symbols/svg-600/rounded/percent_discount.svg";
+import PercentDiscountFill from "@material-symbols/svg-600/rounded/percent_discount-fill.svg";
+
+
+
 import SkipNext from "@material-symbols/svg-600/rounded/skip_next.svg";
 import StarFill from "@material-symbols/svg-600/rounded/star-fill.svg";
 import SwapVert from "@material-symbols/svg-600/rounded/swap_vert.svg";
@@ -49,8 +57,8 @@ type Glyph = (props: SVGProps<SVGSVGElement>) => ReactElement;
 /**
  * Material Symbols Rounded, peso 600, grau 0, tamanho óptico 24. Traço grosso e
  * canto arredondado, como no app. Uma família só em todo o projeto, sem ícone desenhado à mão.
- * "coupon" usa `sell`, nome atual do antigo `local_offer`, e "receipt" usa
- * `list_alt`, porque o cupom fiscal do Material é serrilhado. Selo, nota,
+ * Carro, carrinho, prancheta e moto com caixa vêm da família antiga, mais
+ * redonda. O cupom usa `percent_discount`, o selo com % do app. Selo, nota,
  * chama e erro usam a variante preenchida; a navegação segue vazada.
  */
 const icons = {
@@ -63,9 +71,9 @@ const icons = {
   boxLine: Package2,
   money: AttachMoney,
   briefcase: Work,
-  car: DirectionsCar,
+  car: CarRound,
   card: CreditCard,
-  cart: ShoppingCart,
+  cart: CartRound,
   cash: Payments,
   check: Check,
   chevronDown: KeyboardArrowDown,
@@ -73,17 +81,17 @@ const icons = {
   chevronRight: ChevronRight,
   clock: Schedule,
   copy: ContentCopy,
-  coupon: Sell,
-  couponFill: SellFill,
+  coupon: PercentDiscount,
+  couponFill: PercentDiscountFill,
   flameFill: LocalFireDepartmentFill,
   handshakeFill: HandshakeFill,
   home: Home,
   info: Info,
   minus: Remove,
-  moto: Moped,
+  moto: DeliveryDining,
   pin: LocationOn,
   plus: Add,
-  receipt: ListAlt,
+  receipt: AssignmentRound,
   refresh: Refresh,
   search: Search,
   skipForward: SkipNext,

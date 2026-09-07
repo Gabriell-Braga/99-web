@@ -62,7 +62,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
       </nav>
 
       <header className="flex flex-col gap-4 rounded-2xl border border-border-99 p-4 md:flex-row md:items-start">
-        <FoodArt kind={restaurant.art} seed={restaurant.slug} tint={restaurant.tint} className="h-20 w-20 shrink-0 rounded-xl" scale={1.1} />
+        <FoodArt kind={restaurant.art} seed={restaurant.slug} tint={restaurant.tint} className="h-20 w-20 shrink-0 rounded-xl" />
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className={cx("text-[22px] font-bold", !restaurant.open && "text-secondary-99")}>{restaurant.name}</h1>
