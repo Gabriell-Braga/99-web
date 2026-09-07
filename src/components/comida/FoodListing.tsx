@@ -72,7 +72,7 @@ export function FoodListing() {
     <>
       {/* Busca e banner continuam na faixa amarela, como no app. */}
       <div className="bg-yellow-99 pb-20">
-        <Container className="pb-9 pt-2">
+        <Container className="pb-8 pt-2">
           <h1 className="sr-only">Food</h1>
           <div className="relative">
             <Icon name="search" size={22} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
@@ -86,20 +86,6 @@ export function FoodListing() {
             />
           </div>
 
-          {/* Banner promocional, na faixa amarela, entre a busca e os selos. */}
-          <Link href="/comida" className="mt-8 block overflow-hidden rounded-2xl">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/banners/banner-1.jpg"
-              alt="Cupom de estreia: R$ 15 de desconto no primeiro pedido"
-              width={1200}
-              height={400}
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              className="aspect-[3/1] w-full object-cover"
-            />
-          </Link>
         </Container>
       </div>
 
