@@ -22,7 +22,9 @@ import KeyboardArrowDown from "@material-symbols/svg-600/rounded/keyboard_arrow_
 import LocalFireDepartmentFill from "@material-symbols/svg-600/rounded/local_fire_department-fill.svg";
 import LocationOn from "@material-symbols/svg-600/rounded/location_on.svg";
 import MyLocation from "@material-symbols/svg-600/rounded/my_location.svg";
+import DeployedCode from "@material-symbols/svg-600/rounded/deployed_code.svg";
 import Package2 from "@material-symbols/svg-600/rounded/package_2.svg";
+import AttachMoney from "@material-symbols/svg-600/rounded/attach_money.svg";
 import Park from "@material-symbols/svg-600/rounded/park.svg";
 import Payments from "@material-symbols/svg-600/rounded/payments.svg";
 import Person from "@material-symbols/svg-600/rounded/person.svg";
@@ -57,7 +59,9 @@ const icons = {
   arrowLeft: ArrowBack,
   arrowRight: ArrowForward,
   boltFill: BoltFill,
-  box: Package2,
+  box: DeployedCode,
+  boxLine: Package2,
+  money: AttachMoney,
   briefcase: Work,
   car: DirectionsCar,
   card: CreditCard,

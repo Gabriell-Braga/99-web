@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import SellFill from "@material-symbols/svg-400/rounded/sell-fill.svg";
-import ReceiptLong from "@material-symbols/svg-400/rounded/receipt_long.svg";
+import Assignment from "@material-symbols/svg-400/rounded/assignment.svg";
 import ShoppingCart from "@material-symbols/svg-400/rounded/shopping_cart.svg";
 import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
@@ -19,7 +19,7 @@ import { cx } from "@/lib/cx";
  * preenchimento, mais leves que o resto do app. O cupom é verde, como no 99.
  * O Material renomeou local_offer para sell, mesmo desenho de etiqueta.
  */
-const headerIcons = { coupon: SellFill, receipt: ReceiptLong, cart: ShoppingCart } as const;
+const headerIcons = { coupon: SellFill, receipt: Assignment, cart: ShoppingCart } as const;
 
 function HeaderAction({
   label,

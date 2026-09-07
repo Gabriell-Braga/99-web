@@ -1,4 +1,4 @@
-import type { ArtKind } from "@/lib/types";
+import type { ArtKind, Restaurant } from "@/lib/types";
 
 /**
  * Fotos dos pratos, todas de licença livre e servidas do próprio projeto em
@@ -26,9 +26,24 @@ export const foodPhotos: Record<ArtKind, string[]> = {
 };
 
 /**
+ * Posição do prato no cardápio inteiro da loja. É o que decide a variante da
+ * foto, então o prato aparece com a mesma imagem na lista, na oferta e no
+ * modal, e dois pratos vizinhos da mesma categoria não repetem.
+ */
+export function menuVariantIndex(restaurant: Restaurant, itemId: string): number {
+  let i = 0;
+  for (const secao of restaurant.menu) {
+    for (const item of secao.items) {
+      if (item.id === itemId) return i;
+      i += 1;
+    }
+  }
+  return 0;
+}
+
+/**
  * Escolhe sempre a mesma foto para a mesma semente, para não trocar a cada
- * render. Numa lista da mesma loja, o índice manda: assim dois pratos vizinhos
- * da mesma categoria nunca aparecem com a mesma imagem.
+ * render. Com índice, ele manda.
  */
 export function pickPhoto(kind: ArtKind, seed?: string, index?: number): string {
   const lista = foodPhotos[kind];

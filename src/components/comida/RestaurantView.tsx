@@ -10,12 +10,12 @@ import { useApp } from "@/context/AppProvider";
 import { getRestaurant } from "@/data/restaurants";
 import { FoodShell } from "@/components/comida/FoodShell";
 import { FoodArt } from "@/components/comida/FoodArt";
+import { menuVariantIndex } from "@/data/foodPhotos";
 import { ItemModal } from "@/components/comida/ItemModal";
 import { Icon } from "@/components/ui/Icon";
 import { Badge } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { ErrorNote } from "@/components/ui/States";
 import { cx } from "@/lib/cx";
 
 export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
@@ -65,8 +65,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
         <FoodArt kind={restaurant.art} seed={restaurant.slug} tint={restaurant.tint} className="h-20 w-20 shrink-0 rounded-xl" scale={1.1} />
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[22px] font-bold">{restaurant.name}</h1>
-            {!restaurant.open && <Badge tone="orange">Fechado</Badge>}
+            <h1 className={cx("text-[22px] font-bold", !restaurant.open && "text-secondary-99")}>{restaurant.name}</h1>
           </div>
           <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-secondary-99">
             <span>{restaurant.cuisine}</span>
@@ -84,7 +83,11 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
               <span className="font-bold text-black-99">
                 {restaurant.etaMin}–{restaurant.etaMax} min
               </span>
-              <span className="w-fit rounded bg-yellow-99-light px-1.5 py-0.5 text-[11px] font-bold text-black-99">No Horário</span>
+              {restaurant.open ? (
+                <span className="w-fit rounded bg-yellow-99-light px-1.5 py-0.5 text-[11px] font-bold text-black-99">No Horário</span>
+              ) : (
+                <span>fechada agora</span>
+              )}
             </div>
             <div className="flex flex-col gap-1 px-2">
               <span className="font-bold text-green-99">{restaurant.deliveryFee === 0 ? "Frete grátis" : formatBRL(restaurant.deliveryFee)}</span>
@@ -103,17 +106,11 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
         </div>
       </header>
 
+      {/* Loja fechada: só a faixa cinza com o horário, como no app. */}
       {!restaurant.open && (
-        <ErrorNote
-          className="mt-6"
-          title="Loja fechada agora"
-          description={`Abre às ${restaurant.opensAt}. Você pode ver o cardápio, mas não dá para adicionar itens.`}
-          action={
-            <Link href="/comida" className="inline-flex h-10 items-center rounded-xl border border-border-99 bg-white px-4 text-[15px] font-bold text-black-99 hover:bg-subtle-99">
-              Ver lojas abertas
-            </Link>
-          }
-        />
+        <p className="mt-6 rounded-2xl bg-subtle-99 px-5 py-4 text-[17px] font-bold text-black-99" role="status">
+          Abre às {restaurant.opensAt}
+        </p>
       )}
 
       <div className="mt-8 flex flex-col gap-8">
@@ -123,8 +120,9 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
               {section.title}
             </h2>
             <ul className="grid gap-3 md:grid-cols-2" role="list">
-              {section.items.map((it, i) => {
+              {section.items.map((it) => {
                 const disabled = !it.available || !restaurant.open;
+                const semCor = !it.available;
                 return (
                   <li key={it.id}>
                     <button
@@ -148,7 +146,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
                           {it.promoPrice && <span className="text-[13px] tabular-nums text-muted-99 line-through">{formatBRL(it.price)}</span>}
                         </p>
                       </div>
-                      <FoodArt kind={it.art} seed={it.id} index={i} tint={restaurant.tint} className={cx("h-24 w-24 shrink-0 rounded-xl", disabled && "grayscale")} />
+                      <FoodArt kind={it.art} seed={it.id} index={menuVariantIndex(restaurant, it.id)} tint={restaurant.tint} className={cx("h-24 w-24 shrink-0 rounded-xl", semCor && "grayscale")} />
                     </button>
                   </li>
                 );

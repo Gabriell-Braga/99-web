@@ -10,7 +10,7 @@ const items: { href: string; label: string; icon: IconName; disabled?: boolean }
   { href: "/corrida", label: "Corrida", icon: "car" },
   { href: "/comida", label: "Food", icon: "utensils" },
   { href: "/entrega", label: "Entrega", icon: "box" },
-  { href: "/pay", label: "Pay", icon: "wallet", disabled: true },
+  { href: "/pay", label: "Pay", icon: "money", disabled: true },
 ];
 
 /** Telas de fluxo têm barra de ação própria no rodapé; no celular a pílula sai delas. */

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { MenuItem, Restaurant } from "@/lib/types";
 import { formatBRL } from "@/lib/format";
 import { FoodArt } from "@/components/comida/FoodArt";
+import { menuVariantIndex } from "@/data/foodPhotos";
 import { Icon } from "@/components/ui/Icon";
 
 export interface Offer {
@@ -39,7 +40,7 @@ export function OfferCard({ offer, eager }: { offer: Offer; eager?: boolean }) {
         <p className="truncate text-[12px] text-secondary-99">{restaurant.name}</p>
       </div>
       <div className="relative shrink-0">
-        <FoodArt kind={item.art} seed={item.id} tint={restaurant.tint} className="h-24 w-24 rounded-xl" eager={eager} />
+        <FoodArt kind={item.art} seed={item.id} index={menuVariantIndex(restaurant, item.id)} tint={restaurant.tint} className="h-24 w-24 rounded-xl" eager={eager} />
         <span
           className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-yellow-99 text-black-99"
           aria-hidden="true"
