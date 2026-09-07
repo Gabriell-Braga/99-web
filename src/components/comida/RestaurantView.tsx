@@ -10,6 +10,7 @@ import { useApp } from "@/context/AppProvider";
 import { getRestaurant } from "@/data/restaurants";
 import { FoodShell } from "@/components/comida/FoodShell";
 import { FoodArt } from "@/components/comida/FoodArt";
+import { StoreInfoModal, type Aba } from "@/components/comida/StoreInfoModal";
 import { menuVariantIndex } from "@/data/foodPhotos";
 import { ItemModal } from "@/components/comida/ItemModal";
 import { Icon } from "@/components/ui/Icon";
@@ -24,6 +25,8 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
   const [item, setItem] = useState<MenuItem | null>(null);
   const [pending, setPending] = useState<Omit<BagLine, "lineId"> | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // Guarda em qual aba a ficha da loja abre: nome leva a Informações, nota a Avaliações.
+  const [infoAba, setInfoAba] = useState<Aba | null>(null);
   const reduceMotion = useReducedMotion();
 
   // Card de oferta abre direto o item (ajuste de estado durante a renderização).
@@ -64,19 +67,31 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
       <header className="flex flex-col gap-4 rounded-2xl border border-border-99 p-4 md:flex-row md:items-start">
         <FoodArt kind={restaurant.art} seed={restaurant.slug} tint={restaurant.tint} className="h-20 w-20 shrink-0 rounded-xl" />
         <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setInfoAba("informacoes")}
+            aria-haspopup="dialog"
+            className="flex w-fit items-center gap-1.5 rounded-xl text-left transition-colors duration-150 hover:text-secondary-99"
+          >
             <h1 className={cx("text-[22px] font-bold", !restaurant.open && "text-secondary-99")}>{restaurant.name}</h1>
-          </div>
+            <Icon name="chevronRight" size={20} className="shrink-0 text-muted-99" />
+          </button>
           <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-secondary-99">
             <span>{restaurant.cuisine}</span>
             <span aria-hidden="true">·</span>
             <span>Mín. {formatBRL(restaurant.minOrder)}</span>
             <span aria-hidden="true">·</span>
-            <span className="flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={() => setInfoAba("avaliacoes")}
+              aria-haspopup="dialog"
+              className="flex items-center gap-0.5 rounded hover:underline"
+            >
               <Icon name="starFill" size={13} className="text-yellow-99-deep" />
               <span className="font-bold text-black-99">{restaurant.rating.toFixed(1)}</span>
               <span>({restaurant.ratingCount.toLocaleString("pt-BR")})</span>
-            </span>
+              <Icon name="chevronRight" size={14} className="text-muted-99" />
+            </button>
           </p>
           <div className="grid grid-cols-3 divide-x divide-border-99 text-[13px] text-secondary-99">
             <div className="flex flex-col gap-1 pr-2">
@@ -155,6 +170,14 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
           </section>
         ))}
       </div>
+
+      <StoreInfoModal
+        restaurant={restaurant}
+        aba={infoAba ?? "informacoes"}
+        onAba={setInfoAba}
+        open={infoAba !== null}
+        onClose={() => setInfoAba(null)}
+      />
 
       <ItemModal item={item} restaurant={restaurant} onClose={() => setItem(null)} onAdd={handleAdd} />
 

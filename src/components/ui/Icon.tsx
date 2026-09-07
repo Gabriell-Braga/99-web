@@ -36,6 +36,7 @@ import AttachMoney from "@material-symbols/svg-600/rounded/attach_money.svg";
 import Park from "@material-symbols/svg-600/rounded/park.svg";
 import Payments from "@material-symbols/svg-600/rounded/payments.svg";
 import Person from "@material-symbols/svg-600/rounded/person.svg";
+import PhotoCamera from "@material-symbols/svg-600/rounded/photo_camera.svg";
 
 import Refresh from "@material-symbols/svg-600/rounded/refresh.svg";
 import Remove from "@material-symbols/svg-600/rounded/remove.svg";
@@ -91,6 +92,7 @@ const icons = {
   info: Info,
   minus: Remove,
   moto: Moped,
+  camera: PhotoCamera,
   pin: LocationOn,
   plus: Add,
   receipt: AssignmentRound,

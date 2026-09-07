@@ -91,7 +91,7 @@ export function FoodListing() {
       {/* A folha branca sobe por cima do banner, com raio só no topo. */}
       <div className="relative -mt-8 rounded-tr-[24px] bg-white">
         {/* Aba branca que continua a folha, com os selos sobre o amarelo. */}
-        <div className="absolute left-0 top-0 max-w-full -translate-y-full rounded-t-[24px] bg-white py-2 pr-5 md:pl-4 xl:pl-[max(3rem,calc((100vw-1440px)/2+3rem))]">
+        <div className="absolute left-0 top-0 max-w-full -translate-y-full rounded-t-[24px] bg-white py-2 pr-1 md:pl-4 xl:pl-[max(3rem,calc((100vw-1440px)/2+3rem))]">
           <FilterChips />
         </div>
 
