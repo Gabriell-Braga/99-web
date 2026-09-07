@@ -34,6 +34,8 @@ interface AddressSearchProps {
   position?: LatLng | null;
   /** "pill" é o campo solto das telas de fluxo; "row" é a linha dentro de um card. */
   variant?: "pill" | "row";
+  /** Cor do círculo na variante "row". */
+  ponto?: "origem" | "destino";
 }
 
 type Status = "idle" | "loading" | "error";
@@ -72,6 +74,7 @@ export function AddressSearch({
   showRecents = true,
   position = null,
   variant = "pill",
+  ponto = "destino",
 }: AddressSearchProps) {
   const recentAddresses = useRecents(position);
   const [text, setText] = useState(value ? value.title : "");
@@ -196,7 +199,10 @@ export function AddressSearch({
       <div className="relative">
         {variant === "row" ? (
           <span
-            className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-[3px] border-orange-99 bg-white"
+            className={cx(
+              "pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 rounded-full border-[3px] bg-white",
+              ponto === "origem" ? "border-success-99" : "border-orange-99",
+            )}
             aria-hidden="true"
           />
         ) : (
