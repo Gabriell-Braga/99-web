@@ -42,6 +42,21 @@ interface AddressSearchProps {
 
 type Status = "idle" | "loading" | "error";
 
+/** Número solto digitado na busca, como o 570 de "Tamoios 570 BH". */
+function numeroDigitado(texto: string): string | undefined {
+  const m = texto.match(/(?:^|[\s,])(\d{1,5})(?=[\s,]|$)/);
+  return m ? m[1] : undefined;
+}
+
+/**
+ * O geocodificador costuma devolver só a rua. Se a pessoa digitou o número,
+ * ele entra no resultado, para a sugestão não parecer que perdeu a informação.
+ */
+function comNumero(lista: GeoPlace[], numero?: string): GeoPlace[] {
+  if (!numero) return lista;
+  return lista.map((p) => (p.number || !p.street ? p : { ...p, number: numero, title: `${p.street}, ${numero}` }));
+}
+
 function recentToPlace(r: RecentAddress): GeoPlace {
   return {
     id: r.id,
@@ -122,7 +137,7 @@ export function AddressSearch({
       try {
         const r = await searchAddress(q, controller.signal);
         if (controller.signal.aborted) return;
-        setResults(r);
+        setResults(comNumero(r, numeroDigitado(q)));
         setStatus("idle");
         setHighlight(0);
       } catch (e) {
