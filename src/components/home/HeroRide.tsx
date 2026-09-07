@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppProvider";
 import { useCurrentLocation } from "@/lib/useGeolocation";
 import { AddressSearch } from "@/components/map/AddressSearch";
-import { Button } from "@/components/ui/Button";
+import { HomeButton } from "@/components/home/HomeButton";
 import { Icon } from "@/components/ui/Icon";
 import type { GeoPlace } from "@/lib/geo";
 
@@ -66,9 +66,9 @@ export function HeroRide() {
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
-        <Button size="lg" onClick={() => seguir(destino)}>
+        <HomeButton tom="amarelo" onClick={() => seguir(destino)}>
           Ver preços
-        </Button>
+        </HomeButton>
         <span className="text-[15px] text-secondary-99">Rota e preço aparecem na hora, sem cadastro.</span>
       </div>
     </div>

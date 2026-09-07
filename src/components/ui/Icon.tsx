@@ -10,6 +10,7 @@ import Moped from "@material-symbols/svg-400/rounded/moped.svg";
 import Add from "@material-symbols/svg-600/rounded/add.svg";
 import ArrowBack from "@material-symbols/svg-600/rounded/arrow_back.svg";
 import ArrowForward from "@material-symbols/svg-600/rounded/arrow_forward.svg";
+import ArrowOutward from "@material-symbols/svg-600/rounded/arrow_outward.svg";
 import BoltFill from "@material-symbols/svg-600/rounded/bolt-fill.svg";
 import Check from "@material-symbols/svg-600/rounded/check.svg";
 import ChevronLeft from "@material-symbols/svg-600/rounded/chevron_left.svg";
@@ -66,6 +67,7 @@ const icons = {
   alertFill: ErrorFill,
   arrowLeft: ArrowBack,
   arrowRight: ArrowForward,
+  arrowDiagonal: ArrowOutward,
   boltFill: BoltFill,
   box: DeployedCode,
   boxLine: Package2,

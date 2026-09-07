@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
+import { cx } from "@/lib/cx";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { HomeMap } from "@/components/map/HomeMap";
 import { HeroRide } from "@/components/home/HeroRide";
+import { HomeButton } from "@/components/home/HomeButton";
+import { restaurants } from "@/data/restaurants";
+import { foodCategories } from "@/data/categories";
+import { pickPhoto } from "@/data/foodPhotos";
 
 const servicos: { href: string; title: string; description: string; icon: IconName; cta: string }[] = [
   {
@@ -56,9 +60,7 @@ const vantagens: { title: string; service: string; description: string; imagem: 
     title: "Despachar um pacote sem trocar de aparelho",
     description:
       "Moto até 10 kg, carro até 30 kg, com origem, destino, contato dos dois lados e o que vai no pacote no mesmo painel.",
-    imagem: "/vehicles/moto-box.png",
-    arte: true,
-    tint: "#fff8e1",
+    imagem: "/pessoas/entrega.webp",
   },
   {
     service: "Feito para o computador",
@@ -69,26 +71,16 @@ const vantagens: { title: string; service: string; description: string; imagem: 
   },
 ];
 
-const passos: { icon: IconName; title: string; description: string; imagem: string }[] = [
-  {
-    icon: "search",
-    title: "Diga para onde vai",
-    description: "Digite, cole o endereço inteiro ou escolha um recente. O texto vira rua, número e bairro sozinho.",
-    imagem: "/screens/destino.webp",
-  },
-  {
-    icon: "car",
-    title: "Escolha a categoria",
-    description: "Mapa e painel na mesma tela: a rota real aparece e cada categoria mostra preço e chegada.",
-    imagem: "/screens/categorias.webp",
-  },
-  {
-    icon: "pin",
-    title: "Acompanhe até o fim",
-    description: "Motorista, veículo, placa e etapas em tempo real, no mesmo mapa da solicitação.",
-    imagem: "/screens/acompanhamento.webp",
-  },
+/** Números reais do catálogo do protótipo, para a seção do Food. */
+const totalPratos = restaurants.reduce((soma, r) => soma + r.menu.reduce((s, sec) => s + sec.items.length, 0), 0);
+const numeros = [
+  { valor: String(restaurants.length), rotulo: "lojas abertas no catálogo" },
+  { valor: String(foodCategories.length), rotulo: "categorias no trilho" },
+  { valor: String(totalPratos), rotulo: "pratos com foto e preço" },
 ];
+
+/** Quatro pratos do próprio catálogo, no mosaico da seção do Food. */
+const mosaico = ["burger", "sushi", "pizza"] as const;
 
 export default function HomePage() {
   return (
@@ -105,10 +97,15 @@ export default function HomePage() {
         </div>
 
         <div className="flex min-w-0 flex-col gap-3">
-          <div className="relative overflow-hidden rounded-2xl border border-border-99">
-            <div className="h-[320px] lg:h-[380px]">
-              <HomeMap />
-            </div>
+          <div className="relative overflow-hidden rounded-2xl">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/pessoas/corrida.webp"
+              alt=""
+              className="h-[320px] w-full object-cover lg:h-[380px]"
+              fetchPriority="high"
+              decoding="async"
+            />
             {/* Prévia do painel de categorias, como ele aparece no fluxo. */}
             <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-xl bg-white p-3 shadow-high sm:inset-x-auto sm:right-4 sm:w-[340px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -121,16 +118,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Quem usa está no computador, e a foto diz isso antes do texto. */}
-          <div className="hidden overflow-hidden rounded-2xl border border-border-99 lg:block">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/pessoas/teclado.webp"
-              alt=""
-              className="h-[150px] w-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
+          {/* Os outros dois serviços aparecem em foto, ao lado da corrida. */}
+          <div className="hidden gap-3 lg:grid lg:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/pessoas/mesa.webp" alt="" className="h-[150px] w-full object-cover" loading="lazy" decoding="async" />
+            </div>
+            <div className="overflow-hidden rounded-2xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/pessoas/entrega.webp" alt="" className="h-[150px] w-full object-cover" loading="lazy" decoding="async" />
+            </div>
           </div>
         </div>
       </Container>
@@ -200,46 +197,54 @@ export default function HomePage() {
         </ul>
       </Container>
 
-      {/* As telas reais, na ordem em que a pessoa percorre. */}
-      <section className="bg-subtle-99">
-        <Container className="py-16 lg:py-20">
-          <h2 className="text-[28px] font-bold md:text-[32px]">Como pedir uma corrida</h2>
-          <ol className="mt-8 grid gap-8 md:grid-cols-3" role="list">
-            {passos.map((p, i) => (
-              <li key={p.title} className="flex flex-col gap-4">
-                <div className="relative overflow-hidden rounded-2xl border border-border-99 bg-white">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={p.imagem}
-                    alt=""
-                    className="aspect-[16/11] w-full object-cover object-top"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span
-                    className="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-xl bg-white text-black-99 shadow-high"
-                    aria-hidden="true"
-                  >
-                    <Icon name={p.icon} size={22} />
-                  </span>
+      {/* O Food ganha a própria faixa, com o catálogo do protótipo em números. */}
+      <section className="bg-black-99 text-white">
+        <Container className="grid items-center gap-12 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:py-20">
+          <div className="flex min-w-0 flex-col gap-5">
+            <span className="w-fit rounded-full bg-yellow-99 px-3 py-1 text-[13px] font-bold text-black-99">99 Food</span>
+            <h2 className="text-[32px] font-bold leading-tight md:text-[40px]">
+              O almoço resolvido na aba do lado
+            </h2>
+            <p className="max-w-lg text-[17px] text-white/70">
+              Trilho de categorias, ofertas do dia e o carrinho fixo na coluna. Você compara duas lojas, muda de ideia e
+              volta sem perder nada do que já tinha escolhido.
+            </p>
+
+            <dl className="mt-2 grid grid-cols-3 gap-4 border-t border-white/15 pt-6">
+              {numeros.map((n) => (
+                <div key={n.rotulo} className="flex flex-col gap-1">
+                  <dt className="text-[32px] font-bold leading-none tabular-nums text-yellow-99">{n.valor}</dt>
+                  <dd className="text-[13px] text-white/70">{n.rotulo}</dd>
                 </div>
-                <h3 className="text-[20px] font-bold">
-                  <span className="text-secondary-99">{i + 1}. </span>
-                  {p.title}
-                </h3>
-                <p className="text-[15px] text-secondary-99">{p.description}</p>
+              ))}
+            </dl>
+
+            <div className="mt-2">
+              <HomeButton href="/comida" tom="amarelo">
+                Ver lojas
+              </HomeButton>
+            </div>
+          </div>
+
+          {/* Mosaico com pratos do próprio catálogo. */}
+          <ul
+            className="grid grid-cols-2 grid-rows-[150px_150px] gap-3 lg:grid-rows-[190px_190px]"
+            role="list"
+            aria-label="Pratos do catálogo"
+          >
+            {mosaico.map((kind, i) => (
+              <li key={kind} className={cx("min-h-0", i === 0 && "row-span-2")}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={pickPhoto(kind)}
+                  alt=""
+                  className="h-full w-full rounded-2xl object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
               </li>
             ))}
-          </ol>
-          <div className="mt-10">
-            <Link
-              href="/corrida"
-              className="inline-flex h-14 items-center gap-2 rounded-xl bg-yellow-99 px-6 text-[17px] font-bold text-black-99 transition-colors duration-150 hover:bg-yellow-99-hover"
-            >
-              Começar uma corrida
-              <Icon name="arrowRight" />
-            </Link>
-          </div>
+          </ul>
         </Container>
       </section>
 
