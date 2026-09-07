@@ -32,6 +32,8 @@ interface AddressSearchProps {
   showRecents?: boolean;
   /** Posição atual: os recentes são gerados a 3–6 km dela. */
   position?: LatLng | null;
+  /** "pill" é o campo solto das telas de fluxo; "row" é a linha dentro de um card. */
+  variant?: "pill" | "row";
 }
 
 type Status = "idle" | "loading" | "error";
@@ -69,6 +71,7 @@ export function AddressSearch({
   autoFocus,
   showRecents = true,
   position = null,
+  variant = "pill",
 }: AddressSearchProps) {
   const recentAddresses = useRecents(position);
   const [text, setText] = useState(value ? value.title : "");
@@ -191,7 +194,14 @@ export function AddressSearch({
   return (
     <div ref={wrapRef} className="relative">
       <div className="relative">
-        <Icon name="search" size={22} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
+        {variant === "row" ? (
+          <span
+            className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-[3px] border-orange-99 bg-white"
+            aria-hidden="true"
+          />
+        ) : (
+          <Icon name="search" size={22} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
+        )}
         <input
           ref={inputRef}
           type="text"
@@ -236,7 +246,12 @@ export function AddressSearch({
               setOpen(false);
             }
           }}
-          className="h-14 w-full rounded-full border border-border-99 bg-white pl-14 pr-14 text-[20px] font-bold text-black-99 placeholder:font-bold placeholder:text-placeholder-99 focus:border-black-99 focus:outline-none"
+          className={cx(
+            "w-full text-black-99 placeholder:text-placeholder-99 focus:outline-none",
+            variant === "row"
+              ? "h-14 rounded-xl bg-transparent pl-11 pr-12 text-[17px] font-bold placeholder:font-bold"
+              : "h-14 rounded-full border border-border-99 bg-white pl-14 pr-14 text-[20px] font-bold placeholder:font-bold focus:border-black-99",
+          )}
         />
         {status === "loading" ? (
           <span className="absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 animate-spin rounded-full border-2 border-border-99 border-t-black-99" aria-label="Buscando" />

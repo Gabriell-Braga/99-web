@@ -10,6 +10,7 @@ import {
 } from "react";
 import { usePathname } from "next/navigation";
 import type { Bag, BagLine, Order, SavedAddress } from "@/lib/types";
+import type { GeoPlace } from "@/lib/geo";
 import { savedAddresses } from "@/data/addresses";
 import { useCurrentLocation } from "@/lib/useGeolocation";
 import { useSavedAddresses } from "@/lib/useSavedAddresses";
@@ -19,6 +20,9 @@ interface AppState {
   address: SavedAddress;
   /** Endereços de entrega, montados em volta da posição atual. */
   addresses: SavedAddress[];
+  /** Destino escolhido na home, aproveitado ao abrir a corrida. */
+  rideDestination: GeoPlace | null;
+  setRideDestination: (p: GeoPlace | null) => void;
   setAddress: (a: SavedAddress) => void;
   bag: Bag;
   addLine: (restaurantSlug: string, line: Omit<BagLine, "lineId">) => "added" | "conflict";
@@ -48,6 +52,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [chosenId, setChosenId] = useState<string>(savedAddresses[0].id);
   const address = addresses.find((a) => a.id === chosenId) ?? addresses[0];
   const setAddress = useCallback((a: SavedAddress) => setChosenId(a.id), []);
+  const [rideDestination, setRideDestination] = useState<GeoPlace | null>(null);
   const [bag, setBag] = useState<Bag>({ restaurantSlug: null, lines: [] });
   const [orders, setOrders] = useState<Record<string, Order>>({});
 
@@ -101,6 +106,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       address,
       addresses,
       setAddress,
+      rideDestination,
+      setRideDestination,
       bag,
       addLine,
       replaceBag,
@@ -111,7 +118,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       saveOrder,
       getOrder,
     }),
-    [address, addresses, setAddress, bag, addLine, replaceBag, updateQuantity, removeLine, clearBag, orders, saveOrder, getOrder],
+    [address, addresses, setAddress, rideDestination, bag, addLine, replaceBag, updateQuantity, removeLine, clearBag, orders, saveOrder, getOrder],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

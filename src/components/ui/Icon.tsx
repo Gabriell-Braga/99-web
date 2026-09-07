@@ -1,51 +1,51 @@
 import type { ReactElement, SVGProps } from "react";
 
-import Add from "@material-symbols/svg-400/rounded/add.svg";
-import ArrowBack from "@material-symbols/svg-400/rounded/arrow_back.svg";
-import ArrowForward from "@material-symbols/svg-400/rounded/arrow_forward.svg";
-import BoltFill from "@material-symbols/svg-400/rounded/bolt-fill.svg";
-import Check from "@material-symbols/svg-400/rounded/check.svg";
-import ChevronLeft from "@material-symbols/svg-400/rounded/chevron_left.svg";
-import ChevronRight from "@material-symbols/svg-400/rounded/chevron_right.svg";
-import Close from "@material-symbols/svg-400/rounded/close.svg";
-import ConfirmationNumber from "@material-symbols/svg-400/rounded/confirmation_number.svg";
-import ContentCopy from "@material-symbols/svg-400/rounded/content_copy.svg";
-import CreditCard from "@material-symbols/svg-400/rounded/credit_card.svg";
-import Delete from "@material-symbols/svg-400/rounded/delete.svg";
-import DirectionsCar from "@material-symbols/svg-400/rounded/directions_car.svg";
-import ErrorIcon from "@material-symbols/svg-400/rounded/error.svg";
-import ErrorFill from "@material-symbols/svg-400/rounded/error-fill.svg";
-import HandshakeFill from "@material-symbols/svg-400/rounded/handshake-fill.svg";
-import Home from "@material-symbols/svg-400/rounded/home.svg";
-import Info from "@material-symbols/svg-400/rounded/info.svg";
-import KeyboardArrowDown from "@material-symbols/svg-400/rounded/keyboard_arrow_down.svg";
-import LocalFireDepartmentFill from "@material-symbols/svg-400/rounded/local_fire_department-fill.svg";
-import LocationOn from "@material-symbols/svg-400/rounded/location_on.svg";
-import MyLocation from "@material-symbols/svg-400/rounded/my_location.svg";
-import Package2 from "@material-symbols/svg-400/rounded/package_2.svg";
-import Park from "@material-symbols/svg-400/rounded/park.svg";
-import Payments from "@material-symbols/svg-400/rounded/payments.svg";
-import Person from "@material-symbols/svg-400/rounded/person.svg";
-import ReceiptLong from "@material-symbols/svg-400/rounded/receipt_long.svg";
-import Refresh from "@material-symbols/svg-400/rounded/refresh.svg";
-import Remove from "@material-symbols/svg-400/rounded/remove.svg";
-import Restaurant from "@material-symbols/svg-400/rounded/restaurant.svg";
-import Schedule from "@material-symbols/svg-400/rounded/schedule.svg";
-import Search from "@material-symbols/svg-400/rounded/search.svg";
-import Sell from "@material-symbols/svg-400/rounded/sell.svg";
-import SellFill from "@material-symbols/svg-400/rounded/sell-fill.svg";
-import ShoppingCart from "@material-symbols/svg-400/rounded/shopping_cart.svg";
-import SkipNext from "@material-symbols/svg-400/rounded/skip_next.svg";
-import StarFill from "@material-symbols/svg-400/rounded/star-fill.svg";
-import SwapVert from "@material-symbols/svg-400/rounded/swap_vert.svg";
-import Wallet from "@material-symbols/svg-400/rounded/wallet.svg";
-import Work from "@material-symbols/svg-400/rounded/work.svg";
+import Add from "@material-symbols/svg-500/rounded/add.svg";
+import ArrowBack from "@material-symbols/svg-500/rounded/arrow_back.svg";
+import ArrowForward from "@material-symbols/svg-500/rounded/arrow_forward.svg";
+import BoltFill from "@material-symbols/svg-500/rounded/bolt-fill.svg";
+import Check from "@material-symbols/svg-500/rounded/check.svg";
+import ChevronLeft from "@material-symbols/svg-500/rounded/chevron_left.svg";
+import ChevronRight from "@material-symbols/svg-500/rounded/chevron_right.svg";
+import Close from "@material-symbols/svg-500/rounded/close.svg";
+import ConfirmationNumber from "@material-symbols/svg-500/rounded/confirmation_number.svg";
+import ContentCopy from "@material-symbols/svg-500/rounded/content_copy.svg";
+import CreditCard from "@material-symbols/svg-500/rounded/credit_card.svg";
+import Delete from "@material-symbols/svg-500/rounded/delete.svg";
+import DirectionsCar from "@material-symbols/svg-500/rounded/directions_car.svg";
+import ErrorIcon from "@material-symbols/svg-500/rounded/error.svg";
+import ErrorFill from "@material-symbols/svg-500/rounded/error-fill.svg";
+import HandshakeFill from "@material-symbols/svg-500/rounded/handshake-fill.svg";
+import Home from "@material-symbols/svg-500/rounded/home.svg";
+import Info from "@material-symbols/svg-500/rounded/info.svg";
+import KeyboardArrowDown from "@material-symbols/svg-500/rounded/keyboard_arrow_down.svg";
+import LocalFireDepartmentFill from "@material-symbols/svg-500/rounded/local_fire_department-fill.svg";
+import LocationOn from "@material-symbols/svg-500/rounded/location_on.svg";
+import MyLocation from "@material-symbols/svg-500/rounded/my_location.svg";
+import Package2 from "@material-symbols/svg-500/rounded/package_2.svg";
+import Park from "@material-symbols/svg-500/rounded/park.svg";
+import Payments from "@material-symbols/svg-500/rounded/payments.svg";
+import Person from "@material-symbols/svg-500/rounded/person.svg";
+import ReceiptLong from "@material-symbols/svg-500/rounded/receipt_long.svg";
+import Refresh from "@material-symbols/svg-500/rounded/refresh.svg";
+import Remove from "@material-symbols/svg-500/rounded/remove.svg";
+import Restaurant from "@material-symbols/svg-500/rounded/restaurant.svg";
+import Schedule from "@material-symbols/svg-500/rounded/schedule.svg";
+import Search from "@material-symbols/svg-500/rounded/search.svg";
+import Sell from "@material-symbols/svg-500/rounded/sell.svg";
+import SellFill from "@material-symbols/svg-500/rounded/sell-fill.svg";
+import ShoppingCart from "@material-symbols/svg-500/rounded/shopping_cart.svg";
+import SkipNext from "@material-symbols/svg-500/rounded/skip_next.svg";
+import StarFill from "@material-symbols/svg-500/rounded/star-fill.svg";
+import SwapVert from "@material-symbols/svg-500/rounded/swap_vert.svg";
+import Wallet from "@material-symbols/svg-500/rounded/wallet.svg";
+import Work from "@material-symbols/svg-500/rounded/work.svg";
 
 type Glyph = (props: SVGProps<SVGSVGElement>) => ReactElement;
 
 /**
- * Material Symbols Rounded, peso 400, grau 0, tamanho óptico 24, sem
- * preenchimento. Uma família só em todo o projeto, sem ícone desenhado à mão.
+ * Material Symbols Rounded, peso 500, grau 0, tamanho óptico 24. O traço mais
+ * grosso e o canto arredondado acompanham o app. Uma família só em todo o projeto, sem ícone desenhado à mão.
  * "coupon" usa `sell`, nome atual do antigo `local_offer`. Selo, nota, chama e
  * erro usam a variante preenchida; o cabeçalho e a navegação seguem vazados.
  */

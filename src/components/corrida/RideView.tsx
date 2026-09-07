@@ -48,11 +48,12 @@ function arrivalLabel(minutes: number): string {
 export function RideView() {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
-  const { saveOrder } = useApp();
+  const { saveOrder, rideDestination } = useApp();
   const current = useCurrentLocation();
   const [origin, setOrigin] = useState<GeoPlace | null>(null);
   const [originTouched, setOriginTouched] = useState(false);
-  const [destination, setDestination] = useState<GeoPlace | null>(null);
+  // Destino escolhido na home entra já preenchido.
+  const [destination, setDestination] = useState<GeoPlace | null>(rideDestination);
   const [editing, setEditing] = useState<"origin" | "destination" | null>(null);
   const [routeState, setRouteState] = useState<{ key: string; route: RouteResult } | null>(null);
   const [category, setCategory] = useState<RideCategory["id"]>("pop");
