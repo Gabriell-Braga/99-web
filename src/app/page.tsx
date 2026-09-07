@@ -35,6 +35,40 @@ const servicos: { href: string; title: string; description: string; icon: IconNa
   },
 ];
 
+/** Vantagens, cada uma amarrada a um serviço da 99. */
+const vantagens: { title: string; service: string; description: string; imagem: string; arte?: boolean; tint?: string }[] = [
+  {
+    service: "99 Corrida",
+    title: "O preço de cada categoria antes de confirmar",
+    description:
+      "Pop, Moto, Pop Expresso, Negocia e Táxi na mesma lista, com a rota real no mapa ao lado. No Negocia você propõe o valor sem sair da tela.",
+    imagem: "/pessoas/corrida.webp",
+  },
+  {
+    service: "99 Food",
+    title: "Comparar lojas sem perder o carrinho",
+    description:
+      "O carrinho fica fixo na coluna enquanto você olha ofertas e preferidos. Sair de uma loja não apaga o que já estava escolhido.",
+    imagem: "/pessoas/mesa.webp",
+  },
+  {
+    service: "99 Entrega",
+    title: "Despachar um pacote sem trocar de aparelho",
+    description:
+      "Moto até 10 kg, carro até 30 kg, com origem, destino, contato dos dois lados e o que vai no pacote no mesmo painel.",
+    imagem: "/vehicles/moto-box.png",
+    arte: true,
+    tint: "#fff8e1",
+  },
+  {
+    service: "Feito para o computador",
+    title: "O endereço já está na sua tela",
+    description:
+      "Cole o endereço inteiro que chegou por mensagem e ele vira rua, número, bairro e CEP. Com teclado, cada pedido custa segundos.",
+    imagem: "/pessoas/computador.webp",
+  },
+];
+
 const passos: { icon: IconName; title: string; description: string; imagem: string }[] = [
   {
     icon: "search",
@@ -70,19 +104,33 @@ export default function HomePage() {
           <HeroRide />
         </div>
 
-        <div className="relative min-w-0 overflow-hidden rounded-2xl border border-border-99">
-          <div className="h-[380px] lg:h-[460px]">
-            <HomeMap />
+        <div className="flex min-w-0 flex-col gap-3">
+          <div className="relative overflow-hidden rounded-2xl border border-border-99">
+            <div className="h-[320px] lg:h-[380px]">
+              <HomeMap />
+            </div>
+            {/* Prévia do painel de categorias, como ele aparece no fluxo. */}
+            <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-xl bg-white p-3 shadow-high sm:inset-x-auto sm:right-4 sm:w-[340px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/vehicles/car-white.png" alt="" className="h-14 w-14 shrink-0 object-contain" />
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="whitespace-nowrap text-[15px] font-bold">Pop · 4 min</span>
+                <span className="truncate text-[13px] text-secondary-99">Vila Olímpia ao Ibirapuera</span>
+              </span>
+              <span className="shrink-0 text-[17px] font-bold tabular-nums text-green-99">R$ 16,89</span>
+            </div>
           </div>
-          {/* Prévia do painel de categorias, como ele aparece no fluxo. */}
-          <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-xl bg-white p-3 shadow-high sm:inset-x-auto sm:right-4 sm:w-[340px]">
+
+          {/* Quem usa está no computador, e a foto diz isso antes do texto. */}
+          <div className="hidden overflow-hidden rounded-2xl border border-border-99 lg:block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/vehicles/car-white.png" alt="" className="h-14 w-14 shrink-0 object-contain" />
-            <span className="flex min-w-0 flex-1 flex-col">
-              <span className="whitespace-nowrap text-[15px] font-bold">Pop · 4 min</span>
-              <span className="truncate text-[13px] text-secondary-99">Vila Olímpia ao Ibirapuera</span>
-            </span>
-            <span className="shrink-0 text-[17px] font-bold tabular-nums text-green-99">R$ 16,89</span>
+            <img
+              src="/pessoas/teclado.webp"
+              alt=""
+              className="h-[150px] w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         </div>
       </Container>
@@ -120,80 +168,78 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Como funciona, com as telas reais do protótipo. */}
+      {/* Vantagens, uma por serviço da 99. */}
       <Container className="py-16 lg:py-20">
-        <h2 className="text-[28px] font-bold md:text-[32px]">Como pedir uma corrida</h2>
-        <ol className="mt-8 grid gap-8 md:grid-cols-3" role="list">
-          {passos.map((p, i) => (
-            <li key={p.title} className="flex flex-col gap-4">
-              <div className="relative overflow-hidden rounded-2xl border border-border-99 bg-offwhite-99">
+        <h2 className="text-[28px] font-bold md:text-[32px]">Vantagens do 99 Web</h2>
+        <p className="mt-2 max-w-2xl text-[17px] text-secondary-99">
+          A lacuna foi vista em operação real. Estes são os momentos em que o celular atrapalha.
+        </p>
+        <ul className="mt-8 grid gap-8 sm:grid-cols-2" role="list">
+          {vantagens.map((v) => (
+            <li key={v.service} className="flex flex-col gap-4">
+              <div
+                className="flex items-center justify-center overflow-hidden rounded-2xl border border-border-99"
+                style={{ background: v.tint ?? "#f7f7f8" }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={p.imagem}
+                  src={v.imagem}
                   alt=""
-                  className="aspect-[16/11] w-full object-cover object-top"
+                  className={v.arte ? "h-[220px] w-auto object-contain py-6" : "h-[220px] w-full object-cover"}
                   loading="lazy"
                   decoding="async"
                 />
-                <span
-                  className="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-xl bg-white text-black-99 shadow-high"
-                  aria-hidden="true"
-                >
-                  <Icon name={p.icon} size={22} />
-                </span>
               </div>
-              <h3 className="text-[20px] font-bold">
-                <span className="text-secondary-99">{i + 1}. </span>
-                {p.title}
-              </h3>
-              <p className="text-[15px] text-secondary-99">{p.description}</p>
+              <div className="flex flex-col gap-2">
+                <span className="text-[13px] font-bold uppercase tracking-wide text-secondary-99">{v.service}</span>
+                <h3 className="text-[22px] font-bold leading-tight">{v.title}</h3>
+                <p className="text-[15px] text-secondary-99">{v.description}</p>
+              </div>
             </li>
           ))}
-        </ol>
-        <div className="mt-10">
-          <Link
-            href="/corrida"
-            className="inline-flex h-14 items-center gap-2 rounded-xl bg-yellow-99 px-6 text-[17px] font-bold text-black-99 transition-colors duration-150 hover:bg-yellow-99-hover"
-          >
-            Começar uma corrida
-            <Icon name="arrowRight" />
-          </Link>
-        </div>
+        </ul>
       </Container>
 
+      {/* As telas reais, na ordem em que a pessoa percorre. */}
       <section className="bg-subtle-99">
-        <Container className="grid gap-10 py-16 lg:grid-cols-3 lg:py-20">
-          <div className="lg:col-span-1">
-            <h2 className="text-[28px] font-bold md:text-[32px]">Por que web</h2>
-            <p className="mt-2 text-[15px] text-secondary-99">
-              A lacuna foi vista em operação real. Estes são os momentos em que o celular atrapalha.
-            </p>
-          </div>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:col-span-2" role="list">
-            {[
-              {
-                t: "O endereço já está na tela",
-                d: "Ele chegou por mensagem, e-mail ou planilha. Copiar e colar evita digitar tudo de novo e errar o número.",
-              },
-              {
-                t: "Mapa e painel lado a lado",
-                d: "A tela grande mostra rota, categorias e preço de uma vez. Escolher deixa de ser uma etapa por tela.",
-              },
-              {
-                t: "Quem despacha o dia inteiro",
-                d: "Loja, portaria e recepção pedem corrida e entrega em série. Com teclado, cada pedido custa segundos.",
-              },
-              {
-                t: "O carrinho vira coluna fixa",
-                d: "Dá para comparar lojas sem perder o que já escolheu. No celular, sair da loja é recomeçar.",
-              },
-            ].map((b) => (
-              <li key={b.t} className="flex flex-col gap-1 rounded-2xl bg-white p-5">
-                <h3 className="text-[15px] font-bold">{b.t}</h3>
-                <p className="text-[15px] text-secondary-99">{b.d}</p>
+        <Container className="py-16 lg:py-20">
+          <h2 className="text-[28px] font-bold md:text-[32px]">Como pedir uma corrida</h2>
+          <ol className="mt-8 grid gap-8 md:grid-cols-3" role="list">
+            {passos.map((p, i) => (
+              <li key={p.title} className="flex flex-col gap-4">
+                <div className="relative overflow-hidden rounded-2xl border border-border-99 bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.imagem}
+                    alt=""
+                    className="aspect-[16/11] w-full object-cover object-top"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span
+                    className="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-xl bg-white text-black-99 shadow-high"
+                    aria-hidden="true"
+                  >
+                    <Icon name={p.icon} size={22} />
+                  </span>
+                </div>
+                <h3 className="text-[20px] font-bold">
+                  <span className="text-secondary-99">{i + 1}. </span>
+                  {p.title}
+                </h3>
+                <p className="text-[15px] text-secondary-99">{p.description}</p>
               </li>
             ))}
-          </ul>
+          </ol>
+          <div className="mt-10">
+            <Link
+              href="/corrida"
+              className="inline-flex h-14 items-center gap-2 rounded-xl bg-yellow-99 px-6 text-[17px] font-bold text-black-99 transition-colors duration-150 hover:bg-yellow-99-hover"
+            >
+              Começar uma corrida
+              <Icon name="arrowRight" />
+            </Link>
+          </div>
         </Container>
       </section>
 
