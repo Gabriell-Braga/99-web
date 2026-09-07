@@ -90,13 +90,13 @@ export function FoodListing() {
 
       {/* A folha branca sobe por cima do banner, com raio só no topo. */}
       <div className="relative -mt-8 rounded-t-[24px] bg-white">
+        {/* Aba branca que continua a folha, com os selos sobre o amarelo. */}
+        <div className="absolute left-0 top-0 max-w-full -translate-y-full rounded-tl-[24px] rounded-tr-2xl bg-white py-2 pl-4 pr-4 md:pl-8 xl:pl-16">
+          <FilterChips />
+        </div>
+
         <FoodShell>
           <div className="flex flex-col gap-8">
-            {/* Montada na borda da folha, metade sobre o amarelo. */}
-            <div className="-mt-[52px] w-fit max-w-full">
-              <FilterChips />
-            </div>
-
             <CategoryRail value={category} onChange={setCategory} />
 
         {!address.covered ? (

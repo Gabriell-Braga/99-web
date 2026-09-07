@@ -1,14 +1,14 @@
-import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { cx } from "@/lib/cx";
-import { Icon, type IconName } from "@/components/ui/Icon";
+import { Icon } from "@/components/ui/Icon";
 import { HeroRide } from "@/components/home/HeroRide";
 import { HomeButton } from "@/components/home/HomeButton";
+import { ServiceCards, type Servico } from "@/components/home/ServiceCards";
 import { restaurants } from "@/data/restaurants";
 import { foodCategories } from "@/data/categories";
 import { pickPhoto } from "@/data/foodPhotos";
 
-const servicos: { href: string; title: string; description: string; icon: IconName; cta: string }[] = [
+const servicos: Servico[] = [
   {
     href: "/corrida",
     title: "Corrida",
@@ -129,29 +129,7 @@ export default function HomePage() {
           <p className="mt-2 max-w-2xl text-[17px] text-secondary-99">
             Quatro caminhos, cada um com o fluxo completo, estados de carregamento, erro e bloqueio.
           </p>
-          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="list">
-            {servicos.map((s) => (
-              <li key={s.title}>
-                <Link
-                  href={s.href}
-                  className="group flex h-full flex-col gap-3 rounded-2xl bg-white p-6 transition-colors duration-150 hover:bg-offwhite-99"
-                >
-                  <span
-                    className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-99 text-black-99"
-                    aria-hidden="true"
-                  >
-                    <Icon name={s.icon} size={24} />
-                  </span>
-                  <span className="text-[20px] font-bold">{s.title}</span>
-                  <span className="text-[15px] text-secondary-99">{s.description}</span>
-                  <span className="mt-auto inline-flex items-center gap-2 pt-3 text-[15px] font-bold text-black-99">
-                    {s.cta}
-                    <Icon name="arrowRight" size={18} />
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <ServiceCards items={servicos} />
         </Container>
       </section>
 

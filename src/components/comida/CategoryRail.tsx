@@ -62,8 +62,10 @@ export function CategoryRail({ value, onChange }: CategoryRailProps) {
           aria-label="Categorias"
           className="scroll-rail flex gap-6 overflow-x-auto py-1"
         >
-          {foodCategories.map((c) => {
+          {foodCategories.map((c, i) => {
             const active = value === c.id;
+            // As primeiras já aparecem sem rolar: carregam na hora.
+            const naDobra = i < 6;
             return (
               <button
                 key={c.id}
@@ -79,7 +81,8 @@ export function CategoryRail({ value, onChange }: CategoryRailProps) {
                     alt=""
                     className="h-full w-full object-contain transition-transform duration-150"
                     style={categoryScale[c.id] ? { transform: `scale(${categoryScale[c.id]})` } : undefined}
-                    loading="lazy"
+                    loading={naDobra ? "eager" : "lazy"}
+                    fetchPriority={naDobra ? "high" : undefined}
                     decoding="async"
                   />
                 </span>

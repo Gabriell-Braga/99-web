@@ -78,7 +78,7 @@ export function PromoRail() {
                 <Icon name="arrowRight" size={18} />
               </span>
             </span>
-            {/* O primeiro banner é a maior imagem da tela: carrega na hora. */}
+            {/* O primeiro banner ainda entra na primeira tela: é ele que mede o LCP. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={p.image}
