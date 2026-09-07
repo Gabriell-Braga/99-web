@@ -92,7 +92,7 @@ export function FoodListing() {
       <div className="relative -mt-8 rounded-t-[24px] bg-white">
         {/* Aba branca que sai da folha, recuada até a coluna da página. As duas
             pontas ligam na folha por uma curva côncava, como no app. */}
-        <Container className="pointer-events-none absolute inset-x-0 top-0 -translate-y-full">
+        <Container className="pointer-events-none absolute inset-x-0 top-0 -translate-y-full overflow-hidden">
           <div className="pointer-events-auto relative w-fit max-w-full rounded-t-2xl bg-white py-2 pl-4 pr-1">
             <FilterChips />
             <span
