@@ -58,7 +58,7 @@ function FieldShell({ label, hint, error, required, id, children, className, tra
       {children}
       {error ? (
         <p id={`${id}-error`} className="flex items-start gap-1.5 text-[13px] text-orange-99-text">
-          <Icon name="alert" size={16} className="mt-0.5 shrink-0" />
+          <Icon name="alertFill" size={16} className="mt-0.5 shrink-0" />
           <span>{error}</span>
         </p>
       ) : hint ? (

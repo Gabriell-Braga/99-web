@@ -34,7 +34,7 @@ export function StoreCard({ r }: { r: Restaurant }) {
             <span>Mín. {formatBRL(r.minOrder)}</span>
             <span aria-hidden="true">·</span>
             <span className="flex items-center gap-0.5">
-              <Icon name="star" size={13} className="text-yellow-99-deep" />
+              <Icon name="starFill" size={13} className="text-yellow-99-deep" />
               <span className="font-bold text-black-99">{r.rating.toFixed(1)}</span>
               <span>({r.ratingCount.toLocaleString("pt-BR")})</span>
             </span>

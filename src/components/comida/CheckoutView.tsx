@@ -218,7 +218,7 @@ export function CheckoutView() {
 
             <section className="flex flex-col gap-3 rounded-2xl bg-green-99-tint p-5" aria-labelledby="ck-cupom">
               <h2 id="ck-cupom" className="flex items-center gap-2 text-[17px] font-bold text-green-99-ink">
-                <Icon name="coupon" size={20} />
+                <Icon name="couponFill" size={20} />
                 Cupons de desconto
               </h2>
               {coupon ? (

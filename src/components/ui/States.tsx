@@ -52,7 +52,7 @@ export function ErrorNote({ title, description, action, className }: ErrorNotePr
       role="alert"
       className={cx("flex gap-3 rounded-xl bg-orange-99-bg p-4 text-orange-99-text", className)}
     >
-      <Icon name="alert" className="mt-0.5 shrink-0" />
+      <Icon name="alertFill" className="mt-0.5 shrink-0" />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div>
           <p className="font-bold">{title}</p>

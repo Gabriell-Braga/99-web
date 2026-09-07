@@ -182,7 +182,7 @@ function PersonCard({ order }: { order: Order }) {
         <p className="truncate font-semibold">{person.name}</p>
         <p className="flex flex-wrap items-center gap-x-2 text-sm text-secondary-99">
           <span className="flex items-center gap-1 font-semibold text-black-99">
-            <Icon name="star" size={14} className="text-yellow-99-deep" />
+            <Icon name="starFill" size={14} className="text-yellow-99-deep" />
             {person.rating.toFixed(2)}
           </span>
           <span>{person.line}</span>

@@ -43,17 +43,24 @@ export function BottomNav() {
         {items.map((it) => {
           const active = pathname.startsWith(it.href);
           const inner = (
-            <span className="relative isolate flex h-14 w-[72px] flex-col items-center justify-center gap-1 text-black-99">
+            <span className="relative flex h-12 w-16 items-center justify-center">
               {active && (
                 <motion.span
                   layoutId={reduce ? undefined : "nav-ativo"}
                   transition={transition}
-                  className="absolute inset-0 -z-10 rounded-full bg-yellow-99"
+                  className="absolute h-12 w-12 rounded-full bg-yellow-99"
                   aria-hidden="true"
                 />
               )}
-              <Icon name={it.icon} size={24} />
-              <span className="text-[11px] font-medium leading-none">{it.label}</span>
+              <span className="relative flex flex-col items-center justify-center gap-0.5 text-black-99">
+                <Icon name={it.icon} size={24} />
+                {/* No item selecionado fica só o ícone dentro do círculo amarelo. */}
+                {active ? (
+                  <span className="sr-only">{it.label}</span>
+                ) : (
+                  <span className="text-[11px] font-medium leading-none">{it.label}</span>
+                )}
+              </span>
             </span>
           );
           if (it.disabled) {
