@@ -63,7 +63,7 @@ export function Footer() {
           </p>
           <ul className="mt-2 flex flex-col gap-1 text-[13px]" role="list">
             {photoCredits.map((c) => (
-              <li key={c.kind}>
+              <li key={c.id}>
                 {c.label}: {c.autor}, {c.licenca} ·{" "}
                 <a href={c.fonte} target="_blank" rel="noopener noreferrer" className="rounded underline">
                   original

@@ -49,7 +49,12 @@ export type ArtKind =
   | "drink"
   | "fries"
   | "chicken"
-  | "pasta";
+  | "pasta"
+  | "chinesa"
+  | "sorvete"
+  | "padaria"
+  | "carne"
+  | "arabe";
 
 export interface OptionChoice {
   id: string;

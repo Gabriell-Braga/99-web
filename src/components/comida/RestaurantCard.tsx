@@ -22,7 +22,7 @@ export function StoreCard({ r }: { r: Restaurant }) {
       )}
     >
       <div className="flex items-center gap-3">
-        <FoodArt kind={r.art} tint={r.tint} className={cx("h-14 w-14 shrink-0 rounded-xl", !r.open && "grayscale")} scale={1.1} />
+        <FoodArt kind={r.art} seed={r.slug} tint={r.tint} className={cx("h-14 w-14 shrink-0 rounded-xl", !r.open && "grayscale")} scale={1.1} />
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1 text-[17px] font-bold leading-tight">
             <span className="truncate">{r.name}</span>

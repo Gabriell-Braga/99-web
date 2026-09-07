@@ -32,9 +32,9 @@ import Remove from "@material-symbols/svg-600/rounded/remove.svg";
 import Restaurant from "@material-symbols/svg-600/rounded/restaurant.svg";
 import Schedule from "@material-symbols/svg-600/rounded/schedule.svg";
 import Search from "@material-symbols/svg-600/rounded/search.svg";
-import LocalActivity from "@material-symbols/svg-600/rounded/local_activity.svg";
+import Sell from "@material-symbols/svg-600/rounded/sell.svg";
 import Moped from "@material-symbols/svg-600/rounded/moped.svg";
-import LocalActivityFill from "@material-symbols/svg-600/rounded/local_activity-fill.svg";
+import SellFill from "@material-symbols/svg-600/rounded/sell-fill.svg";
 import ShoppingCart from "@material-symbols/svg-600/rounded/shopping_cart.svg";
 import SkipNext from "@material-symbols/svg-600/rounded/skip_next.svg";
 import StarFill from "@material-symbols/svg-600/rounded/star-fill.svg";
@@ -47,9 +47,9 @@ type Glyph = (props: SVGProps<SVGSVGElement>) => ReactElement;
 /**
  * Material Symbols Rounded, peso 600, grau 0, tamanho óptico 24. Traço grosso e
  * canto arredondado, como no app. Uma família só em todo o projeto, sem ícone desenhado à mão.
- * "coupon" usa `local_activity` e "receipt" usa `list_alt`: a etiqueta e o
- * cupom fiscal do Material têm bicos e serrilhado. Selo, nota, chama e
- * erro usam a variante preenchida; o cabeçalho e a navegação seguem vazados.
+ * "coupon" usa `sell`, nome atual do antigo `local_offer`, e "receipt" usa
+ * `list_alt`, porque o cupom fiscal do Material é serrilhado. Selo, nota,
+ * chama e erro usam a variante preenchida; a navegação segue vazada.
  */
 const icons = {
   alert: ErrorIcon,
@@ -69,8 +69,8 @@ const icons = {
   chevronRight: ChevronRight,
   clock: Schedule,
   copy: ContentCopy,
-  coupon: LocalActivity,
-  couponFill: LocalActivityFill,
+  coupon: Sell,
+  couponFill: SellFill,
   flameFill: LocalFireDepartmentFill,
   handshakeFill: HandshakeFill,
   home: Home,

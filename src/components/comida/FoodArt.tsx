@@ -1,5 +1,5 @@
 import type { ArtKind } from "@/lib/types";
-import { foodPhoto } from "@/data/foodPhotos";
+import { pickPhoto } from "@/data/foodPhotos";
 import { cx } from "@/lib/cx";
 
 /**
@@ -162,6 +162,10 @@ interface FoodArtProps {
   photo?: boolean;
   /** Carrega na hora, para a foto que abre a página não entrar como conteúdo adiado. */
   eager?: boolean;
+  /** Slug da loja ou id do prato: decide qual variante da foto aparece. */
+  seed?: string;
+  /** Posição na lista: garante variantes diferentes em pratos vizinhos. */
+  index?: number;
 }
 
 /**
@@ -169,13 +173,13 @@ interface FoodArtProps {
  * ilustração como alternativa. As fotos vêm do Wikimedia Commons e os créditos
  * ficam no rodapé.
  */
-export function FoodArt({ kind, tint = "#F1F1F1", className, scale = 1, photo = true, eager }: FoodArtProps) {
+export function FoodArt({ kind, tint = "#F1F1F1", className, scale = 1, photo = true, eager, seed, index }: FoodArtProps) {
   if (photo) {
     return (
       <div className={cx("overflow-hidden", className)} style={{ background: tint }} aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={foodPhoto[kind]}
+          src={pickPhoto(kind, seed, index)}
           alt=""
           className="h-full w-full object-cover"
           loading={eager ? "eager" : "lazy"}

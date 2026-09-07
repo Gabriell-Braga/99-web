@@ -23,7 +23,7 @@ export function OfferCard({ offer, eager }: { offer: Offer; eager?: boolean }) {
   return (
     <Link
       href={`/comida/${restaurant.slug}?item=${item.id}`}
-      className="flex gap-3 rounded-2xl bg-yellow-99-light p-3 transition-colors hover:bg-yellow-99-hover/40"
+      className="flex min-w-0 gap-3 rounded-2xl bg-yellow-99-light p-3 transition-colors hover:bg-yellow-99-hover/40"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="truncate text-[15px] font-bold">{item.name}</p>
@@ -39,7 +39,7 @@ export function OfferCard({ offer, eager }: { offer: Offer; eager?: boolean }) {
         <p className="truncate text-[12px] text-secondary-99">{restaurant.name}</p>
       </div>
       <div className="relative shrink-0">
-        <FoodArt kind={item.art} tint={restaurant.tint} className="h-24 w-24 rounded-xl" eager={eager} />
+        <FoodArt kind={item.art} seed={item.id} tint={restaurant.tint} className="h-24 w-24 rounded-xl" eager={eager} />
         <span
           className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-yellow-99 text-black-99"
           aria-hidden="true"

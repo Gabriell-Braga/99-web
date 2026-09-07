@@ -170,7 +170,7 @@ export function FoodListing() {
               <SectionTitle>Ofertas</SectionTitle>
               <ul className="grid gap-4 md:grid-cols-2" role="list">
                 {offers.map((o, i) => (
-                  <li key={`${o.restaurant.slug}-${o.item.id}`}>
+                  <li className="min-w-0" key={`${o.restaurant.slug}-${o.item.id}`}>
                     <OfferCard offer={o} eager={i < 2} />
                   </li>
                 ))}
@@ -187,7 +187,7 @@ export function FoodListing() {
                       <Link href={`/comida/${r.slug}`} className="group flex flex-col gap-2">
                         <span className="sr-only">{i + 1}º lugar</span>
                         <div className="relative overflow-hidden rounded-2xl">
-                          <FoodArt kind={r.art} tint={r.tint} className="aspect-[4/3] w-full" scale={0.9} />
+                          <FoodArt kind={r.art} seed={r.slug} tint={r.tint} className="aspect-[4/3] w-full" scale={0.9} />
                           <span
                             className="absolute left-2 top-0 text-[48px] font-bold leading-none text-orange-99 drop-shadow-[0_2px_0_rgba(255,255,255,0.9)]"
                             aria-hidden="true"

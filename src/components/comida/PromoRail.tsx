@@ -24,7 +24,7 @@ export function PromoRail() {
         aria-label="Ofertas em destaque"
         className="scroll-rail flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-1 scroll-pl-4 md:px-8 md:scroll-pl-8 xl:px-16 xl:scroll-pl-16"
       >
-        {promos.map((p) => (
+        {promos.map((p, i) => (
           <Link
             key={p.id}
             href="/comida"
@@ -42,12 +42,14 @@ export function PromoRail() {
                 <Icon name="arrowRight" size={18} />
               </span>
             </span>
+            {/* O primeiro banner é a maior imagem da tela: carrega na hora. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={p.image}
               alt=""
               className="h-full w-[38%] shrink-0 object-cover"
-              loading="lazy"
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : undefined}
               decoding="async"
             />
           </Link>

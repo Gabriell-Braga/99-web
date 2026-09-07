@@ -125,7 +125,7 @@ function ItemBody({ item, restaurant, onAdd }: { item: MenuItem; restaurant: Res
 
   return (
     <div className="flex flex-col gap-5">
-      <FoodArt kind={item.art} tint={restaurant.tint} className="aspect-[2/1] w-full rounded-xl" scale={0.8} />
+      <FoodArt kind={item.art} seed={item.id} tint={restaurant.tint} className="aspect-[2/1] w-full rounded-xl" scale={0.8} />
       <div className="flex flex-col gap-1">
         <p className="text-[15px] text-secondary-99">{item.description}</p>
         <p className="flex items-baseline gap-2">

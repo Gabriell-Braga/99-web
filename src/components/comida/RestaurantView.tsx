@@ -62,7 +62,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
       </nav>
 
       <header className="flex flex-col gap-4 rounded-2xl border border-border-99 p-4 md:flex-row md:items-start">
-        <FoodArt kind={restaurant.art} tint={restaurant.tint} className="h-20 w-20 shrink-0 rounded-xl" scale={1.1} />
+        <FoodArt kind={restaurant.art} seed={restaurant.slug} tint={restaurant.tint} className="h-20 w-20 shrink-0 rounded-xl" scale={1.1} />
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-[22px] font-bold">{restaurant.name}</h1>
@@ -123,7 +123,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
               {section.title}
             </h2>
             <ul className="grid gap-3 md:grid-cols-2" role="list">
-              {section.items.map((it) => {
+              {section.items.map((it, i) => {
                 const disabled = !it.available || !restaurant.open;
                 return (
                   <li key={it.id}>
@@ -148,7 +148,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
                           {it.promoPrice && <span className="text-[13px] tabular-nums text-muted-99 line-through">{formatBRL(it.price)}</span>}
                         </p>
                       </div>
-                      <FoodArt kind={it.art} tint={restaurant.tint} className={cx("h-24 w-24 shrink-0 rounded-xl", disabled && "grayscale")} />
+                      <FoodArt kind={it.art} seed={it.id} index={i} tint={restaurant.tint} className={cx("h-24 w-24 shrink-0 rounded-xl", disabled && "grayscale")} />
                     </button>
                   </li>
                 );
