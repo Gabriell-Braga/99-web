@@ -166,9 +166,7 @@ export function FoodListing() {
             </section>
 
             {/* O carrossel de ofertas ocupa esta faixa; a área amarela ficou só de fundo. */}
-            <div className="-mx-4 md:-mx-8 xl:-mx-16">
-              <PromoRail />
-            </div>
+            <PromoRail />
 
             <section aria-labelledby="lojas" className="flex flex-col gap-4">
               <SectionTitle>Lojas recomendadas na região</SectionTitle>
