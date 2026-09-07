@@ -20,7 +20,7 @@ interface MapPanelLayoutProps {
 export function MapPanelLayout({ panel, map, footer, panelWidth = "md" }: MapPanelLayoutProps) {
   const reduce = useReducedMotion();
   return (
-    <div className="flex flex-1 flex-col lg:h-[calc(100dvh-48px)] lg:flex-none lg:flex-row lg:items-stretch lg:overflow-hidden lg:rounded-tl-[24px]">
+    <div className="flex flex-1 flex-col lg:h-[calc(100dvh-72px)] lg:flex-none lg:flex-row lg:items-stretch lg:overflow-hidden lg:rounded-tl-[24px]">
       <div className="relative h-[280px] shrink-0 lg:order-2 lg:h-auto lg:min-h-0 lg:flex-1">
         <div className="absolute inset-0">{map}</div>
       </div>

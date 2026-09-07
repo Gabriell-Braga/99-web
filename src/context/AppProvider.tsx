@@ -51,7 +51,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const current = useCurrentLocation(pathname.startsWith("/comida"));
   const located = useSavedAddresses(current);
   const addresses = located.length > 0 ? located : savedAddresses;
-  const [chosenId, setChosenId] = useState<string>(savedAddresses[0].id);
+  // Começa na localização atual; enquanto ela não chega, vale o primeiro da lista fixa.
+  const [chosenId, setChosenId] = useState<string>("atual");
   const address = addresses.find((a) => a.id === chosenId) ?? addresses[0];
   const setAddress = useCallback((a: SavedAddress) => setChosenId(a.id), []);
   const [rideOrigin, setRideOrigin] = useState<GeoPlace | null>(null);

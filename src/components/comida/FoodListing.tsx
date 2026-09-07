@@ -71,8 +71,8 @@ export function FoodListing() {
   return (
     <>
       {/* Busca e banner continuam na faixa amarela, como no app. */}
-      <div className="bg-yellow-99 pb-16">
-        <Container className="pb-6 pt-2">
+      <div className="bg-yellow-99 pb-20">
+        <Container className="pb-8 pt-2">
           <h1 className="sr-only">Food</h1>
           <div className="relative">
             <Icon name="search" size={22} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
@@ -91,7 +91,7 @@ export function FoodListing() {
       {/* A folha branca sobe por cima do banner, com raio só no topo. */}
       <div className="relative -mt-8 rounded-tr-[24px] bg-white">
         {/* Aba branca que continua a folha, com os selos sobre o amarelo. */}
-        <div className="absolute left-0 top-0 max-w-full -translate-y-full rounded-t-[24px] bg-white py-2 pl-4 pr-5 md:pl-8 xl:pl-16">
+        <div className="absolute left-0 top-0 max-w-full -translate-y-full rounded-t-[24px] bg-white py-2 pl-4 pr-5 md:pl-8 xl:pl-[max(4rem,calc((100vw-1440px)/2+4rem))]">
           <FilterChips />
         </div>
 
