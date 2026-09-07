@@ -89,11 +89,22 @@ export function FoodListing() {
       </div>
 
       {/* A folha branca sobe por cima do banner, com raio só no topo. */}
-      <div className="relative -mt-8 rounded-tr-[24px] bg-white">
-        {/* Aba branca que continua a folha, com os selos sobre o amarelo. */}
-        <div className="absolute left-0 top-0 max-w-full -translate-y-full rounded-t-[24px] bg-white py-2 pr-1 md:pl-4 xl:pl-[max(3rem,calc((100vw-1440px)/2+3rem))]">
-          <FilterChips />
-        </div>
+      <div className="relative -mt-8 rounded-t-[24px] bg-white">
+        {/* Aba branca que sai da folha, recuada até a coluna da página. As duas
+            pontas ligam na folha por uma curva côncava, como no app. */}
+        <Container className="pointer-events-none absolute inset-x-0 top-0 -translate-y-full">
+          <div className="pointer-events-auto relative w-fit max-w-full rounded-t-2xl bg-white py-2 pl-4 pr-1">
+            <FilterChips />
+            <span
+              aria-hidden="true"
+              className="absolute bottom-0 right-full h-4 w-4 bg-white [mask-image:radial-gradient(circle_16px_at_0_0,transparent_98%,#000_100%)]"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute bottom-0 left-full h-4 w-4 bg-white [mask-image:radial-gradient(circle_16px_at_100%_0,transparent_98%,#000_100%)]"
+            />
+          </div>
+        </Container>
 
         <FoodShell>
           <div className="flex flex-col gap-8">
