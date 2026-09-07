@@ -57,7 +57,7 @@ function recentToPlace(r: RecentAddress): GeoPlace {
 
 /**
  * Campo de endereço com sugestões, o mesmo em corrida e em entrega. Campo
- * branco de raio total com lupa, texto em 20px bold. Antes de digitar mostra
+ * branco de raio 12px com lupa, texto em 20px bold. Antes de digitar mostra
  * os endereços recentes; ao digitar, resultados reais do OpenStreetMap.
  * Navegável por teclado, com aria-activedescendant no item em foco.
  */
@@ -250,7 +250,7 @@ export function AddressSearch({
             "w-full text-black-99 placeholder:text-placeholder-99 focus:outline-none",
             variant === "row"
               ? "h-14 rounded-xl bg-transparent pl-11 pr-12 text-[17px] font-bold placeholder:font-bold"
-              : "h-14 rounded-full border border-border-99 bg-white pl-14 pr-14 text-[20px] font-bold placeholder:font-bold focus:border-black-99",
+              : "h-14 rounded-xl border border-border-99 bg-white pl-14 pr-14 text-[20px] font-bold placeholder:font-bold focus:border-black-99",
           )}
         />
         {status === "loading" ? (

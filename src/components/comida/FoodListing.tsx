@@ -82,7 +82,7 @@ export function FoodListing() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Buscar loja ou prato"
-              className="h-14 w-full rounded-full border border-transparent bg-white pl-14 pr-5 text-[17px] font-bold text-black-99 placeholder:font-bold placeholder:text-placeholder-99 focus:border-black-99 focus:outline-none"
+              className="h-14 w-full rounded-xl border border-transparent bg-white pl-14 pr-5 text-[17px] font-bold text-black-99 placeholder:font-bold placeholder:text-placeholder-99 focus:border-black-99 focus:outline-none"
             />
           </div>
         </Container>

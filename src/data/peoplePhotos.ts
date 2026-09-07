@@ -40,4 +40,11 @@ export const peopleCredits: PhotoCredit[] = [
     licenca: "CC0 1.0",
     fonte: "https://www.rawpixel.com/image/5925994/photo-image-background-public-domain-technology",
   },
+  {
+    id: "entrega",
+    label: "Entregador de bicicleta",
+    autor: "Michał Siergiejevicz",
+    licenca: "CC BY 2.0",
+    fonte: "https://commons.wikimedia.org/wiki/File:Patterns_and_letters_(50336970348).jpg",
+  },
 ];

@@ -106,16 +106,6 @@ export default function HomePage() {
               fetchPriority="high"
               decoding="async"
             />
-            {/* Prévia do painel de categorias, como ele aparece no fluxo. */}
-            <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-xl bg-white p-3 shadow-high sm:inset-x-auto sm:right-4 sm:w-[340px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/vehicles/car-white.png" alt="" className="h-14 w-14 shrink-0 object-contain" />
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className="whitespace-nowrap text-[15px] font-bold">Pop · 4 min</span>
-                <span className="truncate text-[13px] text-secondary-99">Vila Olímpia ao Ibirapuera</span>
-              </span>
-              <span className="shrink-0 text-[17px] font-bold tabular-nums text-green-99">R$ 16,89</span>
-            </div>
           </div>
 
           {/* Os outros dois serviços aparecem em foto, ao lado da corrida. */}
@@ -220,7 +210,7 @@ export default function HomePage() {
             </dl>
 
             <div className="mt-2">
-              <HomeButton href="/comida" tom="amarelo">
+              <HomeButton href="/comida" tom="amareloNoEscuro">
                 Ver lojas
               </HomeButton>
             </div>
