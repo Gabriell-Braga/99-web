@@ -11,7 +11,7 @@ type Size = "sm" | "md" | "lg";
  * pílula. Laranja não é fundo de botão.
  */
 const base =
-  "inline-flex items-center justify-center gap-2 font-bold whitespace-nowrap select-none transition-[background-color,transform] duration-150 active:scale-[0.98] active:duration-100 disabled:cursor-not-allowed motion-reduce:active:scale-100";
+  "inline-flex items-center justify-center gap-2 font-bold whitespace-nowrap select-none transition-[background-color,scale] duration-150 active:scale-[0.98] active:duration-100 disabled:cursor-not-allowed motion-reduce:active:scale-100";
 
 const variants: Record<Variant, string> = {
   primary:

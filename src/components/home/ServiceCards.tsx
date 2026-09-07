@@ -32,10 +32,10 @@ export function ServiceCards({ items }: { items: Servico[] }) {
         >
           <Link
             href={s.href}
-            className="group flex h-full flex-col gap-3 rounded-2xl bg-white p-6 transition-[transform,box-shadow,background-color] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] hover:-translate-y-1 hover:shadow-high motion-reduce:hover:translate-y-0"
+            className="group flex h-full flex-col gap-3 rounded-2xl bg-white p-6 transition-[translate,box-shadow,background-color] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] hover:-translate-y-1 hover:shadow-high motion-reduce:hover:translate-y-0"
           >
             <span
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-99 text-black-99 transition-transform duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-110 motion-reduce:group-hover:scale-100"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-99 text-black-99 transition-[scale] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-110 motion-reduce:group-hover:scale-100"
               aria-hidden="true"
             >
               <Icon name={s.icon} size={24} />
@@ -47,7 +47,7 @@ export function ServiceCards({ items }: { items: Servico[] }) {
               <Icon
                 name="arrowRight"
                 size={18}
-                className="transition-transform duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:translate-x-1 motion-reduce:group-hover:translate-x-0"
+                className="transition-[translate] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:translate-x-1 motion-reduce:group-hover:translate-x-0"
               />
             </span>
           </Link>

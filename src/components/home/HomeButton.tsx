@@ -60,7 +60,7 @@ export function HomeButton({ href, onClick, children, tom = "amarelo", className
       <span
         aria-hidden="true"
         className={cx(
-          "absolute left-1.5 top-1/2 -z-10 h-11 w-11 -translate-y-1/2 rounded-lg transition-transform duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-[26] motion-reduce:transition-none motion-reduce:group-hover:scale-100",
+          "absolute left-1.5 top-1/2 -z-10 h-11 w-11 -translate-y-1/2 rounded-lg transition-[scale] duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-[26] motion-reduce:transition-none motion-reduce:group-hover:scale-100",
           t.bolha,
         )}
       />
@@ -76,7 +76,7 @@ export function HomeButton({ href, onClick, children, tom = "amarelo", className
         <Icon
           name="arrowRight"
           size={20}
-          className="transition-transform duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:-rotate-45 motion-reduce:transition-none motion-reduce:group-hover:rotate-0"
+          className="transition-[rotate] duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:-rotate-45 motion-reduce:transition-none motion-reduce:group-hover:rotate-0"
         />
       </span>
 
@@ -85,7 +85,7 @@ export function HomeButton({ href, onClick, children, tom = "amarelo", className
         {/* Sublinhado entrando pela esquerda. */}
         <span
           aria-hidden="true"
-          className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-x-100 motion-reduce:transition-none"
+          className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-current transition-[scale] duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-x-100 motion-reduce:transition-none"
         />
       </span>
     </>
