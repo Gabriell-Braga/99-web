@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { cx } from "@/lib/cx";
 import { Icon } from "@/components/ui/Icon";
@@ -80,7 +81,11 @@ export function Modal({
   const transition = { duration: reduce ? 0 : 0.2, ease: [0.4, 0, 0.2, 1] as const };
   const scrim = { duration: reduce ? 0 : 0.15 };
 
-  return (
+  // O modal vai para o body: dentro de um ancestral com transform, "fixed"
+  // passa a se medir por ele, e a caixa aparecia recortada no lugar errado.
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -133,6 +138,7 @@ export function Modal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
