@@ -93,15 +93,15 @@ export function FoodListing() {
         {/* Aba branca que sai da folha, recuada até a coluna da página. As duas
             pontas ligam na folha por uma curva côncava, como no app. */}
         <Container className="pointer-events-none absolute inset-x-0 top-0 -translate-y-full overflow-hidden">
-          <div className="pointer-events-auto relative w-fit max-w-full rounded-t-2xl bg-white py-2 pl-4 pr-1">
+          <div className="pointer-events-auto relative w-fit max-w-full rounded-t-3xl bg-white py-2 pl-4 pr-1">
             <FilterChips />
             <span
               aria-hidden="true"
-              className="absolute bottom-0 right-full h-6 w-6 bg-white [mask-image:radial-gradient(circle_24px_at_0_0,transparent_98%,#000_100%)]"
+              className="absolute bottom-0 right-full h-10 w-10 bg-white [mask-image:radial-gradient(circle_40px_at_0_0,transparent_98%,#000_100%)]"
             />
             <span
               aria-hidden="true"
-              className="absolute bottom-0 left-full h-6 w-6 bg-white [mask-image:radial-gradient(circle_24px_at_100%_0,transparent_98%,#000_100%)]"
+              className="absolute bottom-0 left-full h-10 w-10 bg-white [mask-image:radial-gradient(circle_40px_at_100%_0,transparent_98%,#000_100%)]"
             />
           </div>
         </Container>
