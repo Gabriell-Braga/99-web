@@ -5,7 +5,7 @@ import type { ReactElement, SVGProps } from "react";
 import CarRound from "@material-design-icons/svg/outlined/directions_car.svg";
 import CartRound from "@material-design-icons/svg/outlined/shopping_cart.svg";
 import AssignmentRound from "@material-design-icons/svg/outlined/assignment.svg";
-import MopedRound from "@material-design-icons/svg/round/moped.svg";
+import Moped from "@material-symbols/svg-400/rounded/moped.svg";
 
 import Add from "@material-symbols/svg-600/rounded/add.svg";
 import ArrowBack from "@material-symbols/svg-600/rounded/arrow_back.svg";
@@ -88,7 +88,7 @@ const icons = {
   home: Home,
   info: Info,
   minus: Remove,
-  moto: MopedRound,
+  moto: Moped,
   pin: LocationOn,
   plus: Add,
   receipt: AssignmentRound,
