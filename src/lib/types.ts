@@ -14,18 +14,27 @@ export interface SavedAddress extends LatLng {
 }
 
 export type FoodCategoryId =
-  | "lanche"
-  | "pizza"
-  | "acai"
+  | "chinesa"
+  | "italiana"
+  | "doces"
   | "marmita"
   | "japonesa"
-  | "saudavel"
+  | "salgados"
+  | "lanche"
+  | "acai"
+  | "sorvetes"
+  | "padarias"
+  | "pizza"
+  | "carnes"
   | "brasileira"
-  | "doces";
+  | "saudavel"
+  | "arabe";
 
 export interface FoodCategory {
   id: FoodCategoryId;
   label: string;
+  /** PNG em public/food-icons. */
+  icon: string;
 }
 
 export type ArtKind =

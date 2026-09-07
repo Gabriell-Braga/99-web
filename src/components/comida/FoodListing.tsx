@@ -6,7 +6,10 @@ import { restaurants } from "@/data/restaurants";
 import { foodCategories } from "@/data/categories";
 import type { FoodCategoryId } from "@/lib/types";
 import { useApp } from "@/context/AppProvider";
+import { Container } from "@/components/layout/Container";
 import { FoodShell } from "@/components/comida/FoodShell";
+import { PromoRail } from "@/components/comida/PromoRail";
+import { FilterChips, type FoodFilters } from "@/components/comida/FilterChips";
 import { CategoryRail } from "@/components/comida/CategoryRail";
 import { StoreCard, StoreCardSkeleton } from "@/components/comida/RestaurantCard";
 import { OfferCard, discountPercent, type Offer } from "@/components/comida/OfferCard";
@@ -34,6 +37,7 @@ export function FoodListing() {
   const { address } = useApp();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<FoodCategoryId | null>(null);
+  const [filters, setFilters] = useState<FoodFilters>({ freteGratis: false, noHorario: false });
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const loading = loadedFor !== address.id;
@@ -43,15 +47,17 @@ export function FoodListing() {
     return () => clearTimeout(t);
   }, [address.id]);
 
-  const filtering = Boolean(query.trim() || category);
+  const filtering = Boolean(query.trim() || category || filters.freteGratis || filters.noHorario);
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
     return restaurants
       .filter((r) => (category ? r.category === category : true))
+      .filter((r) => (filters.freteGratis ? r.deliveryFee === 0 : true))
+      .filter((r) => (filters.noHorario ? r.open : true))
       .filter((r) => (q ? `${r.name} ${r.tagline} ${r.cuisine}`.toLowerCase().includes(q) : true))
       .sort((a, b) => Number(b.open) - Number(a.open) || b.rating - a.rating);
-  }, [query, category]);
+  }, [query, category, filters]);
 
   const offers = useMemo<Offer[]>(
     () =>
@@ -73,22 +79,36 @@ export function FoodListing() {
   const categoryLabel = foodCategories.find((c) => c.id === category)?.label;
 
   return (
-    <FoodShell>
-      <div className="flex flex-col gap-8">
-        <h1 className="sr-only">Food</h1>
-        <div className="relative">
-          <Icon name="search" size={22} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
-          <input
-            type="search"
-            placeholder="O que você quer comer hoje?"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            aria-label="Buscar loja ou prato"
-            className="h-14 w-full rounded-full border border-border-99 bg-white pl-14 pr-5 text-[17px] font-bold text-black-99 placeholder:font-bold placeholder:text-placeholder-99 focus:border-black-99 focus:outline-none"
-          />
-        </div>
+    <>
+      {/* Busca e banner continuam na faixa amarela, como no app. */}
+      <div className="bg-yellow-99 pb-16">
+        <Container className="pb-5 pt-1">
+          <h1 className="sr-only">Food</h1>
+          <div className="relative">
+            <Icon name="search" size={22} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black-99" />
+            <input
+              type="search"
+              placeholder="O que você quer comer hoje?"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Buscar loja ou prato"
+              className="h-14 w-full rounded-full border border-transparent bg-white pl-14 pr-5 text-[17px] font-bold text-black-99 placeholder:font-bold placeholder:text-placeholder-99 focus:border-black-99 focus:outline-none"
+            />
+          </div>
+        </Container>
+        <PromoRail />
+      </div>
 
-        <CategoryRail value={category} onChange={setCategory} />
+      {/* A folha branca sobe por cima do banner, com raio só no topo. */}
+      <div className="relative -mt-8 rounded-t-[24px] bg-white">
+        <FoodShell>
+          <div className="flex flex-col gap-8">
+            {/* Montada na borda da folha, metade sobre o amarelo. */}
+            <div className="-mt-[52px] w-fit max-w-full">
+              <FilterChips value={filters} onChange={setFilters} />
+            </div>
+
+            <CategoryRail value={category} onChange={setCategory} />
 
         {!address.covered ? (
           <ErrorNote
@@ -122,6 +142,7 @@ export function FoodListing() {
                   onClick={() => {
                     setQuery("");
                     setCategory(null);
+                    setFilters({ freteGratis: false, noHorario: false });
                   }}
                 >
                   Limpar
@@ -202,8 +223,10 @@ export function FoodListing() {
             </section>
           </>
         )}
+          </div>
+          <AddressPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />
+        </FoodShell>
       </div>
-      <AddressPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />
-    </FoodShell>
+    </>
   );
 }

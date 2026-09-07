@@ -33,6 +33,7 @@ import Restaurant from "@material-symbols/svg-600/rounded/restaurant.svg";
 import Schedule from "@material-symbols/svg-600/rounded/schedule.svg";
 import Search from "@material-symbols/svg-600/rounded/search.svg";
 import LocalActivity from "@material-symbols/svg-600/rounded/local_activity.svg";
+import Moped from "@material-symbols/svg-600/rounded/moped.svg";
 import LocalActivityFill from "@material-symbols/svg-600/rounded/local_activity-fill.svg";
 import ShoppingCart from "@material-symbols/svg-600/rounded/shopping_cart.svg";
 import SkipNext from "@material-symbols/svg-600/rounded/skip_next.svg";
@@ -75,6 +76,7 @@ const icons = {
   home: Home,
   info: Info,
   minus: Remove,
+  moto: Moped,
   pin: LocationOn,
   plus: Add,
   receipt: ListAlt,

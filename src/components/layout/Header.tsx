@@ -3,12 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import Sell from "@material-symbols/svg-400/rounded/sell.svg";
+import ReceiptLong from "@material-symbols/svg-400/rounded/receipt_long.svg";
+import ShoppingCart from "@material-symbols/svg-400/rounded/shopping_cart.svg";
 import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
 import { bagCount, useApp } from "@/context/AppProvider";
 import { AddressPicker } from "@/components/comida/AddressPicker";
 import { user } from "@/data/menu";
 import { CountBubble } from "@/components/ui/CountBubble";
+import { cx } from "@/lib/cx";
+
+/**
+ * As ações do cabeçalho usam Material Symbols Rounded de peso 400, sem
+ * preenchimento, mais leves que o resto do app. O cupom é verde, como no 99.
+ * O Material renomeou local_offer para sell, mesmo desenho de etiqueta.
+ */
+const headerIcons = { coupon: Sell, receipt: ReceiptLong, cart: ShoppingCart } as const;
 
 function HeaderAction({
   label,
@@ -23,11 +34,14 @@ function HeaderAction({
   count?: number;
   onClick?: () => void;
 }) {
-  const cls =
-    "relative flex h-11 w-11 items-center justify-center rounded-full text-black-99 transition-colors hover:bg-black-99/10";
+  const cls = cx(
+    "relative flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-black-99/10",
+    icon === "coupon" ? "text-green-99" : "text-black-99",
+  );
+  const Glyph = headerIcons[icon];
   const inner = (
     <>
-      <Icon name={icon} size={24} />
+      <Glyph width={24} height={24} fill="currentColor" aria-hidden="true" focusable="false" />
       {count ? <CountBubble count={count} className="absolute -right-0.5 -top-0.5 h-5 min-w-5 px-1 text-[11px]" /> : null}
     </>
   );
@@ -71,11 +85,9 @@ export function Header() {
             className="flex min-w-0 items-center gap-2 rounded-xl text-left text-black-99"
             aria-haspopup="dialog"
           >
-            <span className="flex min-w-0 flex-col leading-tight">
-              <span className="text-[13px] font-medium">Entregar em</span>
-              <span className="truncate text-[17px] font-bold">{address.line1}</span>
-            </span>
-            <Icon name="chevronDown" size={18} className="shrink-0" />
+            {/* Uma linha só, endereço truncado e chevron ao lado, como no app. */}
+            <span className="truncate text-[17px] font-bold">{address.line1}</span>
+            <Icon name="chevronRight" size={18} className="shrink-0" />
           </button>
         ) : (
           <p className="min-w-0 truncate text-[22px] font-bold text-black-99">Olá, {user.name}!</p>
