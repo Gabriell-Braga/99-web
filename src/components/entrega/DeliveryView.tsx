@@ -373,11 +373,15 @@ export function DeliveryView() {
                     <span className="flex w-[100px] shrink-0 items-center justify-end text-[17px] font-bold tabular-nums">
                       {pricing.loading ? <PriceSkeleton /> : route ? formatBRL(price) : "—"}
                     </span>
+                    {/* Mesma marca de seleção da corrida. */}
                     <span
-                      className={cx("flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", checked ? "border-black-99" : "border-border-99")}
+                      className={cx(
+                        "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2",
+                        checked ? "border-black-99 bg-black-99 text-white" : "border-border-99 bg-white text-transparent",
+                      )}
                       aria-hidden="true"
                     >
-                      {checked && <span className="h-3 w-3 rounded-full bg-black-99" />}
+                      <Icon name="check" size={14} />
                     </span>
                   </button>
                 </li>
