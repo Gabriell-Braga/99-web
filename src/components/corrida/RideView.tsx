@@ -411,7 +411,7 @@ export function RideView() {
                 />
               }
               action={
-                <Button size="lg" full disabled={blocked || pricing.loading} price={route && !pricing.loading ? formatBRL(fare) : undefined} onClick={() => setPhase("searching")}>
+                <Button size="lg" full disabled={blocked || pricing.loading} price={route && !pricing.loading ? formatBRL(fare) : undefined} onClick={() => setPhase(km > LOW_SUPPLY_KM && attempts === 0 ? "searching" : "paying")}>
                   Solicitar {selected.name}
                 </Button>
               }

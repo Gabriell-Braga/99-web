@@ -46,6 +46,13 @@ import Schedule from "@material-symbols/svg-600/rounded/schedule.svg";
 import Search from "@material-symbols/svg-600/rounded/search.svg";
 import Share from "@material-symbols/svg-600/rounded/share.svg";
 import Call from "@material-symbols/svg-600/rounded/call.svg";
+import CallFill from "@material-symbols/svg-600/rounded/call-fill.svg";
+import ChatFill from "@material-symbols/svg-600/rounded/chat-fill.svg";
+import NearMeFill from "@material-symbols/svg-600/rounded/near_me-fill.svg";
+import HeadsetMicFill from "@material-symbols/svg-600/rounded/headset_mic-fill.svg";
+import EditFill from "@material-symbols/svg-600/rounded/edit-fill.svg";
+import MoodFill from "@material-symbols/svg-600/rounded/mood-fill.svg";
+import SentimentDissatisfiedFill from "@material-symbols/svg-600/rounded/sentiment_dissatisfied-fill.svg";
 import PercentDiscount from "@material-symbols/svg-600/rounded/percent_discount.svg";
 import PercentDiscountFill from "@material-symbols/svg-600/rounded/percent_discount-fill.svg";
 
@@ -104,6 +111,13 @@ const icons = {
   search: Search,
   share: Share,
   phone: Call,
+  phoneFill: CallFill,
+  chatFill: ChatFill,
+  navigateFill: NearMeFill,
+  helpFill: HeadsetMicFill,
+  editFill: EditFill,
+  moodFill: MoodFill,
+  sadFill: SentimentDissatisfiedFill,
   skipForward: SkipNext,
   starFill: StarFill,
   swap: SwapVert,

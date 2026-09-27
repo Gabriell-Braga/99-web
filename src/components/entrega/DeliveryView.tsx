@@ -223,14 +223,17 @@ export function DeliveryView() {
 
   const landingPanel = (
     <div className="flex flex-col gap-8 pb-8">
-      <div className="flex flex-col items-center pt-6 text-center">
-        <p className="text-[24px] font-medium uppercase leading-tight tracking-wide text-black-99">Você precisa,</p>
-        <h1 className="mt-1 flex items-center gap-3 text-[40px] font-bold leading-none tracking-tight">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-yellow-99 text-black-99" aria-hidden="true">
-            <Icon name="arrowRight" size={30} />
-          </span>
-          99 Entrega
-        </h1>
+      <div className="flex flex-col items-center pt-6">
+        {/* Bloco centralizado, mas as duas linhas começam juntas na borda da seta, como no app. */}
+        <div className="flex flex-col items-start">
+          <p className="text-[24px] font-medium uppercase leading-tight tracking-wide text-black-99">Você precisa,</p>
+          <h1 className="mt-1 flex items-center gap-3 text-[40px] font-bold leading-none tracking-tight">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-yellow-99 text-black-99" aria-hidden="true">
+              <Icon name="arrowRight" size={30} />
+            </span>
+            99 Entrega
+          </h1>
+        </div>
         <div className="mt-8 flex items-end justify-center gap-6" aria-hidden="true">
           <VehicleArt category="entrega-moto" width={132} />
           <VehicleArt category="entrega-carro" width={132} />

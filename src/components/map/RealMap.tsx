@@ -40,6 +40,45 @@ function pulse(): HTMLElement {
   return wrap;
 }
 
+/** Círculo azul-claro em volta da origem enquanto os motoristas veem o pedido, como no app. */
+function radar(): HTMLElement {
+  const wrap = document.createElement("span");
+  wrap.style.cssText = "display:block;width:220px;height:220px;pointer-events:none";
+  const el = document.createElement("span");
+  el.className = "map-radar";
+  wrap.appendChild(el);
+  return wrap;
+}
+
+/** Carro parado por perto, na mesma arte da categoria, em tamanho menor. */
+function nearbyCar(kind: NonNullable<MapViewProps["vehicle"]>, turn: number): HTMLElement {
+  const wrap = document.createElement("span");
+  wrap.style.cssText = "display:block;width:40px;height:40px;pointer-events:none";
+  const img = document.createElement("img");
+  img.src = imageFor(kind);
+  img.alt = "";
+  img.className = "map-nearby";
+  img.style.cssText = `display:block;width:40px;height:40px;object-fit:contain;--turn:${turn}deg`;
+  wrap.appendChild(img);
+  return wrap;
+}
+
+/** Ponto a alguns metros de outro, numa direção em graus. */
+function offsetMeters(p: LatLng, meters: number, bearingDeg: number): LatLng {
+  const b = (bearingDeg * Math.PI) / 180;
+  const dLat = (meters * Math.cos(b)) / 111_320;
+  const dLng = (meters * Math.sin(b)) / (111_320 * Math.cos((p.lat * Math.PI) / 180));
+  return { lat: p.lat + dLat, lng: p.lng + dLng };
+}
+
+/** Três carros em volta da origem, sempre nas mesmas posições. */
+const NEARBY: { meters: number; bearing: number; turn: number }[] = [
+  { meters: 260, bearing: 320, turn: -20 },
+  { meters: 340, bearing: 215, turn: 15 },
+  { meters: 300, bearing: 95, turn: -8 },
+];
+
+
 function userDot(): HTMLElement {
   const el = document.createElement("span");
   el.style.cssText =
@@ -85,6 +124,8 @@ export default function RealMap({
   progress,
   vehicle = "pop",
   searching,
+  routeMuted,
+  lookingAround,
   userLocation,
   interactive = true,
   attribution = true,
@@ -215,7 +256,10 @@ export default function RealMap({
       // círculo verde. A rota começa na rua mais próxima, então a folga é maior.
       const userIsOrigin = Boolean(userLocation && startPoint && haversineKm(userLocation, startPoint) < 0.15);
       if (userLocation && !userIsOrigin) add(userDot(), userLocation);
-      if (startPoint && searching) add(pulse(), startPoint);
+      if (startPoint && lookingAround) {
+        add(radar(), startPoint);
+        NEARBY.forEach((n) => add(nearbyCar(vehicle, n.turn), offsetMeters(startPoint, n.meters, n.bearing)));
+      } else if (startPoint && searching) add(pulse(), startPoint);
 
       const ends = map.getSource(ENDS_SOURCE) as maplibregl.GeoJSONSource | undefined;
       ends?.setData(endpointsData(startPoint, endPoint));
@@ -243,9 +287,12 @@ export default function RealMap({
         }
       }
 
-      const pts: LatLng[] = [...line];
-      if (origin) pts.push(origin);
-      if (destination) pts.push(destination);
+      // Com os motoristas vendo o pedido, a câmera fecha na origem.
+      const pts: LatLng[] = lookingAround && startPoint ? [startPoint] : [...line];
+      if (!(lookingAround && startPoint)) {
+        if (origin) pts.push(origin);
+        if (destination) pts.push(destination);
+      }
       if (pts.length === 0 && userLocation) pts.push(userLocation);
       fitRef.current = pts;
       if (pts.length >= 2) {
@@ -259,7 +306,20 @@ export default function RealMap({
     if (readyRef.current) apply();
     else pendingRef.current = apply;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, routeKey, searching, userLocation?.lat, userLocation?.lng]);
+  }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, routeKey, searching, lookingAround, vehicle, userLocation?.lat, userLocation?.lng]);
+
+  // Rota cinza enquanto confirma o destino; verde depois, com transição suave.
+  useEffect(() => {
+    const paint = () => mapRef.current?.setPaintProperty(ROUTE_LAYER, "line-color", routeMuted ? "#B7BCC4" : "#00C853");
+    if (readyRef.current) paint();
+    else {
+      const prev = pendingRef.current;
+      pendingRef.current = () => {
+        prev?.();
+        paint();
+      };
+    }
+  }, [routeMuted]);
 
   // Veículo percorrendo o trajeto.
   useEffect(() => {

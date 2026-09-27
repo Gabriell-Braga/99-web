@@ -25,6 +25,13 @@ export interface MapViewProps {
   accent?: "yellow" | "orange";
   /** Pulso no ponto de origem enquanto procura motorista. */
   searching?: boolean;
+  /** Rota em cinza enquanto o destino é confirmado; fica verde quando a corrida é solicitada. */
+  routeMuted?: boolean;
+  /**
+   * Motoristas vendo o pedido: a câmera fecha na origem, com o círculo azul-claro
+   * em volta e carros parados por perto.
+   */
+  lookingAround?: boolean;
   /** Ponto azul da localização atual do usuário. */
   userLocation?: LatLng | null;
   interactive?: boolean;

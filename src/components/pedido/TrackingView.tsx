@@ -11,6 +11,7 @@ import { useApp } from "@/context/AppProvider";
 import { MapPanelLayout } from "@/components/layout/MapPanelLayout";
 import { MapView } from "@/components/map/MapView";
 import { Timeline } from "@/components/pedido/Timeline";
+import { TripTracking } from "@/components/pedido/TripTracking";
 import { Container } from "@/components/layout/Container";
 import { EmptyState } from "@/components/ui/States";
 import { Button, LinkButton } from "@/components/ui/Button";
@@ -68,16 +69,13 @@ function Tracking({ order }: { order: Order }) {
   }, [order.id, order.route, order.origin, order.destination]);
 
   useEffect(() => {
-    if (finished) return;
+    // Corrida e entrega têm a própria progressão, em TripTracking.
+    if (finished || order.vertical !== "comida") return;
     const t = setTimeout(() => setStage((s) => Math.min(s + 1, last)), STAGE_DURATION_MS);
     return () => clearTimeout(t);
-  }, [stage, finished, last]);
+  }, [stage, finished, last, order.vertical]);
 
-  // O marcador segue o que foi escolhido: a categoria da corrida ou o veículo da entrega, com caixa.
-  const vehicle =
-    order.vertical === "corrida" ? order.category : order.vertical === "comida" ? "bag" : order.size === "moto" ? "entrega-moto" : "entrega-carro";
-  const showVehicle = order.vertical === "comida" ? true : stage >= 1;
-  const searching = current.id === "procurando";
+  if (order.vertical !== "comida") return <TripTracking order={order} route={route} />;
 
   return (
     <MapPanelLayout
@@ -87,9 +85,8 @@ function Tracking({ order }: { order: Order }) {
           origin={order.origin}
           destination={order.destination}
           route={route}
-          progress={showVehicle ? current.progress : undefined}
-          vehicle={vehicle}
-          searching={searching}
+          progress={current.progress}
+          vehicle="bag"
           accent="orange"
         />
       }
@@ -115,13 +112,11 @@ function Tracking({ order }: { order: Order }) {
           {finished && (
             <div className="flex flex-col gap-3 rounded-xl bg-success-99-bg p-4">
               <p className="font-semibold text-success-99-deep">
-                {order.vertical === "comida" && "Pedido entregue. Bom apetite."}
-                {order.vertical === "corrida" && "Corrida finalizada. Obrigado por viajar com a 99."}
-                {order.vertical === "entrega" && "Pacote entregue e confirmado com o código."}
+                Pedido entregue. Bom apetite.
               </p>
               <div className="flex flex-wrap gap-2">
-                <LinkButton href={`/${order.vertical}`} size="sm">
-                  {order.vertical === "comida" ? "Pedir de novo" : order.vertical === "corrida" ? "Nova corrida" : "Nova entrega"}
+                <LinkButton href="/comida" size="sm">
+                  Pedir de novo
                 </LinkButton>
                 <LinkButton href="/" size="sm" variant="ghost">
                   Início
@@ -130,7 +125,7 @@ function Tracking({ order }: { order: Order }) {
             </div>
           )}
 
-          {(order.vertical !== "comida" ? stage >= 1 : stage >= 2) && (
+          {stage >= 2 && (
             <PersonCard order={order} />
           )}
 
