@@ -31,7 +31,7 @@ const modes: { id: DeliveryMode; label: string; hint: (min: number, max: number)
 
 function Card({ title, children, id }: { title: string; children: React.ReactNode; id: string }) {
   return (
-    <section className="flex flex-col gap-3 rounded-2xl bg-white p-5" aria-labelledby={id}>
+    <section className="flex flex-col gap-3 rounded-3xl bg-white p-5" aria-labelledby={id}>
       <h2 id={id} className="text-[17px] font-bold">
         {title}
       </h2>
@@ -148,14 +148,18 @@ export function CheckoutView() {
 
   return (
     <div className="flex flex-1 flex-col bg-subtle-99 lg:rounded-tl-[24px]">
-      <Container className="flex flex-1 flex-col gap-5 py-6 pb-44 lg:pb-32">
-        <nav aria-label="Navegação" className="text-[15px]">
-          <Link href={`/comida/${restaurant.slug}`} className="inline-flex items-center gap-1 font-bold text-secondary-99 hover:text-black-99">
-            <Icon name="arrowLeft" size={16} />
-            Voltar ao cardápio
+      <Container className="flex flex-1 flex-col gap-5 py-6 pb-44 max-md:pt-10 lg:pb-32">
+        {/* Barra do app: voltar e título na mesma linha. */}
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/comida/${restaurant.slug}`}
+            aria-label="Voltar ao cardápio"
+            className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-black-99 transition-colors hover:bg-black-99/5"
+          >
+            <Icon name="chevronLeft" size={30} />
           </Link>
-        </nav>
-        <h1 className="text-[22px] font-bold">Detalhes da entrega</h1>
+          <h1 className="text-[24px] font-bold">Finalizar compra</h1>
+        </div>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_400px] lg:items-start">
           <div className="flex flex-col gap-5">
@@ -216,7 +220,7 @@ export function CheckoutView() {
               {payment === "dinheiro" && <Input label="Troco para quanto?" placeholder="Ex.: R$ 100,00 (opcional)" inputMode="numeric" />}
             </Card>
 
-            <section className="flex flex-col gap-3 rounded-2xl bg-green-99-tint p-5" aria-labelledby="ck-cupom">
+            <section className="flex flex-col gap-3 rounded-3xl bg-green-99-tint p-5" aria-labelledby="ck-cupom">
               <h2 id="ck-cupom" className="flex items-center gap-2 text-[17px] font-bold text-green-99-ink">
                 <Icon name="couponFill" size={20} />
                 Cupons de desconto

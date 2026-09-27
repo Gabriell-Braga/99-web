@@ -13,6 +13,8 @@ import { Icon } from "@/components/ui/Icon";
 import { Modal } from "@/components/ui/Modal";
 import { isStoreRoute } from "@/lib/routes";
 import { cx } from "@/lib/cx";
+import { FoodArt } from "@/components/comida/FoodArt";
+import { menuVariantIndex } from "@/data/foodPhotos";
 
 /** Conteúdo do carrinho: itens com stepper de círculos vazados, totais e "Continuar". */
 export function CartContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -171,9 +173,139 @@ export function CartFloating() {
           <span className="tabular-nums">{formatBRL(subtotal)}</span>
         </Button>
       </div>
-      <Modal open={open} onClose={() => setOpen(false)} title="Carrinho" width="sm">
-        <CartContent onNavigate={() => setOpen(false)} />
+      <Modal open={open} onClose={() => setOpen(false)} title="Carrinho" width="sm" bare>
+        <CartScreen onClose={() => setOpen(false)} />
       </Modal>
+    </>
+  );
+}
+
+/**
+ * Carrinho como tela do app: nome da loja com "Limpar", itens com foto e
+ * stepper de círculos vazados, faixa verde de cupons e rodapé com o total e
+ * "Continuar" com o contador. No celular ocupa a tela toda.
+ */
+function CartScreen({ onClose }: { onClose: () => void }) {
+  const { bag, updateQuantity, clearBag } = useApp();
+  const router = useRouter();
+  const restaurant = bag.restaurantSlug ? getRestaurant(bag.restaurantSlug) : undefined;
+  const subtotal = bagSubtotal(bag);
+  const count = bagCount(bag);
+  if (!restaurant || bag.lines.length === 0) return null;
+
+  const items = restaurant.menu.flatMap((s) => s.items);
+  const fullOf = (itemId: string, unit: number) => {
+    const it = items.find((i) => i.id === itemId);
+    if (!it?.promoPrice) return null;
+    return it.price + (unit - it.promoPrice);
+  };
+  const savings = bag.lines.reduce((sum, l) => {
+    const full = fullOf(l.itemId, l.unitPrice);
+    return full ? sum + (full - l.unitPrice) * l.quantity : sum;
+  }, 0);
+  const belowMin = subtotal < restaurant.minOrder;
+
+  return (
+    <>
+      <div className="flex items-center gap-2 px-2 pb-2 pt-4 md:px-4">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Voltar"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-black-99 transition-colors hover:bg-offwhite-99"
+        >
+          <Icon name="chevronLeft" size={30} />
+        </button>
+        <p className="min-w-0 flex-1 truncate text-[22px] font-bold">{restaurant.name}</p>
+        <button
+          type="button"
+          onClick={() => {
+            clearBag();
+            onClose();
+          }}
+          className="shrink-0 rounded-xl px-3 py-2 text-[17px] text-black-99 transition-colors hover:bg-offwhite-99"
+        >
+          Limpar
+        </button>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <ul className="flex flex-col px-4 md:px-6" role="list">
+          {bag.lines.map((l) => {
+            const it = items.find((i) => i.id === l.itemId);
+            const full = fullOf(l.itemId, l.unitPrice);
+            return (
+              <li key={l.lineId} className="flex gap-4 py-4">
+                {it && (
+                  <FoodArt
+                    kind={it.art}
+                    seed={it.id}
+                    index={menuVariantIndex(restaurant, it.id)}
+                    tint={restaurant.tint}
+                    className="h-16 w-16 shrink-0 rounded-xl"
+                  />
+                )}
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <p className="text-[17px] leading-snug">{l.name}</p>
+                  {l.selections.length > 0 && (
+                    <p className="text-[13px] text-secondary-99">{l.selections.map((s) => s.choiceLabel).join(", ")}</p>
+                  )}
+                  {l.note && <p className="text-[13px] italic text-secondary-99">“{l.note}”</p>}
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="flex items-baseline gap-1.5 tabular-nums">
+                      <span className={cx("text-[17px] font-bold", full ? "text-green-99" : null)}>{formatBRL(l.unitPrice * l.quantity)}</span>
+                      {full ? <span className="text-[14px] text-muted-99 line-through">{formatBRL(full * l.quantity)}</span> : null}
+                    </p>
+                    <Stepper
+                      value={l.quantity}
+                      min={1}
+                      onChange={(n) => updateQuantity(l.lineId, n)}
+                      size="sm"
+                      variant="circle"
+                      removeAtMin
+                      label={`Quantidade de ${l.name}`}
+                    />
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="mt-2 flex items-center gap-4 bg-green-99-tint px-4 py-5 md:px-6">
+          <Icon name="couponFill" size={26} className="shrink-0 text-green-99" />
+          <p className="flex-1 text-[17px]">Cupons de desconto</p>
+          <span className="flex items-center gap-1 text-[14px] text-black-99">
+            No checkout
+            <Icon name="chevronRight" size={20} />
+          </span>
+        </div>
+
+        {belowMin && (
+          <p className="mx-4 mt-4 rounded-xl bg-yellow-99-light px-4 py-3 text-[14px] md:mx-6">
+            Adicione {formatBRL(restaurant.minOrder - subtotal)} para atingir o valor mínimo de {formatBRL(restaurant.minOrder)}.
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between gap-4 border-t border-border-99 bg-white px-4 py-4 md:px-6">
+        <div className="flex flex-col leading-tight">
+          <span className="text-[26px] font-bold tabular-nums">{formatBRL(subtotal)}</span>
+          {savings > 0 && <span className="text-[15px] text-green-99">Economizou {formatBRL(savings)}</span>}
+        </div>
+        <Button
+          size="lg"
+          count={count}
+          disabled={belowMin}
+          className="min-w-[180px] rounded-2xl text-[18px]"
+          onClick={() => {
+            onClose();
+            router.push("/comida/checkout");
+          }}
+        >
+          Continuar
+        </Button>
+      </div>
     </>
   );
 }

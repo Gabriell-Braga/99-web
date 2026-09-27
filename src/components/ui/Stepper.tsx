@@ -31,7 +31,7 @@ export function Stepper({
     dim,
     variant === "square"
       ? cx(size === "lg" ? "rounded-2xl" : "rounded-lg", "bg-offwhite-99 hover:bg-border-99 disabled:bg-offwhite-99")
-      : "rounded-full border border-border-99 bg-white hover:bg-subtle-99 disabled:bg-white",
+      : "rounded-full border-2 border-black-99 bg-white hover:bg-subtle-99 disabled:border-border-99 disabled:bg-white",
   );
   return (
     <div className="inline-flex items-center gap-3" role="group" aria-label={label}>
