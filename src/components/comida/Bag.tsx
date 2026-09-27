@@ -297,7 +297,7 @@ function CartScreen({ onClose }: { onClose: () => void }) {
           size="lg"
           count={count}
           disabled={belowMin}
-          className="shrink-0 rounded-2xl max-[399px]:px-4 max-[399px]:text-[16px] min-[360px]:min-w-[150px] min-[400px]:min-w-[180px] min-[400px]:text-[18px]"
+          className="shrink-0 rounded-2xl max-[359px]:px-3 max-[399px]:px-4 max-[359px]:text-[15px] max-[399px]:text-[16px] min-[360px]:min-w-[150px] min-[400px]:min-w-[180px] min-[400px]:text-[18px]"
           onClick={() => {
             onClose();
             router.push("/comida/checkout");

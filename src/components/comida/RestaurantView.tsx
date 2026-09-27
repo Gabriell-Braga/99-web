@@ -243,7 +243,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
                   <li key={it.id}>
                     <button type="button" onClick={() => setItem(it)} className="flex w-full gap-4 py-4 text-left">
                       <div className="flex min-w-0 flex-1 flex-col gap-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                           <h3 className={cx("text-[17px] font-bold leading-snug", semCor && "text-secondary-99")}>{it.name}</h3>
                           {semCor && <Badge tone="neutral">Indisponível</Badge>}
                         </div>

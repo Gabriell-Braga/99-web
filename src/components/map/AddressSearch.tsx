@@ -356,7 +356,7 @@ export function AddressSearch({
                     </>
                   ) : it.kind === "recent" ? (
                     <>
-                      <span className={cx("block text-[15px]", contact ? "font-bold" : "font-normal")}>{it.place?.title}</span>
+                      <span className={cx("block text-[15px]", contact ? "font-bold" : "font-medium")}>{it.place?.title}</span>
                       <span className="block truncate text-sm text-secondary-99">{contact ?? it.place?.subtitle}</span>
                     </>
                   ) : (

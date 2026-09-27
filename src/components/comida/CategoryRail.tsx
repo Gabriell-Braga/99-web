@@ -86,7 +86,7 @@ export function CategoryRail({ value, onChange }: CategoryRailProps) {
                     decoding="async"
                   />
                 </span>
-                <span className={cx("text-[15px] leading-tight text-black-99 md:text-[14px]", active ? "font-bold" : "font-normal")}>
+                <span className={cx("text-[15px] leading-tight text-black-99 md:text-[14px]", active ? "font-bold" : "font-medium")}>
                   {c.label}
                 </span>
               </button>

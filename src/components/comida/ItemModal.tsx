@@ -226,9 +226,9 @@ function ItemBody({
             disabled={blocked}
             className="flex h-14 min-w-0 flex-1 items-center justify-between gap-2 rounded-2xl bg-yellow-99 px-4 min-[400px]:gap-3 min-[400px]:px-5 text-black-99 transition-[background-color,scale] duration-150 hover:bg-yellow-99-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-offwhite-99 disabled:text-disabled-99 motion-reduce:active:scale-100"
           >
-            <span className="text-[16px] font-bold min-[400px]:text-[18px]">Adicionar</span>
+            <span className="text-[15px] font-bold min-[360px]:text-[16px] min-[400px]:text-[18px]">Adicionar</span>
             <span className="flex flex-col items-end leading-tight tabular-nums">
-              <span className="whitespace-nowrap text-[15px] min-[400px]:text-[16px]">{formatBRL(total)}</span>
+              <span className="whitespace-nowrap text-[14px] font-bold min-[360px]:text-[15px] min-[400px]:text-[16px]">{formatBRL(total)}</span>
               {totalFull && <span className="whitespace-nowrap text-[12px] line-through opacity-70 min-[400px]:text-[13px]">{formatBRL(totalFull)}</span>}
             </span>
           </button>
