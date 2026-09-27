@@ -295,7 +295,7 @@ export function RideView() {
                 />
               ) : (
                 <div className="flex flex-col gap-1">
-                <p className="text-center text-[16px] text-secondary-99">Escolha uma ou mais categorias</p>
+                <p className="text-center text-[16px] font-medium text-secondary-99">Escolha uma ou mais categorias</p>
                 <ul className="flex flex-col" role="list" aria-label="Categorias">
                   {rideCategories.map((c) => {
                     const checked = category === c.id;
@@ -322,7 +322,7 @@ export function RideView() {
                           {/* Nome e preço dividem a primeira linha; o nome encolhe com reticências, o preço nunca. */}
                           <span className="flex min-w-0 flex-1 flex-col">
                             <span className="flex min-w-0 items-center gap-2">
-                              <span className="flex min-w-0 flex-1 items-center gap-1.5 text-[17px] min-[400px]:text-[18px]">
+                              <span className="flex min-w-0 flex-1 items-center gap-1.5 text-[17px] font-semibold min-[400px]:text-[18px]">
                                 <span className="truncate">{c.name}</span>
                                 {c.seats > 0 ? (
                                   // Abaixo de 360px os lugares saem para o nome caber.
@@ -347,7 +347,7 @@ export function RideView() {
                                   >
                                     <Icon name="minus" size={16} />
                                   </button>
-                                  <span className="whitespace-nowrap px-0.5 text-center text-[16px] font-bold tabular-nums min-[400px]:min-w-[64px] min-[400px]:text-[18px]">
+                                  <span className="whitespace-nowrap px-0.5 text-center text-[16px] font-extrabold tabular-nums min-[400px]:min-w-[64px] min-[400px]:text-[18px]">
                                     {route ? formatBRL(negotiated ?? price) : "—"}
                                   </span>
                                   <button
@@ -361,7 +361,7 @@ export function RideView() {
                                   </button>
                                 </span>
                               ) : (
-                                <span className="shrink-0 whitespace-nowrap text-[17px] font-bold tabular-nums min-[400px]:text-[19px]">{route ? formatBRL(price) : "—"}</span>
+                                <span className="shrink-0 whitespace-nowrap text-[17px] font-extrabold tabular-nums min-[400px]:text-[19px]">{route ? formatBRL(price) : "—"}</span>
                               )}
                               <span
                                 className={cx(
@@ -373,7 +373,7 @@ export function RideView() {
                                 <Icon name="check" size={14} />
                               </span>
                             </span>
-                            <span className={cx("text-[15px] text-secondary-99", route ? "whitespace-nowrap" : "truncate")}>
+                            <span className={cx("text-[15px] font-medium text-secondary-99", route ? "whitespace-nowrap" : "truncate")}>
                               {route ? `${arrivalLabel(c.etaMin + mins)} · ${mins} min` : c.description}
                             </span>
                           </span>
@@ -413,7 +413,7 @@ export function RideView() {
                 />
               }
               action={
-                <Button size="lg" full disabled={blocked || pricing.loading} price={route && !pricing.loading ? formatBRL(fare) : undefined} onClick={() => setPhase(km > LOW_SUPPLY_KM && attempts === 0 ? "searching" : "paying")}>
+                <Button size="lg" full className="h-16 rounded-2xl" disabled={blocked || pricing.loading} price={route && !pricing.loading ? formatBRL(fare) : undefined} onClick={() => setPhase(km > LOW_SUPPLY_KM && attempts === 0 ? "searching" : "paying")}>
                   Solicitar {selected.name}
                 </Button>
               }

@@ -442,7 +442,7 @@ export function DeliveryView() {
                       <span className="truncate">{c.name}</span>
                       <Icon name="info" size={16} className="shrink-0 text-placeholder-99" />
                     </span>
-                    <span className="shrink-0 whitespace-nowrap text-[16px] font-bold tabular-nums min-[400px]:text-[19px]">
+                    <span className="shrink-0 whitespace-nowrap text-[16px] font-extrabold tabular-nums min-[400px]:text-[19px]">
                       {pricing.loading ? <PriceSkeleton /> : route ? formatBRL(price) : "—"}
                     </span>
                     {/* Radio do app: anel preto grosso quando escolhido. */}
@@ -451,8 +451,8 @@ export function DeliveryView() {
                       aria-hidden="true"
                     />
                   </span>
-                  {route && <span className="text-[15px] text-secondary-99">{`${eta.min}–${eta.max} min`}</span>}
-                  <span className="text-[15px] text-secondary-99">
+                  {route && <span className="text-[15px] font-medium text-secondary-99">{`${eta.min}–${eta.max} min`}</span>}
+                  <span className="text-[15px] font-medium text-secondary-99">
                     {c.dims} · {c.weight}
                   </span>
                 </span>

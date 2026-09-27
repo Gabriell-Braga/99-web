@@ -55,8 +55,8 @@ function Content({
   if (price) {
     return (
       <span className="flex flex-col items-center leading-tight">
-        <span className="text-[15px] font-bold">{price}</span>
-        <span className="text-[15px] font-bold">{children}</span>
+        <span className="text-[17px] font-bold tabular-nums">{price}</span>
+        <span className="text-[18px] font-extrabold">{children}</span>
       </span>
     );
   }

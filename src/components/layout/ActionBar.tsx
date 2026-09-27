@@ -29,7 +29,7 @@ export function ActionBar({ left, offer, action, hint, stacked }: ActionBarProps
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">{left}</div>
           {offer && (
-            <span className="flex min-w-0 items-center gap-1 text-[15px] text-green-99">
+            <span className="flex min-w-0 items-center gap-1 text-[16px] font-semibold text-green-99">
               <span className="truncate">{offer}</span>
               <Icon name="chevronRight" size={18} className="shrink-0 text-black-99" />
             </span>
@@ -94,7 +94,7 @@ export function PaymentBlock({
         <PaymentIcon name={icon} size={20} />
       </span>
       {compact ? (
-        <span className="truncate text-[16px] font-bold">{detail ? detail.replace(/\D/g, "") : label}</span>
+        <span className="truncate text-[17px] font-extrabold">{detail ? detail.replace(/\D/g, "") : label}</span>
       ) : (
         <span className="flex flex-col leading-tight">
           <span className="whitespace-nowrap text-[15px] font-bold">{label}</span>
