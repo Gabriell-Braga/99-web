@@ -27,11 +27,19 @@ const vehicleImage: Record<NonNullable<MapViewProps["vehicle"]>, string> = {
   bag: "/vehicles/moto-box.png",
 };
 
+/**
+ * O MapLibre posiciona o marcador com `transform`; a animação de escala no mesmo
+ * elemento apagava essa posição e o pulso ia parar no canto do mapa. Por isso o
+ * pulso fica num filho, e o contêiner só recebe a posição.
+ */
 function pulse(): HTMLElement {
+  const wrap = document.createElement("span");
+  wrap.style.cssText = "display:block;width:24px;height:24px;pointer-events:none";
   const el = document.createElement("span");
   el.className = "map-pulse";
   el.style.setProperty("--pulse", "#FFDD00");
-  return el;
+  wrap.appendChild(el);
+  return wrap;
 }
 
 function userDot(): HTMLElement {

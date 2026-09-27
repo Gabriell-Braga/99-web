@@ -40,16 +40,16 @@ export function BottomNav() {
         inFlow ? "hidden lg:flex lg:justify-end lg:pr-8" : isStoreRoute(pathname) ? "hidden md:flex" : "flex",
       )}
     >
-      <ul className="pointer-events-auto flex h-20 items-center rounded-full bg-white px-1 shadow-high" role="list">
+      <ul className="pointer-events-auto flex h-[72px] items-center rounded-full bg-white px-1 shadow-high min-[360px]:h-20" role="list">
         {items.map((it) => {
           const active = pathname.startsWith(it.href);
           const inner = (
-            <span className="relative flex h-[72px] w-20 items-center justify-center">
+            <span className="relative flex h-16 w-[72px] items-center justify-center min-[360px]:h-[72px] min-[360px]:w-20">
               {active && (
                 <motion.span
                   layoutId={reduce ? undefined : "nav-ativo"}
                   transition={transition}
-                  className="absolute h-[72px] w-[72px] rounded-full bg-yellow-99"
+                  className="absolute h-16 w-16 rounded-full bg-yellow-99 min-[360px]:h-[72px] min-[360px]:w-[72px]"
                   aria-hidden="true"
                 />
               )}

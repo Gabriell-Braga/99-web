@@ -27,11 +27,11 @@ export function ActionBar({ left, offer, action, hint, stacked }: ActionBarProps
     return (
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
-          {left}
+          <div className="min-w-0">{left}</div>
           {offer && (
-            <span className="flex shrink-0 items-center gap-1 text-[15px] text-green-99">
-              {offer}
-              <Icon name="chevronRight" size={18} className="text-black-99" />
+            <span className="flex min-w-0 items-center gap-1 text-[15px] text-green-99">
+              <span className="truncate">{offer}</span>
+              <Icon name="chevronRight" size={18} className="shrink-0 text-black-99" />
             </span>
           )}
         </div>
@@ -74,11 +74,14 @@ export function PaymentBlock({
   label,
   detail,
   onClick,
+  compact,
 }: {
   icon: "pix" | "card" | "cash" | "ticket";
   label: string;
   detail?: string;
   onClick?: () => void;
+  /** Uma linha só, como o "▭ 5941" do app: os últimos dígitos, ou o nome quando não há. */
+  compact?: boolean;
 }) {
   return (
     <button
@@ -90,10 +93,14 @@ export function PaymentBlock({
       <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-offwhite-99 text-black-99">
         <PaymentIcon name={icon} size={20} />
       </span>
-      <span className="flex flex-col leading-tight">
-        <span className="whitespace-nowrap text-[15px] font-bold">{label}</span>
-        {detail && <span className="text-[13px] text-secondary-99">{detail}</span>}
-      </span>
+      {compact ? (
+        <span className="truncate text-[16px] font-bold">{detail ? detail.replace(/\D/g, "") : label}</span>
+      ) : (
+        <span className="flex flex-col leading-tight">
+          <span className="whitespace-nowrap text-[15px] font-bold">{label}</span>
+          {detail && <span className="text-[13px] text-secondary-99">{detail}</span>}
+        </span>
+      )}
       <Icon name="chevronDown" size={16} className="text-muted-99" />
     </button>
   );

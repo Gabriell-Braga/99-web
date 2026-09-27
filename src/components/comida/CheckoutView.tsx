@@ -161,7 +161,7 @@ export function CheckoutView() {
           <h1 className="text-[24px] font-bold">Finalizar compra</h1>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[1fr_400px] lg:items-start">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_400px] lg:items-start">
           <div className="flex flex-col gap-5">
             <Card id="ck-endereco" title="Informações da entrega">
               <div className="flex items-start justify-between gap-4">
@@ -190,7 +190,7 @@ export function CheckoutView() {
                   </p>
                 </div>
               </div>
-              <div className="grid gap-2 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {modes.map((m) => {
                   const checked = mode === m.id;
                   const price = m.id === "retirada" ? 0 : baseFee + m.extra;

@@ -86,7 +86,7 @@ export default function HomePage() {
   return (
     <>
       {/* Banner: a corrida começa aqui, com a rota real ao lado. */}
-      <Container className="grid gap-12 py-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-center lg:py-16">
+      <Container className="grid grid-cols-1 gap-12 py-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-center lg:py-16">
         <div className="flex min-w-0 flex-col gap-6">
           <h1 className="max-w-2xl text-[44px] font-bold leading-[1.05] text-black-99 md:text-[60px]">Para onde vamos?</h1>
           <p className="max-w-lg text-[17px] text-secondary-99">
@@ -167,7 +167,7 @@ export default function HomePage() {
 
       {/* O Food ganha a própria faixa, com o catálogo do protótipo em números. */}
       <section className="bg-black-99 text-white">
-        <Container className="grid items-center gap-12 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:py-20">
+        <Container className="grid grid-cols-1 items-center gap-12 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:py-20">
           <div className="flex min-w-0 flex-col gap-5">
             <span className="w-fit rounded-full bg-yellow-99 px-3 py-1 text-[13px] font-bold text-black-99">99 Food</span>
             <h2 className="text-[32px] font-bold leading-tight md:text-[40px]">

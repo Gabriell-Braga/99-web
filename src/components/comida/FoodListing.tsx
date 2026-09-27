@@ -124,7 +124,7 @@ export function FoodListing() {
             }
           />
         ) : loading ? (
-          <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3" aria-busy="true" aria-label="Carregando lojas">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3" aria-busy="true" aria-label="Carregando lojas">
             {Array.from({ length: 6 }).map((_, i) => (
               <StoreCardSkeleton key={i} />
             ))}
@@ -157,7 +157,7 @@ export function FoodListing() {
                 {list.length} {list.length === 1 ? "loja" : "lojas"}
                 {categoryLabel ? ` em ${categoryLabel}` : ""}
               </h2>
-              <ul className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3" role="list">
+              <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3" role="list">
                 {list.map((r) => (
                   <li key={r.slug}>
                     <StoreCard r={r} />
@@ -170,7 +170,7 @@ export function FoodListing() {
           <>
             <section aria-labelledby="ofertas" className="flex flex-col gap-4">
               <SectionTitle>Ofertas</SectionTitle>
-              <ul className="grid gap-4 md:grid-cols-2" role="list">
+              <ul className="grid grid-cols-1 gap-4 md:grid-cols-2" role="list">
                 {offers.map((o, i) => (
                   <li className="min-w-0" key={`${o.restaurant.slug}-${o.item.id}`}>
                     <OfferCard offer={o} eager={i < 2} />
@@ -184,7 +184,7 @@ export function FoodListing() {
 
             <section aria-labelledby="lojas" className="flex flex-col gap-4">
               <SectionTitle>Lojas recomendadas na região</SectionTitle>
-              <ul className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3" role="list">
+              <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3" role="list">
                 {list.map((r) => (
                   <li key={r.slug}>
                     <StoreCard r={r} />

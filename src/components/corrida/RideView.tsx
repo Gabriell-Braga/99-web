@@ -403,6 +403,7 @@ export function RideView() {
               offer="Clique para descontos"
               left={
                 <PaymentBlock
+                  compact
                   icon={paymentIcon[payment]}
                   label={paymentLabel(payment)}
                   detail={payment === "cartao" && card.number ? `•••• ${card.number.replace(/\s/g, "").slice(-4)}` : undefined}

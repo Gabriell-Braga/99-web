@@ -212,18 +212,24 @@ function ItemBody({
 
       {/* Rodapé fixo: stepper quadrado à esquerda e "Adicionar" com o valor à direita. */}
       <div className="flex flex-col gap-2 border-t border-border-99 bg-white px-4 py-4 md:px-6">
-        <div className="flex items-center gap-4">
-          <Stepper value={qty} onChange={setQty} variant="square" size="lg" />
+        <div className="flex items-center gap-3 min-[400px]:gap-4">
+          {/* Em telas estreitas o stepper encolhe para o botão caber com o preço. */}
+          <div className="shrink-0 min-[400px]:hidden">
+            <Stepper value={qty} onChange={setQty} variant="square" size="sm" />
+          </div>
+          <div className="hidden shrink-0 min-[400px]:block">
+            <Stepper value={qty} onChange={setQty} variant="square" size="lg" />
+          </div>
           <button
             type="button"
             onClick={submit}
             disabled={blocked}
-            className="flex h-14 min-w-0 flex-1 items-center justify-between gap-3 rounded-2xl bg-yellow-99 px-5 text-black-99 transition-[background-color,scale] duration-150 hover:bg-yellow-99-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-offwhite-99 disabled:text-disabled-99 motion-reduce:active:scale-100"
+            className="flex h-14 min-w-0 flex-1 items-center justify-between gap-2 rounded-2xl bg-yellow-99 px-4 min-[400px]:gap-3 min-[400px]:px-5 text-black-99 transition-[background-color,scale] duration-150 hover:bg-yellow-99-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-offwhite-99 disabled:text-disabled-99 motion-reduce:active:scale-100"
           >
-            <span className="text-[18px] font-bold">Adicionar</span>
+            <span className="text-[16px] font-bold min-[400px]:text-[18px]">Adicionar</span>
             <span className="flex flex-col items-end leading-tight tabular-nums">
-              <span className="text-[16px]">{formatBRL(total)}</span>
-              {totalFull && <span className="text-[13px] line-through opacity-70">{formatBRL(totalFull)}</span>}
+              <span className="whitespace-nowrap text-[15px] min-[400px]:text-[16px]">{formatBRL(total)}</span>
+              {totalFull && <span className="whitespace-nowrap text-[12px] line-through opacity-70 min-[400px]:text-[13px]">{formatBRL(totalFull)}</span>}
             </span>
           </button>
         </div>

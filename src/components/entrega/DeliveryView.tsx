@@ -494,8 +494,8 @@ export function DeliveryView() {
                 {route && <span className="shrink-0 text-[15px] text-secondary-99">{formatKm(km)}</span>}
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[26px] font-bold tabular-nums">{route && !pricing.loading ? formatBRL(fare) : "—"}</span>
-                <Button size="lg" className="h-16 min-w-[180px] rounded-2xl text-[22px]" disabled={blocked || pricing.loading} onClick={() => setPaying(true)}>
+                <span className="whitespace-nowrap text-[22px] font-bold tabular-nums min-[400px]:text-[26px]">{route && !pricing.loading ? formatBRL(fare) : "—"}</span>
+                <Button size="lg" className="h-16 rounded-2xl max-[399px]:px-5 max-[399px]:text-[18px] min-[400px]:min-w-[180px] min-[400px]:text-[22px]" disabled={blocked || pricing.loading} onClick={() => setPaying(true)}>
                   Confirmar
                 </Button>
               </div>

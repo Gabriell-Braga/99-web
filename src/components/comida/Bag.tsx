@@ -216,7 +216,7 @@ function CartScreen({ onClose }: { onClose: () => void }) {
         >
           <Icon name="chevronLeft" size={30} />
         </button>
-        <p className="min-w-0 flex-1 truncate text-[22px] font-bold">{restaurant.name}</p>
+        <p className="min-w-0 flex-1 truncate text-[20px] font-bold min-[400px]:text-[22px]">{restaurant.name}</p>
         <button
           type="button"
           onClick={() => {
@@ -251,8 +251,8 @@ function CartScreen({ onClose }: { onClose: () => void }) {
                     <p className="text-[13px] text-secondary-99">{l.selections.map((s) => s.choiceLabel).join(", ")}</p>
                   )}
                   {l.note && <p className="text-[13px] italic text-secondary-99">“{l.note}”</p>}
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="flex items-baseline gap-1.5 tabular-nums">
+                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                    <p className="flex items-baseline gap-1.5 whitespace-nowrap tabular-nums">
                       <span className={cx("text-[17px] font-bold", full ? "text-green-99" : null)}>{formatBRL(l.unitPrice * l.quantity)}</span>
                       {full ? <span className="text-[14px] text-muted-99 line-through">{formatBRL(full * l.quantity)}</span> : null}
                     </p>
@@ -274,8 +274,8 @@ function CartScreen({ onClose }: { onClose: () => void }) {
 
         <div className="mt-2 flex items-center gap-4 bg-green-99-tint px-4 py-5 md:px-6">
           <Icon name="couponFill" size={26} className="shrink-0 text-green-99" />
-          <p className="flex-1 text-[17px]">Cupons de desconto</p>
-          <span className="flex items-center gap-1 text-[14px] text-black-99">
+          <p className="min-w-0 flex-1 truncate text-[16px] min-[400px]:text-[17px]">Cupons de desconto</p>
+          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap text-[14px] text-black-99">
             No checkout
             <Icon name="chevronRight" size={20} />
           </span>
@@ -288,16 +288,16 @@ function CartScreen({ onClose }: { onClose: () => void }) {
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-4 border-t border-border-99 bg-white px-4 py-4 md:px-6">
+      <div className="flex items-center justify-between gap-3 border-t border-border-99 bg-white px-4 py-4 min-[400px]:gap-4 md:px-6">
         <div className="flex flex-col leading-tight">
-          <span className="text-[26px] font-bold tabular-nums">{formatBRL(subtotal)}</span>
-          {savings > 0 && <span className="text-[15px] text-green-99">Economizou {formatBRL(savings)}</span>}
+          <span className="whitespace-nowrap text-[22px] font-bold tabular-nums min-[360px]:text-[24px] min-[400px]:text-[26px]">{formatBRL(subtotal)}</span>
+          {savings > 0 && <span className="whitespace-nowrap text-[14px] text-green-99 min-[400px]:text-[15px]">Economizou {formatBRL(savings)}</span>}
         </div>
         <Button
           size="lg"
           count={count}
           disabled={belowMin}
-          className="min-w-[180px] rounded-2xl text-[18px]"
+          className="shrink-0 rounded-2xl max-[399px]:px-4 max-[399px]:text-[16px] min-[360px]:min-w-[150px] min-[400px]:min-w-[180px] min-[400px]:text-[18px]"
           onClick={() => {
             onClose();
             router.push("/comida/checkout");

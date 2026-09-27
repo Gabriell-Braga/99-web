@@ -144,7 +144,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
         {restaurant.open ? (
           // Três colunas separadas por fios: prazo, taxa e quem entrega.
           <dl className="mt-7 flex text-[13px] md:text-[14px]">
-            <div className="flex flex-col gap-1 whitespace-nowrap pr-3 min-[400px]:pr-4 md:pr-8">
+            <div className="flex min-w-0 flex-col gap-1 pr-3 min-[400px]:whitespace-nowrap min-[400px]:pr-4 md:pr-8">
               <dt className="flex items-center gap-1 text-secondary-99">
                 <span className="flex h-4 w-4 items-center justify-center rounded-[5px] bg-yellow-99 text-black-99" aria-hidden="true">
                   <Icon name="boltFill" size={12} />
@@ -155,7 +155,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
                 {restaurant.etaMin}-{restaurant.etaMax} Min
               </dd>
             </div>
-            <div className="flex flex-col gap-1 whitespace-nowrap border-l border-border-99 px-3 min-[400px]:px-4 md:px-8">
+            <div className="flex min-w-0 flex-col gap-1 border-l border-border-99 px-3 min-[400px]:whitespace-nowrap min-[400px]:px-4 md:px-8">
               <dt className="text-secondary-99">Taxa de entrega</dt>
               <dd className="flex flex-wrap items-baseline gap-x-1 tabular-nums">
                 <span className="text-[16px] font-bold">{restaurant.deliveryFee === 0 ? "Grátis" : formatBRL(restaurant.deliveryFee)}</span>
@@ -164,7 +164,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
                 )}
               </dd>
             </div>
-            <div className="flex flex-col gap-1 whitespace-nowrap border-l border-border-99 pl-3 min-[400px]:pl-4 md:pl-8">
+            <div className="flex min-w-0 flex-col gap-1 border-l border-border-99 pl-3 min-[400px]:whitespace-nowrap min-[400px]:pl-4 md:pl-8">
               <dt className="text-secondary-99">Entregue pela</dt>
               <dd className="text-[16px] font-bold">{restaurant.deliveredBy === "Entregador 99" ? "99Food" : "Loja"}</dd>
             </div>
@@ -183,7 +183,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
             <h2 id="sec-ofertas" className="mb-4 text-[22px] font-bold">
               Ofertas
             </h2>
-            <ul className="grid gap-3 md:grid-cols-2" role="list">
+            <ul className="grid grid-cols-1 gap-3 md:grid-cols-2" role="list">
               {offers.map((it) => (
                 <li key={it.id}>
                   <button
@@ -236,7 +236,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
             <h2 id={`sec-${section.id}`} className="mb-2 text-[22px] font-bold">
               {section.title}
             </h2>
-            <ul className="grid divide-y divide-border-99 md:grid-cols-2 md:gap-x-8 md:divide-y-0" role="list">
+            <ul className="grid grid-cols-1 divide-y divide-border-99 md:grid-cols-2 md:gap-x-8 md:divide-y-0" role="list">
               {section.items.map((it) => {
                 const semCor = !it.available;
                 return (
