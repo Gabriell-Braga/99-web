@@ -10,7 +10,7 @@ import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
 import { bagCount, useApp } from "@/context/AppProvider";
 import { AddressPicker } from "@/components/comida/AddressPicker";
-import { user } from "@/data/menu";
+import { useUserName } from "@/lib/useUserName";
 import { CountBubble } from "@/components/ui/CountBubble";
 import { cx } from "@/lib/cx";
 
@@ -69,10 +69,19 @@ export function Header() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const inFood = pathname.startsWith("/comida");
   const count = bagCount(bag);
+  const name = useUserName();
+  // Corrida, entrega e acompanhamento ocupam a tela toda com o painel colado à
+  // esquerda; o cabeçalho acompanha a mesma margem em vez da coluna de 1440px.
+  const fullBleed = ["/corrida", "/entrega", "/pedido"].some((p) => pathname.startsWith(p));
 
   return (
     <header className="bg-yellow-99 pb-6">
-      <div className="mx-auto flex h-[72px] max-w-[1440px] items-center gap-3 px-4 md:gap-4 md:px-8 xl:px-16">
+      <div
+        className={cx(
+          "flex h-[72px] items-center gap-3 px-4 md:gap-4 md:px-8",
+          !fullBleed && "mx-auto max-w-[1440px] xl:px-16",
+        )}
+      >
         {/* Avatar decorativo: o menu do perfil está fora do escopo. */}
         <span className="flex h-11 w-11 shrink-0 cursor-default items-center justify-center rounded-full bg-white text-black-99" aria-hidden="true">
           <Icon name="user" size={24} />
@@ -90,7 +99,7 @@ export function Header() {
             <Icon name="chevronRight" size={18} className="shrink-0" />
           </button>
         ) : (
-          <p className="min-w-0 truncate text-[22px] font-bold text-black-99">Olá, {user.name}!</p>
+          <p className="min-w-0 truncate text-[22px] font-bold text-black-99">{name ? `Olá, ${name}!` : name === undefined ? "" : "Olá!"}</p>
         )}
 
         <Link

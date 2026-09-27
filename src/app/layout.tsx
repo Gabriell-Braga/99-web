@@ -5,6 +5,7 @@ import { AppProvider } from "@/context/AppProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { NameModal } from "@/components/layout/NameModal";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </main>
           <Footer />
           <BottomNav />
+          <NameModal />
         </AppProvider>
       </body>
     </html>
