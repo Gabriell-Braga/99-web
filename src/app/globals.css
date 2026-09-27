@@ -204,3 +204,20 @@ body {
     display: none;
   }
 }
+
+/* Gaveta sobre o mapa (MapPanelLayout): sem barra de rolagem visível. */
+.sheet-scroller {
+  scrollbar-width: none;
+}
+.sheet-scroller::-webkit-scrollbar {
+  display: none;
+}
+/* A gaveta sobe do rodapé ao abrir a tela, com a curva de mola do iOS. */
+@keyframes sheet-in {
+  from {
+    transform: translateY(48%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

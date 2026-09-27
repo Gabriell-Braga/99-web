@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { Order } from "@/lib/types";
 import { STAGE_DURATION_MS } from "@/lib/stages";
 import { fetchRoute, type LatLng } from "@/lib/geo";
@@ -48,6 +49,7 @@ export function TrackingView({ id }: { id: string }) {
 }
 
 function Tracking({ order }: { order: Order }) {
+  const router = useRouter();
   const [stage, setStage] = useState(0);
   const [fetchedRoute, setFetchedRoute] = useState<{ id: string; points: LatLng[] } | null>(null);
   const last = order.stages.length - 1;
@@ -77,6 +79,7 @@ function Tracking({ order }: { order: Order }) {
 
   return (
     <MapPanelLayout
+      onBack={() => router.push("/")}
       map={
         <MapView
           origin={order.origin}

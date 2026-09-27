@@ -15,7 +15,7 @@ const items: { href: string; label: string; icon: IconName; disabled?: boolean }
 ];
 
 /** Telas de fluxo têm barra de ação própria no rodapé; no celular a pílula sai delas. */
-const flowRoutes = ["/corrida", "/entrega"];
+const flowRoutes = ["/corrida", "/entrega", "/pedido"];
 /** No checkout a barra de ação ocupa a largura toda e cobriria a pílula. */
 const hiddenRoutes = ["/comida/checkout"];
 
