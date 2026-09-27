@@ -12,7 +12,7 @@ import { fetchRoute, type GeoPlace, type RouteResult } from "@/lib/geo";
 import { useCurrentLocation } from "@/lib/useGeolocation";
 import { useApp } from "@/context/AppProvider";
 import { MapPanelLayout } from "@/components/layout/MapPanelLayout";
-import { ActionBar, PaymentBlock } from "@/components/layout/ActionBar";
+import { PaymentBlock } from "@/components/layout/ActionBar";
 import { MapView } from "@/components/map/MapView";
 import { AddressSearch, type PastedExtras } from "@/components/map/AddressSearch";
 import { RoutePair } from "@/components/map/RoutePair";
@@ -92,6 +92,7 @@ export function DeliveryView() {
   const [pickupTouched, setPickupTouched] = useState(false);
   const [dropoff, setDropoff] = useState<PointState>(emptyPoint);
   const [editing, setEditing] = useState<"pickup" | "dropoff" | null>(null);
+  const [contactFor, setContactFor] = useState<"pickup" | "dropoff" | null>(null);
   const [routeState, setRouteState] = useState<{ key: string; route: RouteResult } | null>(null);
   const [content, setContent] = useState("");
   const [size, setSize] = useState<PackageSize>("moto");
@@ -181,6 +182,7 @@ export function DeliveryView() {
     return (
       <MapPanelLayout
         map={map}
+        onBack={() => setPaying(false)}
         panel={<PaymentFlow method={payment} amount={fare} orderRef={orderId} noun="entrega" onConfirmed={confirm} onCancel={() => setPaying(false)} />}
       />
     );
@@ -194,23 +196,30 @@ export function DeliveryView() {
       setter({ ...prev, place: null });
       return;
     }
-    setter({
+    const next = {
       place,
       number: place.number || extras?.number || prev.number,
       complement: extras?.complement ?? prev.complement,
       name: extras?.name ?? prev.name,
       phone: extras?.phone ? formatPhone(extras.phone) : prev.phone,
-    });
+    };
+    setter(next);
     setEditing(null);
+    // Endereço novo sem contato: segue para a ficha de quem envia ou recebe, como no app.
+    if (!contactFor && (!next.name.trim() || next.phone.replace(/\D/g, "").length < 10)) setContactFor(which);
   }
 
   const otherState = tab === "enviar" ? dropoff : pickup;
-  const searching = editing !== null || !otherState.place;
-
-  // Tela inicial do app: só o ponto da pessoa preenchido, nada sendo editado.
-  const landing = editing === null && !otherState.place;
   const mineKey = tab === "enviar" ? "pickup" : "dropoff";
   const otherKey = tab === "enviar" ? "dropoff" : "pickup";
+  // Qual tela do app está aberta: busca de endereço, ficha do contato, início ou detalhes.
+  const screen: "search" | "contact" | "landing" | "details" = editing
+    ? "search"
+    : contactFor
+      ? "contact"
+      : !otherState.place
+        ? "landing"
+        : "details";
 
   const landingPanel = (
     <div className="flex flex-col gap-8 pb-8">
@@ -257,7 +266,7 @@ export function DeliveryView() {
 
         <button
           type="button"
-          onClick={() => setEditing(mineKey)}
+          onClick={() => setContactFor(mineKey)}
           className="mt-3 flex w-full items-center gap-4 rounded-2xl px-4 py-4 text-left transition-colors hover:bg-black-99/5"
         >
           <span
@@ -290,218 +299,208 @@ export function DeliveryView() {
     </div>
   );
 
-
-  const panel = (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-[22px] font-bold">99 Entrega</h1>
-        <div className="mt-3 flex gap-6 border-b border-border-99" role="tablist" aria-label="Enviar ou receber">
-          {(["enviar", "receber"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={tab === t}
-              onClick={() => {
-                setTab(t);
-                setEditing(null);
-              }}
-              className={cx(
-                "relative -mb-px pb-2 text-[15px] font-bold capitalize transition-colors duration-150",
-                tab === t ? "text-black-99" : "text-secondary-99 hover:text-black-99",
-              )}
-            >
-              {t === "enviar" ? "Enviar" : "Receber"}
-              {tab === t && (
-                <motion.span
-                  layoutId={reduceMotion ? undefined : "aba-entrega"}
-                  transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] }}
-                  className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-orange-99"
-                  aria-hidden="true"
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {searching ? (
-        <>
-          {editing === "pickup" || (editing === null && !pickup.place) ? (
-            <AddressSearch
-              key="pickup"
-              placeholder={tab === "enviar" ? "Coletar em" : "Coletar de"}
-              ariaLabel="Endereço de coleta"
-              value={pickup.place}
-              autoFocus
-              currentLocation={current.place}
-              currentLoading={current.status === "loading"}
-              position={current.position}
-              onChange={(p, extras) => applyPlace("pickup", p, extras)}
-            />
-          ) : (
-            <AddressSearch
-              key="dropoff"
-              placeholder="Entregar para"
-              ariaLabel="Endereço de entrega"
-              value={dropoff.place}
-              autoFocus
-              currentLocation={tab === "receber" ? current.place : undefined}
-              currentLoading={tab === "receber" && current.status === "loading"}
-              position={current.position}
-              onChange={(p, extras) => applyPlace("dropoff", p, extras)}
-            />
-          )}
-          {mine.place && editing === null && (
-            <button
-              type="button"
-              onClick={() => setEditing(tab === "enviar" ? "pickup" : "dropoff")}
-              className="flex items-center gap-4 rounded-xl px-4 py-3 text-left transition-colors duration-[120ms] hover:bg-offwhite-99"
-            >
-              <span
-                className={cx("h-4 w-4 shrink-0 rounded-full border-[3px] bg-white", tab === "enviar" ? "border-success-99" : "border-orange-99")}
-                aria-hidden="true"
-              />
-              <span className="min-w-0 flex-1">
-                <span className="block text-[13px] text-secondary-99">{tab === "enviar" ? "Coleta" : "Entrega"}</span>
-                <span className="block truncate text-[17px] font-bold">{mine.place.title}</span>
-              </span>
-              <span className="text-[13px] font-bold text-secondary-99">Mudar</span>
-            </button>
-          )}
-          {current.status === "denied" && !pickupTouched && (
-            <InfoNote>Sem acesso à sua localização. O ponto começa em Vila Madalena, São Paulo. Toque em Mudar para trocar.</InfoNote>
-          )}
-        </>
-      ) : (
-        <>
-          <RoutePair
-            origin={a && { title: pointLabel(pickup), contact: contactLine(pickup) }}
-            destination={b && { title: pointLabel(dropoff), contact: contactLine(dropoff) }}
-            onEditOrigin={() => setEditing("pickup")}
-            onEditDestination={() => setEditing("dropoff")}
-            onSwap={() => {
-              setPickup(dropoff);
-              setDropoff(pickup);
-            }}
-          />
-          {notCovered && (
-            <ErrorNote
-              title="Endereço fora da área de cobertura"
-              description={`Ainda não atendemos ${notCovered.city || notCovered.title}. A entrega precisa começar e terminar no Brasil.`}
-            />
-          )}
-
-          <section aria-labelledby="info-title" className="flex flex-col">
-            <h2 id="info-title" className="text-[17px] font-bold">
-              Informações da entrega
-            </h2>
-            <div className="grid gap-x-6 md:grid-cols-2">
-              <Input label="Quem envia" required value={pickup.name} onChange={(e) => setPickup({ ...pickup, name: e.target.value })} placeholder="Nome" autoComplete="off" />
-              <Input label="Telefone de quem envia" required inputMode="tel" value={pickup.phone} onChange={(e) => setPickup({ ...pickup, phone: formatPhone(e.target.value) })} placeholder="(11) 90000-0000" autoComplete="off" />
-              {a && !a.number && !a.exact && (
-                <Input label="Número da coleta" required inputMode="numeric" value={pickup.number} onChange={(e) => setPickup({ ...pickup, number: e.target.value })} placeholder="Número" autoComplete="off" />
-              )}
-              <Input label="Complemento da coleta" value={pickup.complement} onChange={(e) => setPickup({ ...pickup, complement: e.target.value })} placeholder="Apto, bloco, loja" autoComplete="off" />
-              <Input label="Quem recebe" required value={dropoff.name} onChange={(e) => setDropoff({ ...dropoff, name: e.target.value })} placeholder="Nome" autoComplete="off" />
-              <Input label="Telefone de quem recebe" required inputMode="tel" value={dropoff.phone} onChange={(e) => setDropoff({ ...dropoff, phone: formatPhone(e.target.value) })} placeholder="(11) 90000-0000" autoComplete="off" />
-              {b && !b.number && !b.exact && (
-                <Input label="Número da entrega" required inputMode="numeric" value={dropoff.number} onChange={(e) => setDropoff({ ...dropoff, number: e.target.value })} placeholder="Número" autoComplete="off" />
-              )}
-              <Input label="Complemento da entrega" value={dropoff.complement} onChange={(e) => setDropoff({ ...dropoff, complement: e.target.value })} placeholder="Apto, bloco, loja" autoComplete="off" />
-            </div>
-          </section>
-
-          <section aria-labelledby="item-title" className="flex flex-col">
-            <h2 id="item-title" className="text-[17px] font-bold">
-              Inserir detalhes do item
-            </h2>
-            <Input label="O que vai no pacote" required value={content} onChange={(e) => setContent(e.target.value)} placeholder="Ex.: Pedido #4821, 2 lanches e 1 bebida" maxLength={80} autoComplete="off" />
-          </section>
-
-          <ul className="flex flex-col" role="list" aria-label="Categorias de entrega">
-            {deliveryCategories.map((c) => {
-              const checked = size === c.id;
-              const price = route ? deliveryFare(km, c.id) : 0;
-              return (
-                <li key={c.id} className="border-b border-border-99 last:border-b-0">
-                  <button
-                    type="button"
-                    aria-pressed={checked}
-                    onClick={() => setSize(c.id)}
-                    className={cx(
-                      "relative isolate flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors duration-150 ease-out hover:duration-[120ms]",
-                      !checked && "hover:bg-offwhite-99",
-                    )}
-                  >
-                    {checked && (
-                      <motion.span
-                        layoutId={reduceMotion ? undefined : "categoria-entrega"}
-                        transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] }}
-                        className="absolute inset-0 -z-10 rounded-xl bg-offwhite-99"
-                        aria-hidden="true"
-                      />
-                    )}
-                    {/* No fluxo de entrega a moto também aparece com a caixa. */}
-                    <VehicleArt category={c.id === "moto" ? "entrega-moto" : "entrega-carro"} />
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="flex min-w-0 items-center gap-1.5 text-[17px] font-bold">
-                        <span className="truncate">{c.name}</span>
-                        <Icon name="info" size={14} className="text-secondary-99" />
-                      </span>
-                      <span className={cx("text-sm text-secondary-99", route ? "whitespace-nowrap" : "truncate")}>
-                        {c.dims} · {c.weight}
-                        {route ? ` · ${eta.min}–${eta.max} min` : ""}
-                      </span>
-                    </span>
-                    <span className="flex w-[100px] shrink-0 items-center justify-end text-[17px] font-bold tabular-nums">
-                      {pricing.loading ? <PriceSkeleton /> : route ? formatBRL(price) : "—"}
-                    </span>
-                    {/* Mesma marca de seleção da corrida. */}
-                    <span
-                      className={cx(
-                        "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2",
-                        checked ? "border-black-99 bg-black-99 text-white" : "border-border-99 bg-white text-transparent",
-                      )}
-                      aria-hidden="true"
-                    >
-                      <Icon name="check" size={14} />
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </>
-      )}
+  const searchPanel = editing && (
+    <div className="flex flex-col gap-4">
+      <AddressSearch
+        key={editing}
+        placeholder={editing === "pickup" ? "Coletar em" : "Entregar para"}
+        ariaLabel={editing === "pickup" ? "Endereço de coleta" : "Endereço de entrega"}
+        value={editing === "pickup" ? pickup.place : dropoff.place}
+        autoFocus
+        listaFixa
+        currentLocation={editing === mineKey ? current.place : undefined}
+        currentLoading={editing === mineKey && current.status === "loading"}
+        position={current.position}
+        onChange={(p, extras) => applyPlace(editing, p, extras)}
+      />
     </div>
   );
+
+  // Ficha de quem envia ou recebe, a "Informações do remetente" do app.
+  const who = contactFor ?? "pickup";
+  const contact = who === "pickup" ? pickup : dropoff;
+  const setContact = who === "pickup" ? setPickup : setDropoff;
+  const contactReady =
+    Boolean(contact.place) &&
+    (Boolean(contact.place?.number) || Boolean(contact.place?.exact) || contact.number.trim() !== "") &&
+    contact.name.trim() !== "" &&
+    contact.phone.replace(/\D/g, "").length >= 10;
+  const contactTitle = who === "pickup" ? "Informações do remetente" : "Informações do destinatário";
+
+  const contactPanel = (
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        onClick={() => setEditing(who)}
+        className="flex w-full items-center gap-3 border-b border-border-99 py-3 text-left"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] text-secondary-99">
+            Endereço<span className="text-alert-99">*</span>
+          </span>
+          <span className={cx("mt-1 block truncate text-[18px]", !contact.place && "text-placeholder-99")}>
+            {contact.place ? contact.place.title : "Escolha o endereço"}
+          </span>
+        </span>
+        <Icon name="chevronRight" size={24} className="shrink-0" />
+      </button>
+      {contact.place && !contact.place.number && !contact.place.exact && (
+        <Input label="Número" required inputMode="numeric" value={contact.number} onChange={(e) => setContact({ ...contact, number: e.target.value })} placeholder="Número" autoComplete="off" />
+      )}
+      <Input
+        label="Detalhes do endereço"
+        value={contact.complement}
+        onChange={(e) => setContact({ ...contact, complement: e.target.value })}
+        placeholder="Ex.: bloco A, apartamento 201"
+        autoComplete="off"
+      />
+      <Input
+        label="Nome para contato"
+        required
+        value={contact.name}
+        onChange={(e) => setContact({ ...contact, name: e.target.value })}
+        placeholder="Nome"
+        autoComplete="off"
+      />
+      <Input
+        label="Número de telefone"
+        required
+        inputMode="tel"
+        value={contact.phone}
+        onChange={(e) => setContact({ ...contact, phone: formatPhone(e.target.value) })}
+        placeholder="(11) 90000-0000"
+        autoComplete="off"
+        leading={<span className="text-[17px] text-black-99">+55</span>}
+      />
+      <Button size="lg" full className="mt-6 h-16 rounded-2xl text-[22px]" disabled={!contactReady} onClick={() => setContactFor(null)}>
+        Confirmar
+      </Button>
+    </div>
+  );
+
+  const detailsPanel = (
+    <div className="flex flex-col gap-3">
+      <RoutePair
+        bare
+        origin={a && { title: pointLabel(pickup), contact: contactLine(pickup) ?? "Adicionar nome e telefone" }}
+        destination={b && { title: pointLabel(dropoff), contact: contactLine(dropoff) ?? "Adicionar nome e telefone" }}
+        onEditOrigin={() => setContactFor("pickup")}
+        onEditDestination={() => setContactFor("dropoff")}
+        onSwap={() => {
+          setPickup(dropoff);
+          setDropoff(pickup);
+        }}
+      />
+      {notCovered && (
+        <ErrorNote
+          title="Endereço fora da área de cobertura"
+          description={`Ainda não atendemos ${notCovered.city || notCovered.title}. A entrega precisa começar e terminar no Brasil.`}
+        />
+      )}
+
+      <section aria-labelledby="item-title" className="rounded-3xl bg-white px-5 pb-3 pt-5">
+        <div className="flex items-start gap-4">
+          <Icon name="box" size={24} className="mt-0.5 shrink-0 text-secondary-99" />
+          <div className="min-w-0 flex-1">
+            <h2 id="item-title" className="text-[18px] font-bold">
+              Inserir detalhes do item<span className="text-alert-99">*</span>
+            </h2>
+            <Input
+              aria-label="O que vai no pacote"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Adicionar uma observação na entrega"
+              maxLength={80}
+              autoComplete="off"
+              wrapperClassName="border-b-0"
+            />
+          </div>
+        </div>
+      </section>
+
+      <ul className="rounded-3xl bg-white px-2 py-2" role="list" aria-label="Categorias de entrega">
+        {deliveryCategories.map((c) => {
+          const checked = size === c.id;
+          const price = route ? deliveryFare(km, c.id) : 0;
+          return (
+            <li key={c.id} className="border-b border-border-99 last:border-b-0">
+              <button
+                type="button"
+                aria-pressed={checked}
+                onClick={() => setSize(c.id)}
+                className="flex w-full items-center gap-2.5 rounded-2xl px-3 py-4 text-left transition-colors duration-150 hover:bg-offwhite-99"
+              >
+                {/* No fluxo de entrega a moto também aparece com a caixa. */}
+                <VehicleArt category={c.id === "moto" ? "entrega-moto" : "entrega-carro"} width={56} />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="flex min-w-0 items-center gap-1.5 text-[17px] font-bold min-[400px]:text-[18px]">
+                    <span className="whitespace-nowrap">{c.name}</span>
+                    <Icon name="info" size={16} className="shrink-0 text-placeholder-99" />
+                  </span>
+                  {route && <span className="text-[15px] text-secondary-99">{`${eta.min}–${eta.max} min`}</span>}
+                  <span className="text-[15px] text-secondary-99">
+                    {c.dims} · {c.weight}
+                  </span>
+                </span>
+                <span className="flex shrink-0 items-center justify-end self-start pt-0.5 text-[18px] min-[400px]:text-[19px] font-bold tabular-nums">
+                  {pricing.loading ? <PriceSkeleton /> : route ? formatBRL(price) : "—"}
+                </span>
+                {/* Radio do app: anel preto grosso quando escolhido. */}
+                <span
+                  className={cx(
+                    "h-6 w-6 shrink-0 self-start rounded-full",
+                    checked ? "border-[7px] border-black-99" : "border-2 border-border-99",
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+
+  const panelFor = { landing: landingPanel, search: searchPanel, contact: contactPanel, details: detailsPanel }[screen];
 
   return (
     <MapPanelLayout
       map={map}
       panelWidth="lg"
-      panel={landing ? landingPanel : panel}
-      mapHiddenOnMobile={landing}
+      panel={panelFor}
+      mapHiddenOnMobile
+      tone={screen === "details" ? "subtle" : "white"}
+      title={screen === "contact" ? contactTitle : screen === "details" ? "Detalhes da entrega" : undefined}
+      onBack={
+        screen === "landing"
+          ? undefined
+          : () => {
+              if (screen === "search") setEditing(null);
+              else if (screen === "contact") setContactFor(null);
+              else setEditing(otherKey);
+            }
+      }
       footer={
-        !searching ? (
+        screen === "details" ? (
           <>
-            <ActionBar
-              left={
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-3">
                 <PaymentBlock
                   icon={paymentIcon[payment]}
                   label={paymentLabel(payment)}
                   detail={payment === "cartao" && card.number ? `•••• ${card.number.replace(/\s/g, "").slice(-4)}` : undefined}
                   onClick={() => setPayOpen(true)}
                 />
-              }
-              action={
-                <Button size="lg" full disabled={blocked || pricing.loading} price={route && !pricing.loading ? `${formatBRL(fare)} · ${formatKm(km)}` : undefined} onClick={() => setPaying(true)}>
+                {route && <span className="shrink-0 text-[15px] text-secondary-99">{formatKm(km)}</span>}
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-[26px] font-bold tabular-nums">{route && !pricing.loading ? formatBRL(fare) : "—"}</span>
+                <Button size="lg" className="h-16 min-w-[180px] rounded-2xl text-[22px]" disabled={blocked || pricing.loading} onClick={() => setPaying(true)}>
                   Confirmar
                 </Button>
-              }
-              hint={<BlockedHint items={missing.slice(0, 3).concat(missing.length > 3 ? [`mais ${missing.length - 3}`] : [])} />}
-            />
+              </div>
+              <BlockedHint items={missing.slice(0, 3).concat(missing.length > 3 ? [`mais ${missing.length - 3}`] : [])} />
+            </div>
             <Modal open={payOpen} onClose={() => setPayOpen(false)} title="Métodos de pagamento" width="sm">
               <div className="flex flex-col gap-4">
                 <PaymentPicker value={payment} onChange={setPayment} allowed={["pix", "cartao", "dinheiro"]} compact />

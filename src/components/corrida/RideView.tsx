@@ -150,6 +150,7 @@ export function RideView() {
     return (
       <MapPanelLayout
         map={map}
+        onBack={() => setPhase("form")}
         panel={<PaymentFlow method={payment} amount={fare} orderRef={orderId} noun="corrida" onConfirmed={confirm} onCancel={() => setPhase("form")} />}
       />
     );
@@ -159,6 +160,7 @@ export function RideView() {
     return (
       <MapPanelLayout
         map={map}
+        onBack={() => setPhase("form")}
         panel={
           <div className="flex flex-col gap-6">
             <h1 className="text-[22px] font-bold">{selected.name}</h1>
@@ -204,6 +206,13 @@ export function RideView() {
   return (
     <MapPanelLayout
       map={map}
+      mapHiddenOnMobile={searching}
+      onBack={() => {
+        // Da troca de endereço volta às categorias; das categorias, à busca; da busca, à home.
+        if (editing && destination) setEditing(null);
+        else if (!searching) setEditing("destination");
+        else router.push("/");
+      }}
       panel={
         <div className="flex flex-col gap-6">
           {searching ? (

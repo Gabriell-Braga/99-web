@@ -197,3 +197,10 @@ body {
     opacity: 0;
   }
 }
+
+/* Tela de fluxo empilhada (ver useStackedScreen): no celular o cabeçalho amarelo sai. */
+@media (max-width: 1023.98px) {
+  html[data-stacked] .app-header {
+    display: none;
+  }
+}

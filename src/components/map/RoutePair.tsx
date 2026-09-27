@@ -18,6 +18,8 @@ interface RoutePairProps {
   onEditDestination?: () => void;
   /** Botão circular de inversão sobre a linha, usado em entrega. */
   onSwap?: () => void;
+  /** Só o cartão branco de raio 24px, sem a moldura cinza: para fundo cinza, como nos detalhes da entrega. */
+  bare?: boolean;
 }
 
 /**
@@ -72,10 +74,11 @@ export function RoutePair({
   onEditOrigin,
   onEditDestination,
   onSwap,
+  bare,
 }: RoutePairProps) {
   return (
-    <div className="rounded-2xl bg-offwhite-99 p-2">
-      <div className="relative rounded-2xl bg-white p-4">
+    <div className={bare ? undefined : "rounded-2xl bg-offwhite-99 p-2"}>
+      <div className={cx("relative bg-white p-4", bare ? "rounded-3xl" : "rounded-2xl")}>
         {/* Linha vertical ligando os dois círculos, no eixo deles (centro em 40px). */}
         <span
           className="pointer-events-none absolute left-[39px] top-[calc(25%+8px)] bottom-[calc(25%+8px)] w-0.5 bg-border-99"

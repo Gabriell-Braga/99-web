@@ -37,7 +37,7 @@ export function BottomNav() {
       aria-label="Serviços"
       className={cx(
         "pointer-events-none fixed inset-x-0 bottom-4 z-30 justify-center px-4 lg:bottom-6",
-        inFlow ? "hidden lg:flex" : isStoreRoute(pathname) ? "hidden md:flex" : "flex",
+        inFlow ? "hidden lg:flex lg:justify-end lg:pr-8" : isStoreRoute(pathname) ? "hidden md:flex" : "flex",
       )}
     >
       <ul className="pointer-events-auto flex h-20 items-center rounded-full bg-white px-1 shadow-high" role="list">

@@ -76,7 +76,7 @@ export function Header() {
   const fullBleed = ["/corrida", "/entrega", "/pedido"].some((p) => pathname.startsWith(p));
 
   return (
-    <header className={cx("bg-yellow-99 pb-6", isStackedRoute(pathname) && "max-md:hidden")}>
+    <header className={cx("app-header bg-yellow-99 pb-6", isStackedRoute(pathname) && "max-md:hidden")}>
       <div
         className={cx(
           "flex h-[72px] items-center gap-3 px-4 md:gap-4 md:px-8",
