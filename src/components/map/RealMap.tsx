@@ -22,8 +22,8 @@ const HIDDEN_LAYER = /poi|housenumber|house_number|transit|shop|building.*(label
 /** Rótulos de rua só a partir do zoom 15. */
 const ROAD_LABEL = /^highway-name|road.*(name|label)/i;
 
-/** Mesma imagem do card da categoria; o entregador do Food vai de moto com caixa. */
-const imageFor = (kind: NonNullable<MapViewProps["vehicle"]>) => (kind === "bag" ? vehicleImage["entrega-moto"] : vehicleImage[kind]);
+/** Mesma imagem do card da categoria; o entregador do Food vai de moto, sem caixa. */
+const imageFor = (kind: NonNullable<MapViewProps["vehicle"]>) => (kind === "bag" ? vehicleImage.moto : vehicleImage[kind]);
 
 /**
  * O MapLibre posiciona o marcador com `transform`; a animação de escala no mesmo

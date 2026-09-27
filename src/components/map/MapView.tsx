@@ -18,7 +18,7 @@ export interface MapViewProps {
   progress?: number;
   /**
    * Categoria escolhida: o marcador usa a mesma imagem do card (táxi amarelo, moto
-   * ou carro com caixa na entrega). "bag" é o entregador do Food, moto com caixa.
+   * ou carro com caixa na entrega). "bag" é o entregador do Food, moto sem caixa.
    */
   vehicle?: VehicleCategory | "bag";
   /** Cor do pino de destino. No app é laranja. */

@@ -173,7 +173,7 @@ export function TripTracking({ order, route }: { order: TripOrder; route?: LatLn
         ? (deliveryCategories.find((c) => c.id === order.size)?.name ?? "Entrega")
         : "Entregador 99";
   const vehicle: VehicleCategory =
-    order.vertical === "corrida" ? order.category : order.vertical === "entrega" && order.size === "carro" ? "entrega-carro" : "entrega-moto";
+    order.vertical === "corrida" ? order.category : order.vertical === "entrega" ? (order.size === "carro" ? "entrega-carro" : "entrega-moto") : "moto";
   const pin = useMemo(() => pinFor(order.id), [order.id]);
   const copy = order.vertical === "comida" ? searchCopy.corrida[0] : searchCopy[order.vertical][step];
   const noun = isRide ? "corrida" : isFood ? "pedido" : "entrega";
