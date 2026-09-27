@@ -1,10 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Logo } from "@/components/layout/Logo";
 import { author } from "@/data/author";
 import { photoCredits } from "@/data/foodPhotos";
 import { peopleCredits } from "@/data/peoplePhotos";
 
+/** Só na home, onde explica o intuito do conceito; nas telas dos serviços ficaria no caminho. */
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname !== "/") return null;
   return (
     <footer className="border-t border-border-99 bg-subtle-99 pb-24">
       <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 md:grid-cols-[1.2fr_1fr_1fr] md:px-8 xl:px-16">

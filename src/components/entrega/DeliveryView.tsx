@@ -207,6 +207,90 @@ export function DeliveryView() {
   const otherState = tab === "enviar" ? dropoff : pickup;
   const searching = editing !== null || !otherState.place;
 
+  // Tela inicial do app: só o ponto da pessoa preenchido, nada sendo editado.
+  const landing = editing === null && !otherState.place;
+  const mineKey = tab === "enviar" ? "pickup" : "dropoff";
+  const otherKey = tab === "enviar" ? "dropoff" : "pickup";
+
+  const landingPanel = (
+    <div className="flex flex-col gap-8 pb-8">
+      <div className="flex flex-col items-center pt-6 text-center">
+        <p className="text-[24px] font-medium uppercase leading-tight tracking-wide text-black-99">Você precisa,</p>
+        <h1 className="mt-1 flex items-center gap-3 text-[40px] font-bold leading-none tracking-tight">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-yellow-99 text-black-99" aria-hidden="true">
+            <Icon name="arrowRight" size={30} />
+          </span>
+          99 Entrega
+        </h1>
+        <div className="mt-8 flex items-end justify-center gap-6" aria-hidden="true">
+          <VehicleArt category="entrega-moto" width={132} />
+          <VehicleArt category="entrega-carro" width={132} />
+        </div>
+      </div>
+
+      <div className="rounded-3xl bg-offwhite-99 p-4">
+        <div className="flex gap-10 px-4 pt-2" role="tablist" aria-label="Enviar ou receber">
+          {(["enviar", "receber"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              aria-selected={tab === t}
+              onClick={() => setTab(t)}
+              className={cx(
+                "relative isolate pb-1 text-[24px] transition-colors duration-150",
+                tab === t ? "font-bold text-black-99" : "text-secondary-99 hover:text-black-99",
+              )}
+            >
+              {t === "enviar" ? "Enviar" : "Receber"}
+              {tab === t && (
+                <motion.span
+                  layoutId={reduceMotion ? undefined : "aba-entrega-inicio"}
+                  transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] }}
+                  className="absolute inset-x-0 bottom-1.5 -z-10 h-1.5 rounded-full bg-orange-99"
+                  aria-hidden="true"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setEditing(mineKey)}
+          className="mt-3 flex w-full items-center gap-4 rounded-2xl px-4 py-4 text-left transition-colors hover:bg-black-99/5"
+        >
+          <span
+            className={cx("h-4 w-4 shrink-0 rounded-full border-[3px] bg-white", tab === "enviar" ? "border-success-99" : "border-orange-99")}
+            aria-hidden="true"
+          />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[18px]">{mine.place ? pointLabel(mine) : current.status === "loading" ? "Localizando você…" : "Onde está o pacote?"}</span>
+            <span className="block truncate text-[15px] text-secondary-99">{contactLine(mine) ?? "Toque para adicionar nome e telefone"}</span>
+          </span>
+          <Icon name="chevronRight" size={22} className="shrink-0 text-muted-99" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setEditing(otherKey)}
+          className="mt-2 flex w-full items-center gap-4 rounded-2xl bg-white px-4 py-6 text-left transition-colors hover:bg-subtle-99"
+        >
+          <span
+            className={cx("h-4 w-4 shrink-0 rounded-full border-[3px] bg-white", tab === "enviar" ? "border-orange-99" : "border-success-99")}
+            aria-hidden="true"
+          />
+          <span className="text-[28px] font-bold leading-none">{tab === "enviar" ? "Entregar para" : "Coletar de"}</span>
+        </button>
+      </div>
+
+      {current.status === "denied" && !pickupTouched && (
+        <InfoNote>Sem acesso à sua localização. O ponto começa em Vila Madalena, São Paulo. Toque nele para trocar.</InfoNote>
+      )}
+    </div>
+  );
+
+
   const panel = (
     <div className="flex flex-col gap-6">
       <div>
@@ -397,7 +481,8 @@ export function DeliveryView() {
     <MapPanelLayout
       map={map}
       panelWidth="lg"
-      panel={panel}
+      panel={landing ? landingPanel : panel}
+      mapHiddenOnMobile={landing}
       footer={
         !searching ? (
           <>
