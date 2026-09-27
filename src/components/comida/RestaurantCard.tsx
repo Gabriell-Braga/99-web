@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import type { Restaurant } from "@/lib/types";
 import { formatBRL } from "@/lib/format";
@@ -6,76 +9,111 @@ import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/States";
 import { cx } from "@/lib/cx";
 
+/** Maior desconto entre os pratos da loja, para o selo "Itens com até X% OFF". */
+export function maxDiscount(r: Restaurant): number {
+  let best = 0;
+  for (const s of r.menu)
+    for (const i of s.items) if (i.promoPrice && i.available) best = Math.max(best, Math.round((1 - i.promoPrice / i.price) * 100));
+  return best;
+}
+
+function countLabel(n: number): string {
+  if (n >= 1000) return "1000+";
+  if (n >= 100) return "100+";
+  if (n >= 10) return "10+";
+  return String(n);
+}
+
 /**
- * Card de loja do app: logo quadrado, nome com chevron, linha de metadados e
- * três colunas com prazo ("No Horário"), taxa promocional e quem entrega.
+ * Linha de loja do app: foto arredondada à esquerda, nome com coração, nota e
+ * cozinha, prazo com o raio amarelo, distância e taxa, e o selo verde de ofertas.
  */
 export function StoreCard({ r }: { r: Restaurant }) {
-  const promoFee = r.deliveryFee;
-  const fullFee = r.deliveryFeeFull;
+  const [fav, setFav] = useState(false);
+  const off = maxDiscount(r);
+  const isNew = r.ratingCount < 50;
   return (
-    <Link
-      href={`/comida/${r.slug}`}
-      className={cx(
-        "flex flex-col gap-3 rounded-2xl border border-border-99 bg-white p-4 transition-colors hover:bg-subtle-99",
-        !r.open && "bg-subtle-99",
-      )}
-    >
-      <div className="flex items-center gap-3">
-        <FoodArt kind={r.art} seed={r.slug} tint={r.tint} className={cx("h-14 w-14 shrink-0 rounded-xl", !r.open && "grayscale")} />
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1 text-[17px] font-bold leading-tight">
-            <span className="truncate">{r.name}</span>
-            <Icon name="chevronRight" size={18} className="shrink-0 text-muted-99" />
-          </p>
-          <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-secondary-99">
-            <span>{r.cuisine}</span>
-            <span aria-hidden="true">·</span>
-            <span>Mín. {formatBRL(r.minOrder)}</span>
-            <span aria-hidden="true">·</span>
-            <span className="flex items-center gap-0.5">
-              <Icon name="starFill" size={13} className="text-yellow-99-deep" />
-              <span className="font-bold text-black-99">{r.rating.toFixed(1)}</span>
-              <span>({r.ratingCount.toLocaleString("pt-BR")})</span>
-            </span>
-          </p>
+    <div className="relative flex gap-4 py-3">
+      <Link href={`/comida/${r.slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={r.name} />
+      <FoodArt
+        kind={r.art}
+        seed={r.slug}
+        tint={r.tint}
+        className={cx("h-[84px] w-[112px] shrink-0 rounded-2xl min-[400px]:h-[96px] min-[400px]:w-[128px]", !r.open && "grayscale")}
+      />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start gap-2">
+          <p className={cx("min-w-0 flex-1 truncate text-[17px] font-bold min-[400px]:text-[18px]", !r.open && "text-secondary-99")}>{r.name}</p>
+          <button
+            type="button"
+            onClick={() => setFav((v) => !v)}
+            aria-pressed={fav}
+            aria-label={fav ? `Remover ${r.name} dos favoritos` : `Favoritar ${r.name}`}
+            className={cx("relative z-10 -mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-offwhite-99", fav ? "text-orange-99" : "text-black-99")}
+          >
+            <Icon name={fav ? "heartFill" : "heart"} size={22} />
+          </button>
         </div>
+        <p className="flex min-w-0 items-center gap-1 text-[15px] text-secondary-99">
+          {isNew ? (
+            <>
+              <Icon name="sparkle" size={14} className="shrink-0 text-black-99" />
+              <span className="text-black-99">Novo</span>
+            </>
+          ) : (
+            <>
+              <Icon name="starFill" size={15} className={cx("shrink-0", r.rating >= 4.6 ? "text-yellow-99-deep" : "text-black-99")} />
+              <span className="text-black-99">{r.rating.toFixed(1).replace(".", ",")}</span>
+              <span>({countLabel(r.ratingCount)})</span>
+            </>
+          )}
+          <span aria-hidden="true">·</span>
+          <span className="truncate">{r.cuisine}</span>
+        </p>
+        {r.open ? (
+          <p className="flex min-w-0 items-center gap-1 overflow-hidden whitespace-nowrap text-[14px] text-secondary-99 min-[400px]:text-[15px]">
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] bg-yellow-99 text-black-99" aria-hidden="true">
+              <Icon name="boltFill" size={12} />
+            </span>
+            <span className="text-black-99">
+              {r.etaMin}-{r.etaMax} Min
+            </span>
+            {/* Abaixo de 360px a distância sai para a taxa caber. */}
+            <span aria-hidden="true" className="hidden min-[360px]:inline">·</span>
+            <span className="hidden min-[360px]:inline">{r.distanceKm.toFixed(1)}km</span>
+            <span aria-hidden="true">·</span>
+            {r.deliveryFee === 0 ? (
+              <span className="min-w-0 truncate text-green-99">Grátis</span>
+            ) : (
+              <span className="flex min-w-0 items-baseline gap-1 truncate">
+                <span>{formatBRL(r.deliveryFee).replace(/\s/g, "")}</span>
+                {r.deliveryFeeFull && r.deliveryFeeFull > r.deliveryFee && (
+                  <span className="truncate text-muted-99 line-through">{formatBRL(r.deliveryFeeFull).replace(/\s/g, "")}</span>
+                )}
+              </span>
+            )}
+          </p>
+        ) : (
+          <p className="text-[15px] text-secondary-99">Fechado{r.opensAt ? ` · abre às ${r.opensAt}` : ""}</p>
+        )}
+        {r.open && off > 0 && (
+          <span className="mt-1.5 inline-block rounded-md bg-green-99-tint px-2 py-0.5 text-[14px] text-green-99">Itens com até {off}% OFF</span>
+        )}
       </div>
-      {r.open ? (
-        <div className="grid grid-cols-3 divide-x divide-border-99 text-[13px] text-secondary-99">
-          <div className="flex flex-col gap-1 pr-2">
-            <span className="font-bold text-black-99">
-              {r.etaMin}–{r.etaMax} min
-            </span>
-            <span className="w-fit rounded bg-yellow-99-light px-1.5 py-0.5 text-[11px] font-bold text-black-99">No Horário</span>
-          </div>
-          <div className="flex flex-col gap-1 px-2">
-            <span className="font-bold text-green-99">{promoFee === 0 ? "Frete grátis" : formatBRL(promoFee)}</span>
-            {fullFee && fullFee > promoFee ? <span className="text-muted-99 line-through">{formatBRL(fullFee)}</span> : <span>entrega</span>}
-          </div>
-          <div className="flex flex-col gap-1 pl-2">
-            <span className="font-bold text-black-99">{r.deliveredBy}</span>
-            <span>entrega</span>
-          </div>
-        </div>
-      ) : (
-        <p className="text-[13px] font-bold text-secondary-99">Fechado{r.opensAt ? ` · abre às ${r.opensAt}` : ""}</p>
-      )}
-    </Link>
+    </div>
   );
 }
 
 export function StoreCardSkeleton() {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border-99 bg-white p-4">
-      <div className="flex items-center gap-3">
-        <Skeleton className="h-14 w-14 rounded-xl" />
-        <div className="flex flex-1 flex-col gap-2">
-          <Skeleton className="h-4 w-2/3" />
-          <Skeleton className="h-3 w-full" />
-        </div>
+    <div className="flex gap-4 py-3">
+      <Skeleton className="h-[84px] w-[112px] rounded-2xl min-[400px]:h-[96px] min-[400px]:w-[128px]" />
+      <div className="flex flex-1 flex-col gap-2 pt-1">
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-3 w-1/2" />
+        <Skeleton className="h-3 w-3/4" />
+        <Skeleton className="h-5 w-32" />
       </div>
-      <Skeleton className="h-10 w-full" />
     </div>
   );
 }

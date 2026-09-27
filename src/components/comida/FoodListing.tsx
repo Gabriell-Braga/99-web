@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { restaurants } from "@/data/restaurants";
 import { foodCategories } from "@/data/categories";
-import type { FoodCategoryId } from "@/lib/types";
+import type { FoodCategoryId, Restaurant } from "@/lib/types";
 import { useApp } from "@/context/AppProvider";
 import { Container } from "@/components/layout/Container";
 import { FoodShell } from "@/components/comida/FoodShell";
@@ -12,23 +12,34 @@ import { PromoRail } from "@/components/comida/PromoRail";
 import { FilterChips } from "@/components/comida/FilterChips";
 import { CategoryRail } from "@/components/comida/CategoryRail";
 import { StoreCard, StoreCardSkeleton } from "@/components/comida/RestaurantCard";
-import { OfferCard, discountPercent, type Offer } from "@/components/comida/OfferCard";
+import { UauSection, discountPercent, type Offer } from "@/components/comida/OfferCard";
+import { StoreFilters, type StoreFilterState } from "@/components/comida/StoreFilters";
+import { FoodArt } from "@/components/comida/FoodArt";
+import { cx } from "@/lib/cx";
 import { AddressPicker } from "@/components/comida/AddressPicker";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { EmptyState, ErrorNote } from "@/components/ui/States";
 
-function SectionTitle({ children, href }: { children: string; href?: string }) {
+function SectionTitle({ children, href, id }: { children: string; href?: string; id?: string }) {
   return (
-    <div className="flex items-baseline justify-between">
-      <h2 className="text-[20px] font-bold">{children}</h2>
+    <div className="flex items-center justify-between">
+      <h2 id={id} className="text-[22px] font-bold">
+        {children}
+      </h2>
       {href && (
-        <Link href={href} className="text-[15px] font-bold text-black-99 hover:underline">
-          Ver tudo
-        </Link>
+        <a href={href} className="flex items-center gap-1 text-[17px] font-medium text-black-99 hover:underline">
+          Ver mais
+          <Icon name="chevronRight" size={20} />
+        </a>
       )}
     </div>
   );
+}
+
+/** Vale-refeição: na demonstração, só as lojas de sobremesa e sorvete não aceitam. */
+function acceptsVR(r: Restaurant): boolean {
+  return r.category !== "sorvetes" && r.category !== "doces";
 }
 
 export function FoodListing() {
@@ -44,15 +55,25 @@ export function FoodListing() {
     return () => clearTimeout(t);
   }, [address.id]);
 
-  const filtering = Boolean(query.trim() || category);
+  const [filters, setFilters] = useState<StoreFilterState>({ sort: "relevancia", freeDelivery: false, vr: false });
+  const filtering = Boolean(query.trim() || category || filters.freeDelivery || filters.vr || filters.sort !== "relevancia");
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const by: Record<StoreFilterState["sort"], (a: Restaurant, b: Restaurant) => number> = {
+      relevancia: (a, b) => b.rating - a.rating,
+      tempo: (a, b) => a.etaMin - b.etaMin || a.etaMax - b.etaMax,
+      taxa: (a, b) => a.deliveryFee - b.deliveryFee,
+      nota: (a, b) => b.rating - a.rating || b.ratingCount - a.ratingCount,
+      distancia: (a, b) => a.distanceKm - b.distanceKm,
+    };
     return restaurants
       .filter((r) => (category ? r.category === category : true))
       .filter((r) => (q ? `${r.name} ${r.tagline} ${r.cuisine}`.toLowerCase().includes(q) : true))
-      .sort((a, b) => Number(b.open) - Number(a.open) || b.rating - a.rating);
-  }, [query, category]);
+      .filter((r) => (filters.freeDelivery ? r.deliveryFee === 0 : true))
+      .filter((r) => (filters.vr ? acceptsVR(r) : true))
+      .sort((a, b) => Number(b.open) - Number(a.open) || by[filters.sort](a, b));
+  }, [query, category, filters]);
 
   const offers = useMemo<Offer[]>(
     () =>
@@ -62,9 +83,14 @@ export function FoodListing() {
           r.menu.flatMap((s) => s.items.filter((i) => i.promoPrice && i.available).map((i) => ({ restaurant: r, item: i as Offer["item"] }))),
         )
         .sort((a, b) => discountPercent(b.item.price, b.item.promoPrice) - discountPercent(a.item.price, a.item.promoPrice))
-        .slice(0, 4),
+        .slice(0, 10),
     [],
   );
+
+  // "Últimas lojas" da demonstração: uma seleção fixa, com lojas fechadas no meio como no app.
+  const recent = useMemo(() => ["acai-do-largo", "kaito-sushi", "braseiro-burger", "doceria-amelie", "forno-da-vila", "casa-da-coxinha"]
+    .map((s) => restaurants.find((r) => r.slug === s))
+    .filter((r): r is Restaurant => Boolean(r)), []);
 
   const categoryLabel = foodCategories.find((c) => c.id === category)?.label;
 
@@ -110,90 +136,108 @@ export function FoodListing() {
         </Container>
 
         <FoodShell>
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-7">
             <CategoryRail value={category} onChange={setCategory} />
 
-        {!address.covered ? (
-          <ErrorNote
-            title="Endereço fora do raio de entrega"
-            description={`Nenhuma loja entrega em ${address.line1}, ${address.city}. Escolha outro endereço para ver as lojas abertas perto de você.`}
-            action={
-              <Button variant="ghost" size="sm" onClick={() => setPickerOpen(true)}>
-                Trocar endereço
-              </Button>
-            }
-          />
-        ) : loading ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3" aria-busy="true" aria-label="Carregando lojas">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <StoreCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : filtering ? (
-          list.length === 0 ? (
-            <EmptyState
-              icon="search"
-              title="Nenhuma loja encontrada"
-              description={
-                query
-                  ? `Não achamos “${query}”${categoryLabel ? ` em ${categoryLabel}` : ""}. Tente outro termo ou limpe os filtros.`
-                  : `Nenhuma loja de ${categoryLabel} aberta agora nessa região.`
-              }
-              action={
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setQuery("");
-                    setCategory(null);
-                  }}
-                >
-                  Limpar
-                </Button>
-              }
-            />
-          ) : (
-            <section aria-labelledby="res-title" className="flex flex-col gap-4">
-              <h2 id="res-title" className="text-[20px] font-bold" aria-live="polite">
-                {list.length} {list.length === 1 ? "loja" : "lojas"}
-                {categoryLabel ? ` em ${categoryLabel}` : ""}
-              </h2>
-              <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3" role="list">
-                {list.map((r) => (
-                  <li key={r.slug}>
-                    <StoreCard r={r} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )
-        ) : (
-          <>
-            <section aria-labelledby="ofertas" className="flex flex-col gap-4">
-              <SectionTitle>Ofertas</SectionTitle>
-              <ul className="grid grid-cols-1 gap-4 md:grid-cols-2" role="list">
-                {offers.map((o, i) => (
-                  <li className="min-w-0" key={`${o.restaurant.slug}-${o.item.id}`}>
-                    <OfferCard offer={o} eager={i < 2} />
-                  </li>
-                ))}
-              </ul>
-            </section>
+            {address.covered && !filtering && !loading && (
+              <>
+                <UauSection offers={offers} />
 
-            {/* O carrossel de ofertas ocupa esta faixa; a área amarela ficou só de fundo. */}
-            <PromoRail />
+                <section aria-labelledby="ultimas" className="flex flex-col gap-3">
+                  <SectionTitle id="ultimas" href="#lojas">
+                    Últimas lojas
+                  </SectionTitle>
+                  <ul className="scroll-rail -mx-4 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:px-0" role="list">
+                    {recent.map((r) => (
+                      <li key={r.slug} className="w-[150px] shrink-0 snap-start min-[400px]:w-[164px]">
+                        <Link href={`/comida/${r.slug}`} className="block">
+                          <span className="relative block">
+                            <FoodArt kind={r.art} seed={`${r.slug}-capa`} tint={r.tint} className={cx("h-[104px] w-full rounded-2xl", !r.open && "grayscale")} />
+                            <FoodArt kind={r.art} seed={r.slug} tint={r.tint} className="absolute left-2 top-2 h-9 w-9 rounded-xl ring-2 ring-white" />
+                          </span>
+                          <span className="mt-2 block truncate text-[17px] font-semibold">{r.name}</span>
+                          <span className="block truncate text-[15px] text-secondary-99">
+                            {r.open ? `${r.etaMin}-${r.etaMax} Min` : `Abre às ${r.opensAt ?? "amanhã"}`}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </>
+            )}
 
-            <section aria-labelledby="lojas" className="flex flex-col gap-4">
-              <SectionTitle>Lojas recomendadas na região</SectionTitle>
-              <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3" role="list">
-                {list.map((r) => (
-                  <li key={r.slug}>
-                    <StoreCard r={r} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </>
-        )}
+            {!address.covered ? (
+              <ErrorNote
+                title="Endereço fora do raio de entrega"
+                description={`Nenhuma loja entrega em ${address.line1}, ${address.city}. Escolha outro endereço para ver as lojas abertas perto de você.`}
+                action={
+                  <Button variant="ghost" size="sm" onClick={() => setPickerOpen(true)}>
+                    Trocar endereço
+                  </Button>
+                }
+              />
+            ) : (
+              <section id="lojas" aria-labelledby="lojas-title" className="-mt-3 flex scroll-mt-4 flex-col">
+                <h2 id="lojas-title" className="sr-only">
+                  Lojas
+                </h2>
+                <StoreFilters value={filters} onChange={setFilters} />
+                {loading ? (
+                  <div className="grid grid-cols-1 gap-x-8 md:grid-cols-2" aria-busy="true" aria-label="Carregando lojas">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <StoreCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : list.length === 0 ? (
+                  <EmptyState
+                    icon="search"
+                    title="Nenhuma loja encontrada"
+                    description={
+                      query
+                        ? `Não achamos “${query}”${categoryLabel ? ` em ${categoryLabel}` : ""}. Tente outro termo ou limpe os filtros.`
+                        : "Nenhuma loja aberta com esses filtros nessa região."
+                    }
+                    action={
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setQuery("");
+                          setCategory(null);
+                          setFilters({ sort: "relevancia", freeDelivery: false, vr: false });
+                        }}
+                      >
+                        Limpar
+                      </Button>
+                    }
+                  />
+                ) : (
+                  <>
+                    {filtering && (
+                      <p className="pb-1 text-[15px] text-secondary-99" aria-live="polite">
+                        {list.length} {list.length === 1 ? "loja" : "lojas"}
+                        {categoryLabel ? ` em ${categoryLabel}` : ""}
+                      </p>
+                    )}
+                    <ul className="grid grid-cols-1 gap-x-8 md:grid-cols-2" role="list">
+                      {list.map((r, i) => (
+                        <Fragment key={r.slug}>
+                          <li className="min-w-0">
+                            <StoreCard r={r} />
+                          </li>
+                          {/* Os banners amarelos entram entre as lojas, como no app. */}
+                          {!filtering && i === 1 && (
+                            <li className="col-span-full min-w-0 py-4">
+                              <PromoRail onPick={setCategory} />
+                            </li>
+                          )}
+                        </Fragment>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </section>
+            )}
           </div>
           <AddressPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />
         </FoodShell>

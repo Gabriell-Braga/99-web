@@ -26,6 +26,9 @@ import ErrorFill from "@material-symbols/svg-600/rounded/error-fill.svg";
 import HandshakeFill from "@material-symbols/svg-600/rounded/handshake-fill.svg";
 import Home from "@material-symbols/svg-600/rounded/home.svg";
 import Favorite from "@material-symbols/svg-600/rounded/favorite.svg";
+import FavoriteFill from "@material-symbols/svg-600/rounded/favorite-fill.svg";
+import Tune from "@material-symbols/svg-600/rounded/tune.svg";
+import StarShineFill from "@material-symbols/svg-600/rounded/star_shine-fill.svg";
 import Info from "@material-symbols/svg-600/rounded/info.svg";
 import KeyboardArrowDown from "@material-symbols/svg-600/rounded/keyboard_arrow_down.svg";
 import LocalFireDepartmentFill from "@material-symbols/svg-600/rounded/local_fire_department-fill.svg";
@@ -99,6 +102,9 @@ const icons = {
   flameFill: LocalFireDepartmentFill,
   handshakeFill: HandshakeFill,
   heart: Favorite,
+  heartFill: FavoriteFill,
+  tune: Tune,
+  sparkle: StarShineFill,
   home: Home,
   info: Info,
   minus: Remove,

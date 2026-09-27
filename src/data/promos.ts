@@ -1,44 +1,57 @@
+import type { FoodCategoryId } from "@/lib/types";
+
 export interface Promo {
   id: string;
-  badge: string;
   title: string;
-  description: string;
-  cta: string;
-  /** Fundo do banner e foto do lado direito. */
-  tint: string;
-  image: string;
+  /** Selo de preço "a partir de" em destaque, como no banner do app. */
+  price?: { reais: string; centavos: string };
+  /** Recortes em PNG/WebP transparente, em public/food-cut. O primeiro fica na frente. */
+  images: string[];
+  /** Mancha lilás atrás da comida, como no banner "Burger da madrugada". */
+  blob?: boolean;
+  /** Categoria que o banner abre na listagem. */
+  category: FoodCategoryId;
 }
 
 /**
- * Banners de demonstração. Campanha, valor e prazo são fictícios: o protótipo
- * não reproduz nenhuma promoção real da 99.
+ * Banners de demonstração, todos no amarelo do app, com a comida recortada
+ * saindo da borda. Campanha e valores são fictícios: o protótipo não reproduz
+ * nenhuma promoção real da 99.
  */
 export const promos: Promo[] = [
   {
-    id: "cupom",
-    badge: "Cupom de estreia",
-    title: "R$ 15 de desconto no primeiro pedido",
-    description: "Aplicado no carrinho, sem código para digitar.",
-    cta: "Ver lojas",
-    tint: "#212121",
-    image: "/food/burger.webp",
+    id: "larica",
+    title: "Larica da madrugada",
+    price: { reais: "14", centavos: "99" },
+    images: ["/food-cut/pizza-2.webp"],
+    category: "pizza",
   },
   {
-    id: "frete",
-    badge: "Entrega grátis",
-    title: "Frete zero acima de R$ 30",
-    description: "Nas lojas com o selo, na região que você escolheu.",
-    cta: "Aproveitar",
-    tint: "#00803d",
-    image: "/food/pizza.webp",
+    id: "burger",
+    title: "Burger da madrugada",
+    images: ["/food-cut/burger.webp", "/food-cut/fries-2.webp"],
+    blob: true,
+    category: "lanche",
   },
   {
-    id: "semana",
-    badge: "Ofertas da semana",
-    title: "Até 40% OFF em pratos selecionados",
-    description: "Uma lista nova toda segunda, enquanto durar o estoque.",
-    cta: "Ver ofertas",
-    tint: "#c43c00",
-    image: "/food/sushi.webp",
+    id: "pizza",
+    title: "Japa pra dois",
+    price: { reais: "59", centavos: "90" },
+    images: ["/food-cut/sushi.webp"],
+    category: "japonesa",
+  },
+  {
+    id: "acai",
+    title: "Açaí no capricho",
+    images: ["/food-cut/acai-2.webp"],
+    blob: true,
+    category: "acai",
+  },
+  {
+    id: "doce",
+    title: "Sobremesa por conta",
+    price: { reais: "12", centavos: "90" },
+    images: ["/food-cut/dessert-2.webp"],
+    category: "doces",
   },
 ];

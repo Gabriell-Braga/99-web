@@ -65,7 +65,7 @@ export function Footer() {
           <summary className="w-fit rounded font-semibold text-black-99">Créditos das fotos</summary>
           <p className="mt-2 text-[13px]">
             As fotos dos pratos vêm do Wikimedia Commons e as das vantagens do Rawpixel, todas em licença livre e servidas
-            pelo próprio projeto.
+            pelo próprio projeto. Os recortes dos banners do Food foram feitos a partir dessas mesmas fotos, sob as mesmas licenças.
           </p>
           <ul className="mt-2 flex flex-col gap-1 text-[13px]" role="list">
             {photoCredits.map((c) => (
