@@ -50,33 +50,77 @@ function radar(): HTMLElement {
   return wrap;
 }
 
-/** Carro parado por perto, na mesma arte da categoria, em tamanho menor. */
-function nearbyCar(kind: NonNullable<MapViewProps["vehicle"]>, turn: number): HTMLElement {
+/**
+ * Veículo parado por perto, visto de cima como no app, girado na direção da rua.
+ * A foto lateral da categoria não gira bem, por isso aqui é um desenho simples.
+ */
+function nearbyCar(kind: NonNullable<MapViewProps["vehicle"]>, angleDeg: number): HTMLElement {
+  const moto = kind === "moto" || kind === "entrega-moto" || kind === "bag";
+  const taxi = kind === "taxi";
   const wrap = document.createElement("span");
   wrap.style.cssText = "display:block;width:40px;height:40px;pointer-events:none";
-  const img = document.createElement("img");
-  img.src = imageFor(kind);
-  img.alt = "";
-  img.className = "map-nearby";
-  img.style.cssText = `display:block;width:40px;height:40px;object-fit:contain;--turn:${turn}deg`;
-  wrap.appendChild(img);
+  const inner = document.createElement("span");
+  inner.className = "map-nearby";
+  inner.style.cssText = `display:flex;width:40px;height:40px;align-items:center;justify-content:center;--turn:${angleDeg}deg`;
+  const body = taxi ? "#F1C400" : "#2B2D31";
+  inner.innerHTML = moto
+    ? `<svg width="14" height="30" viewBox="0 0 14 30" aria-hidden="true"><rect x="4" y="0.5" width="6" height="7" rx="3" fill="#1b1b1b"/><rect x="2" y="7" width="10" height="15" rx="5" fill="${body}"/><circle cx="7" cy="12" r="3.2" fill="#E8EAED"/><rect x="4" y="22" width="6" height="7.5" rx="3" fill="#1b1b1b"/></svg>`
+    : `<svg width="20" height="36" viewBox="0 0 20 36" aria-hidden="true" style="filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))"><rect x="1" y="1" width="18" height="34" rx="6" fill="${body}"/><rect x="3.5" y="7" width="13" height="7" rx="2.5" fill="#C9D3DE"/><rect x="3.5" y="24" width="13" height="5" rx="2" fill="#C9D3DE"/><rect x="4" y="15.5" width="12" height="7" rx="1.5" fill="${body}" opacity=".85"/><rect x="2.5" y="1.5" width="4" height="2.4" rx="1" fill="#FFF6C8"/><rect x="13.5" y="1.5" width="4" height="2.4" rx="1" fill="#FFF6C8"/></svg>`;
+  wrap.appendChild(inner);
   return wrap;
 }
 
-/** Ponto a alguns metros de outro, numa direção em graus. */
-function offsetMeters(p: LatLng, meters: number, bearingDeg: number): LatLng {
-  const b = (bearingDeg * Math.PI) / 180;
-  const dLat = (meters * Math.cos(b)) / 111_320;
-  const dLng = (meters * Math.sin(b)) / (111_320 * Math.cos((p.lat * Math.PI) / 180));
-  return { lat: p.lat + dLat, lng: p.lng + dLng };
-}
+/** Classes de via onde carro circula, no esquema OpenMapTiles do estilo. */
+const DRIVABLE = new Set(["motorway", "trunk", "primary", "secondary", "tertiary", "minor"]);
 
-/** Três carros em volta da origem, sempre nas mesmas posições. */
-const NEARBY: { meters: number; bearing: number; turn: number }[] = [
-  { meters: 260, bearing: 320, turn: -20 },
-  { meters: 340, bearing: 215, turn: 15 },
-  { meters: 300, bearing: 95, turn: -8 },
-];
+/**
+ * Três pontos sobre ruas desenhadas perto da origem, entre 120 e 420 m dela, em
+ * direções bem separadas, com o ângulo da rua na tela. Lê as vias do próprio mapa,
+ * então os carros caem na rua e alinhados com ela.
+ */
+function roadSpots(map: MLMap, origin: LatLng): { at: LatLng; angle: number }[] {
+  const c = map.project([origin.lng, origin.lat]);
+  const box: [[number, number], [number, number]] = [
+    [c.x - 220, c.y - 220],
+    [c.x + 220, c.y + 220],
+  ];
+  const candidates: { at: LatLng; angle: number; around: number }[] = [];
+  for (const f of map.queryRenderedFeatures(box)) {
+    if (f.sourceLayer !== "transportation" || !DRIVABLE.has(String(f.properties?.class))) continue;
+    const g = f.geometry;
+    const lines = g.type === "LineString" ? [g.coordinates] : g.type === "MultiLineString" ? g.coordinates : [];
+    for (const line of lines) {
+      for (let i = 1; i < line.length; i++) {
+        const a = { lng: line[i - 1][0], lat: line[i - 1][1] };
+        const b = { lng: line[i][0], lat: line[i][1] };
+        const segKm = haversineKm(a, b);
+        if (segKm < 0.03) continue;
+        const mid = { lat: (a.lat + b.lat) / 2, lng: (a.lng + b.lng) / 2 };
+        const d = haversineKm(origin, mid);
+        if (d < 0.12 || d > 0.42) continue;
+        const pa = map.project([a.lng, a.lat]);
+        const pb = map.project([b.lng, b.lat]);
+        const pm = map.project([mid.lng, mid.lat]);
+        // O desenho aponta para cima; soma 90° ao ângulo da rua na tela.
+        const angle = (Math.atan2(pb.y - pa.y, pb.x - pa.x) * 180) / Math.PI + 90;
+        const around = (Math.atan2(pm.y - c.y, pm.x - c.x) * 180) / Math.PI;
+        candidates.push({ at: mid, angle, around });
+      }
+    }
+  }
+  // Direções em volta da origem separadas por pelo menos 80°.
+  const picked: typeof candidates = [];
+  for (const cand of candidates.sort((x, y) => x.around - y.around)) {
+    const far = picked.every((p) => {
+      const diff = Math.abs(((cand.around - p.around + 540) % 360) - 180);
+      return diff >= 80;
+    });
+    if (far) picked.push(cand);
+    if (picked.length === 3) break;
+  }
+  // Metade dos carros vai no sentido contrário da rua.
+  return picked.map((p, i) => ({ at: p.at, angle: i % 2 ? p.angle + 180 : p.angle }));
+}
 
 
 function userDot(): HTMLElement {
@@ -137,6 +181,7 @@ export default function RealMap({
   const readyRef = useRef(false);
   const markersRef = useRef<Marker[]>([]);
   const vehicleRef = useRef<Marker | null>(null);
+  const carsTokenRef = useRef(0);
   const animRef = useRef<number | null>(null);
   const drawRef = useRef<number | null>(null);
   const currentRef = useRef(0);
@@ -256,9 +301,16 @@ export default function RealMap({
       // círculo verde. A rota começa na rua mais próxima, então a folga é maior.
       const userIsOrigin = Boolean(userLocation && startPoint && haversineKm(userLocation, startPoint) < 0.15);
       if (userLocation && !userIsOrigin) add(userDot(), userLocation);
+      // Cada aplicação invalida os carros que ainda esperavam a câmera parar.
+      const token = ++carsTokenRef.current;
       if (startPoint && lookingAround) {
         add(radar(), startPoint);
-        NEARBY.forEach((n) => add(nearbyCar(vehicle, n.turn), offsetMeters(startPoint, n.meters, n.bearing)));
+        // Só depois da câmera fechar na origem as ruas certas estão desenhadas.
+        const sp = startPoint;
+        map.once("idle", () => {
+          if (token !== carsTokenRef.current) return;
+          roadSpots(map, sp).forEach((s) => add(nearbyCar(vehicle, s.angle), s.at));
+        });
       } else if (startPoint && searching) add(pulse(), startPoint);
 
       const ends = map.getSource(ENDS_SOURCE) as maplibregl.GeoJSONSource | undefined;

@@ -434,28 +434,28 @@ export function DeliveryView() {
                 className="flex w-full items-center gap-2.5 rounded-2xl px-3 py-4 text-left transition-colors duration-150 hover:bg-offwhite-99"
               >
                 {/* No fluxo de entrega a moto também aparece com a caixa. */}
-                <VehicleArt category={c.id === "moto" ? "entrega-moto" : "entrega-carro"} width={56} />
+                <VehicleArt category={c.id === "moto" ? "entrega-moto" : "entrega-carro"} width={48} />
+                {/* Nome e preço dividem a primeira linha: o nome encolhe com reticências, o preço nunca. */}
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="flex min-w-0 items-center gap-1.5 text-[17px] font-bold min-[400px]:text-[18px]">
-                    <span className="whitespace-nowrap">{c.name}</span>
-                    <Icon name="info" size={16} className="shrink-0 text-placeholder-99" />
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="flex min-w-0 flex-1 items-center gap-1.5 text-[16px] font-bold min-[400px]:text-[18px]">
+                      <span className="truncate">{c.name}</span>
+                      <Icon name="info" size={16} className="shrink-0 text-placeholder-99" />
+                    </span>
+                    <span className="shrink-0 whitespace-nowrap text-[16px] font-bold tabular-nums min-[400px]:text-[19px]">
+                      {pricing.loading ? <PriceSkeleton /> : route ? formatBRL(price) : "—"}
+                    </span>
+                    {/* Radio do app: anel preto grosso quando escolhido. */}
+                    <span
+                      className={cx("h-6 w-6 shrink-0 rounded-full", checked ? "border-[7px] border-black-99" : "border-2 border-border-99")}
+                      aria-hidden="true"
+                    />
                   </span>
                   {route && <span className="text-[15px] text-secondary-99">{`${eta.min}–${eta.max} min`}</span>}
                   <span className="text-[15px] text-secondary-99">
                     {c.dims} · {c.weight}
                   </span>
                 </span>
-                <span className="flex shrink-0 items-center justify-end self-start pt-0.5 text-[18px] min-[400px]:text-[19px] font-bold tabular-nums">
-                  {pricing.loading ? <PriceSkeleton /> : route ? formatBRL(price) : "—"}
-                </span>
-                {/* Radio do app: anel preto grosso quando escolhido. */}
-                <span
-                  className={cx(
-                    "h-6 w-6 shrink-0 self-start rounded-full",
-                    checked ? "border-[7px] border-black-99" : "border-2 border-border-99",
-                  )}
-                  aria-hidden="true"
-                />
               </button>
             </li>
           );

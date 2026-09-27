@@ -318,62 +318,64 @@ export function RideView() {
                             "relative isolate flex w-full cursor-pointer items-center gap-3 rounded-xl px-2 py-4 text-left transition-colors duration-150 ease-out hover:bg-offwhite-99 hover:duration-[120ms]",
                           )}
                         >
-                          <VehicleArt category={c.id} />
+                          <VehicleArt category={c.id} width={52} />
+                          {/* Nome e preço dividem a primeira linha; o nome encolhe com reticências, o preço nunca. */}
                           <span className="flex min-w-0 flex-1 flex-col">
-                            <span className="flex min-w-0 items-center gap-1.5 text-[18px]">
-                              <span className="truncate">{c.name}</span>
-                              {c.seats > 0 ? (
-                                <span className="flex items-center gap-0.5 text-[13px] font-medium text-secondary-99">
-                                  <Icon name="user" size={13} />
-                                  {c.seats}
+                            <span className="flex min-w-0 items-center gap-2">
+                              <span className="flex min-w-0 flex-1 items-center gap-1.5 text-[17px] min-[400px]:text-[18px]">
+                                <span className="truncate">{c.name}</span>
+                                {c.seats > 0 ? (
+                                  // Abaixo de 360px os lugares saem para o nome caber.
+                                  <span className="hidden shrink-0 items-center gap-0.5 text-[13px] font-medium text-secondary-99 min-[360px]:flex">
+                                    <Icon name="user" size={13} />
+                                    {c.seats}
+                                  </span>
+                                ) : (
+                                  <Icon name="info" size={14} className="shrink-0 text-secondary-99" />
+                                )}
+                              </span>
+                              {pricing.loading ? (
+                                <PriceSkeleton />
+                              ) : c.negotiable ? (
+                                <span className="flex shrink-0 items-center gap-0.5 min-[400px]:gap-1" onClick={(e) => e.stopPropagation()}>
+                                  <button
+                                    type="button"
+                                    aria-label="Diminuir valor"
+                                    disabled={!route}
+                                    onClick={() => setNegotiated(Math.max(Math.round((rideFare(c, km) * 0.7) * 100) / 100, (negotiated ?? price) - 1))}
+                                    className="flex h-6 w-6 items-center justify-center rounded-full bg-offwhite-99 text-black-99 transition-colors duration-[120ms] hover:bg-border-99 disabled:text-disabled-99 min-[400px]:h-7 min-[400px]:w-7"
+                                  >
+                                    <Icon name="minus" size={16} />
+                                  </button>
+                                  <span className="whitespace-nowrap px-0.5 text-center text-[16px] font-bold tabular-nums min-[400px]:min-w-[64px] min-[400px]:text-[18px]">
+                                    {route ? formatBRL(negotiated ?? price) : "—"}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    aria-label="Aumentar valor"
+                                    disabled={!route}
+                                    onClick={() => setNegotiated((negotiated ?? price) + 1)}
+                                    className="flex h-6 w-6 items-center justify-center rounded-full bg-offwhite-99 text-black-99 transition-colors duration-[120ms] hover:bg-border-99 disabled:text-disabled-99 min-[400px]:h-7 min-[400px]:w-7"
+                                  >
+                                    <Icon name="plus" size={16} />
+                                  </button>
                                 </span>
                               ) : (
-                                <Icon name="info" size={14} className="text-secondary-99" />
+                                <span className="shrink-0 whitespace-nowrap text-[17px] font-bold tabular-nums min-[400px]:text-[19px]">{route ? formatBRL(price) : "—"}</span>
                               )}
+                              <span
+                                className={cx(
+                                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2",
+                                  checked ? "border-black-99 bg-black-99 text-white" : "border-border-99 bg-white text-transparent",
+                                )}
+                                aria-hidden="true"
+                              >
+                                <Icon name="check" size={14} />
+                              </span>
                             </span>
                             <span className={cx("text-[15px] text-secondary-99", route ? "whitespace-nowrap" : "truncate")}>
                               {route ? `${arrivalLabel(c.etaMin + mins)} · ${mins} min` : c.description}
                             </span>
-                          </span>
-                          <span className="flex w-[128px] shrink-0 items-center justify-end">
-                          {pricing.loading ? (
-                            <PriceSkeleton />
-                          ) : c.negotiable ? (
-                            <span className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                type="button"
-                                aria-label="Diminuir valor"
-                                disabled={!route}
-                                onClick={() => setNegotiated(Math.max(Math.round((rideFare(c, km) * 0.7) * 100) / 100, (negotiated ?? price) - 1))}
-                                className="flex h-7 w-7 items-center justify-center rounded-full border border-border-99 text-black-99 transition-colors duration-[120ms] hover:bg-offwhite-99 disabled:text-disabled-99"
-                              >
-                                <Icon name="minus" size={16} />
-                              </button>
-                              <span className="min-w-[64px] text-center text-[17px] font-bold tabular-nums">
-                                {route ? formatBRL(negotiated ?? price) : "—"}
-                              </span>
-                              <button
-                                type="button"
-                                aria-label="Aumentar valor"
-                                disabled={!route}
-                                onClick={() => setNegotiated((negotiated ?? price) + 1)}
-                                className="flex h-7 w-7 items-center justify-center rounded-full border border-border-99 text-black-99 transition-colors duration-[120ms] hover:bg-offwhite-99 disabled:text-disabled-99"
-                              >
-                                <Icon name="plus" size={16} />
-                              </button>
-                            </span>
-                          ) : (
-                            <span className="shrink-0 text-[19px] font-bold tabular-nums">{route ? formatBRL(price) : "—"}</span>
-                          )}
-                          </span>
-                          <span
-                            className={cx(
-                              "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2",
-                              checked ? "border-black-99 bg-black-99 text-white" : "border-border-99 bg-white text-transparent",
-                            )}
-                            aria-hidden="true"
-                          >
-                            <Icon name="check" size={14} />
                           </span>
                         </div>
                       </li>

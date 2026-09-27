@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import type { DeliveryOrder, RideOrder } from "@/lib/types";
+import type { DeliveryOrder, FoodOrder, RideOrder } from "@/lib/types";
 import { STAGE_DURATION_MS } from "@/lib/stages";
 import type { LatLng } from "@/lib/geo";
 import { formatBRL } from "@/lib/format";
@@ -18,7 +18,7 @@ import { PaymentIcon } from "@/components/payment/PaymentIcon";
 import { paymentLabel } from "@/components/payment/PaymentPicker";
 import { cx } from "@/lib/cx";
 
-type TripOrder = RideOrder | DeliveryOrder;
+type TripOrder = RideOrder | DeliveryOrder | FoodOrder;
 
 /** A busca ocupa o primeiro estágio, dividida nas três telas do app. */
 const SEARCH_STEPS = 3;
@@ -46,6 +46,10 @@ const reasons = {
   entrega: [
     { icon: "moodFill" as IconName, title: "Motivos pessoais", items: ["Não preciso mais enviar", "Mudei o endereço de coleta ou entrega", "Preciso alterar meu método de pagamento"] },
     { icon: "sadFill" as IconName, title: "Entregador", items: ["Entregador pediu para cancelar", "Entregador está demorando", "Entregador está indo na direção oposta"] },
+  ],
+  comida: [
+    { icon: "moodFill" as IconName, title: "Motivos pessoais", items: ["Pedi por engano", "Quero mudar os itens do pedido", "Quero mudar o endereço de entrega"] },
+    { icon: "sadFill" as IconName, title: "Loja", items: ["A loja está demorando para confirmar", "O prazo de entrega aumentou"] },
   ],
 };
 
@@ -87,14 +91,19 @@ function RouteBadge() {
   );
 }
 
-function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <section className={cx("rounded-3xl bg-white p-5", className)}>{children}</section>;
+function Card({ children, className, tone = "white" }: { children: ReactNode; className?: string; tone?: "white" | "success" }) {
+  return <section className={cx("rounded-3xl p-5", tone === "success" ? "bg-success-99-bg" : "bg-white", className)}>{children}</section>;
 }
 
 export function TripTracking({ order, route }: { order: TripOrder; route?: LatLng[] }) {
   const router = useRouter();
   const reduce = useReducedMotion();
   const isRide = order.vertical === "corrida";
+  const isFood = order.vertical === "comida";
+  // Corrida e entrega começam procurando quem aceite; no Food a loja confirma direto.
+  const hasSearch = !isFood;
+  // Estágio em que o motorista ou o entregador aparece.
+  const courierStage = isFood ? 2 : 1;
   const [stage, setStage] = useState(0);
   const [step, setStep] = useState(0);
   const [cancel, setCancel] = useState<null | "retain" | "reasons" | "done">(null);
@@ -107,26 +116,32 @@ export function TripTracking({ order, route }: { order: TripOrder; route?: LatLn
   const cancelled = cancel === "done";
   const finished = stage >= last && !cancelled;
   const current = order.stages[stage];
-  const searching = stage === 0 && !cancelled;
+  const searching = hasSearch && stage === 0 && !cancelled;
 
   // Estágios avançam sozinhos; a busca troca de tela a cada terço do primeiro.
   useEffect(() => {
     if (finished || cancelled || cancel) return;
-    if (stage === 0 && step < SEARCH_STEPS - 1) {
+    if (hasSearch && stage === 0 && step < SEARCH_STEPS - 1) {
       const t = setTimeout(() => setStep((s) => s + 1), STAGE_DURATION_MS / SEARCH_STEPS);
       return () => clearTimeout(t);
     }
-    const wait = stage === 0 ? STAGE_DURATION_MS / SEARCH_STEPS : STAGE_DURATION_MS;
+    const wait = hasSearch && stage === 0 ? STAGE_DURATION_MS / SEARCH_STEPS : STAGE_DURATION_MS;
     const t = setTimeout(() => setStage((s) => Math.min(s + 1, last)), wait);
     return () => clearTimeout(t);
-  }, [stage, step, finished, cancelled, cancel, last]);
+  }, [stage, step, finished, cancelled, cancel, last, hasSearch]);
 
-  // Motorista aceitou: aviso no topo do mapa e começa a contagem sem taxa.
+  // Motorista ou entregador a caminho: aviso no topo do mapa e começa a contagem sem taxa.
   const [announced, setAnnounced] = useState(false);
-  if (stage === 1 && !announced) {
+  if (stage === courierStage && !announced) {
     setAnnounced(true);
     setFreeLeft(FREE_CANCEL_S);
-    setToast(isRide ? "O motorista está a cerca de 500 m do ponto de embarque" : "O entregador está a cerca de 500 m do ponto de coleta");
+    setToast(
+      isFood
+        ? `${order.courier.name.split(" ")[0]} saiu com o seu pedido`
+        : isRide
+          ? "O motorista está a cerca de 500 m do ponto de embarque"
+          : "O entregador está a cerca de 500 m do ponto de coleta",
+    );
   }
   useEffect(() => {
     if (!toast) return;
@@ -134,25 +149,34 @@ export function TripTracking({ order, route }: { order: TripOrder; route?: LatLn
     return () => clearTimeout(t);
   }, [toast]);
   useEffect(() => {
-    if (stage !== 1 || cancelled || freeLeft <= 0) return;
+    if (isFood || stage !== 1 || cancelled || freeLeft <= 0) return;
     const t = setTimeout(() => setFreeLeft((s) => s - 1), 1000);
     return () => clearTimeout(t);
-  }, [stage, cancelled, freeLeft]);
+  }, [stage, cancelled, freeLeft, isFood]);
   useEffect(() => {
     if (!notice) return;
     const t = setTimeout(() => setNotice(null), 2600);
     return () => clearTimeout(t);
   }, [notice]);
 
-  const person = isRide
-    ? { name: order.driver.name, rating: order.driver.rating, model: `${order.driver.vehicle} · ${order.driver.color}`, plate: order.driver.plate, meta: `${order.driver.trips.toLocaleString("pt-BR")}+ corridas` }
-    : { name: order.courier.name, rating: order.courier.rating, model: order.courier.vehicle, plate: order.courier.plate, meta: "Entregador parceiro" };
+  const person =
+    order.vertical === "corrida"
+      ? { name: order.driver.name, rating: order.driver.rating, model: `${order.driver.vehicle} · ${order.driver.color}`, plate: order.driver.plate, meta: `${order.driver.trips.toLocaleString("pt-BR")}+ corridas` }
+      : order.vertical === "entrega"
+        ? { name: order.courier.name, rating: order.courier.rating, model: order.courier.vehicle, plate: order.courier.plate, meta: "Entregador parceiro" }
+        : { name: order.courier.name, rating: order.courier.rating, model: order.courier.vehicle, plate: undefined, meta: "Entregador parceiro" };
   const firstName = person.name.split(" ")[0];
-  const categoryLabel = isRide ? order.categoryName : (deliveryCategories.find((c) => c.id === order.size)?.name ?? "Entrega");
-  const vehicle: VehicleCategory = isRide ? order.category : order.size === "moto" ? "entrega-moto" : "entrega-carro";
+  const categoryLabel =
+    order.vertical === "corrida"
+      ? order.categoryName
+      : order.vertical === "entrega"
+        ? (deliveryCategories.find((c) => c.id === order.size)?.name ?? "Entrega")
+        : "Entregador 99";
+  const vehicle: VehicleCategory =
+    order.vertical === "corrida" ? order.category : order.vertical === "entrega" && order.size === "carro" ? "entrega-carro" : "entrega-moto";
   const pin = useMemo(() => pinFor(order.id), [order.id]);
-  const copy = searchCopy[order.vertical][step];
-  const noun = isRide ? "corrida" : "entrega";
+  const copy = order.vertical === "comida" ? searchCopy.corrida[0] : searchCopy[order.vertical][step];
+  const noun = isRide ? "corrida" : isFood ? "pedido" : "entrega";
 
   function restart() {
     setStage(0);
@@ -271,24 +295,58 @@ export function TripTracking({ order, route }: { order: TripOrder; route?: LatLn
   );
 
   const heading =
-    stage === 1 ? (isRide ? "Embarque em 4 min" : "Coleta em 4 min") : `${current.title} · ${current.etaLabel}`;
+    stage === 1 && !isFood ? (isRide ? "Embarque em 4 min" : "Coleta em 4 min") : `${current.title} · ${current.etaLabel}`;
+  const optionsTitle = isFood ? "Opções do pedido" : `Opções da ${noun}`;
 
-  const foundPanel = (
-    <div className="flex flex-col gap-4">
-      {stage === 1 && (
-        <p className="text-center text-[15px]">
-          Taxa de Cancelamento será aplicada se cancelar após
-          <br />
-          <span className="font-semibold tabular-nums text-orange-99">
-            {String(Math.floor(freeLeft / 60)).padStart(2, "0")}:{String(freeLeft % 60).padStart(2, "0")}
+  // Food: janela de entrega como o cartão do app, "22:52-23:07", fixa na previsão inicial.
+  const etaWindow = useMemo(() => {
+    const m = order.stages[0].etaLabel.match(/(\d+)\D+(\d+)/);
+    const [a, b] = m ? [Number(m[1]), Number(m[2])] : [30, 40];
+    const at = (min: number) => new Date(order.createdAt + min * 60_000).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return `${at(a)}-${at(b)}`;
+  }, [order.createdAt, order.stages]);
+
+  const foodStatus = isFood && (
+    <Card>
+      <p className="text-[16px] text-secondary-99">Previsão de entrega</p>
+      <p className="mt-1 text-[30px] font-extrabold leading-tight tabular-nums">{etaWindow}</p>
+      <p className="mt-2 text-[17px]" aria-live="polite">
+        {stage === 0 ? "A loja confirmou seu pedido" : stage === 1 ? "Preparando seu pedido" : current.title}
+      </p>
+      {/* Três traços amarelos: confirmado, em preparo, a caminho. O atual enche devagar. */}
+      <div className="mt-5 flex gap-2" aria-hidden="true">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <span key={i} className="h-2 flex-1 overflow-hidden rounded-full bg-offwhite-99">
+            {i < stage ? (
+              <span className="block h-full w-full bg-yellow-99" />
+            ) : i === stage ? (
+              <motion.span
+                key={`${stage}-${i}`}
+                className="block h-full bg-yellow-99"
+                initial={{ width: reduce ? "60%" : "8%" }}
+                animate={{ width: "60%" }}
+                transition={{ duration: reduce ? 0 : STAGE_DURATION_MS / 1000, ease: "linear" }}
+              />
+            ) : null}
           </span>
-        </p>
+        ))}
+      </div>
+      {order.vertical === "comida" && (
+        <div className="mt-5 flex items-center gap-3">
+          <Avatar name={order.restaurantName} size={36} tint="#FFF3C4" className="ring-0" />
+          <span className="min-w-0 flex-1 truncate text-[17px]">{order.restaurantName}</span>
+          <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-offwhite-99 px-3 py-1 text-[17px] font-bold tabular-nums" title="Código do pedido">
+            <Icon name="boxLine" size={16} />
+            {pin}
+          </span>
+        </div>
       )}
-      <h1 className="text-center text-[20px] font-bold" aria-live="polite">
-        {heading}
-      </h1>
+    </Card>
+  );
 
-      <Card className="p-0">
+  const personCard = (
+    <Card className="p-0">
+      {person.plate ? (
         <div className="flex items-center gap-3 px-5 pt-5">
           <div className="min-w-0 flex-1">
             <span className="inline-block rounded-full bg-offwhite-99 px-3 py-0.5 text-[14px] font-bold">{categoryLabel}</span>
@@ -297,140 +355,199 @@ export function TripTracking({ order, route }: { order: TripOrder; route?: LatLn
           </div>
           <VehicleArt category={vehicle} width={112} />
         </div>
-        <div className="mt-4 flex items-center gap-3 border-t border-border-99 px-5 py-4">
-          <Avatar name={person.name} size={52} />
+      ) : (
+        <div className="flex items-center gap-3 px-5 pt-5">
           <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-1 text-[18px] font-bold">
-              <span className="truncate">{firstName}</span>
-              <Icon name="chevronRight" size={20} className="shrink-0" />
-            </p>
-            <p className="flex min-w-0 items-center gap-1 text-[14px] min-[400px]:text-[15px]">
-              <Icon name="starFill" size={15} className="shrink-0" />
-              <span className="truncate">
-                {person.rating.toFixed(1).replace(".", ",")} · {person.meta}
-              </span>
-            </p>
+            <span className="inline-block rounded-full bg-offwhite-99 px-3 py-0.5 text-[14px] font-bold">{categoryLabel}</span>
+            <p className="mt-2 truncate text-[20px] font-bold">{person.model}</p>
           </div>
-          <button
-            type="button"
-            aria-label={`Mensagem para ${firstName}`}
-            onClick={() => setNotice("Chat indisponível na demonstração")}
-            className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-offwhite-99 transition-colors hover:bg-border-99"
-          >
-            <Icon name="chatFill" size={22} />
-            <span aria-hidden="true" className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-alert-99 ring-2 ring-white" />
-          </button>
-          <button
-            type="button"
-            aria-label={`Ligar para ${firstName}`}
-            onClick={() => setNotice("Ligação indisponível na demonstração")}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-offwhite-99 transition-colors hover:bg-border-99"
-          >
-            <Icon name="phoneFill" size={22} />
-          </button>
+          <VehicleArt category={vehicle} width={88} />
         </div>
-      </Card>
-
-      {stage === 1 && (
-        <Card className="flex items-center justify-between gap-4 py-6">
-          <p className="flex items-center gap-2 text-[18px] font-bold">
-            {isRide ? "PIN desta corrida" : "Código da coleta"}
-            <Icon name="info" size={18} className="text-placeholder-99" />
-          </p>
-          <span className="text-[40px] font-bold leading-none tracking-wider text-info-99 tabular-nums">{pin}</span>
-        </Card>
       )}
+      <div className="mt-4 flex items-center gap-3 border-t border-border-99 px-5 py-4">
+        <Avatar name={person.name} size={52} />
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-1 text-[18px] font-bold">
+            <span className="truncate">{firstName}</span>
+            <Icon name="chevronRight" size={20} className="shrink-0" />
+          </p>
+          <p className="flex min-w-0 items-center gap-1 text-[14px] min-[400px]:text-[15px]">
+            <Icon name="starFill" size={15} className="shrink-0" />
+            <span className="truncate">
+              {person.rating.toFixed(1).replace(".", ",")} · {person.meta}
+            </span>
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label={`Mensagem para ${firstName}`}
+          onClick={() => setNotice("Chat indisponível na demonstração")}
+          className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-offwhite-99 transition-colors hover:bg-border-99"
+        >
+          <Icon name="chatFill" size={22} />
+          <span aria-hidden="true" className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-alert-99 ring-2 ring-white" />
+        </button>
+        <button
+          type="button"
+          aria-label={`Ligar para ${firstName}`}
+          onClick={() => setNotice("Ligação indisponível na demonstração")}
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-offwhite-99 transition-colors hover:bg-border-99"
+        >
+          <Icon name="phoneFill" size={22} />
+        </button>
+      </div>
+    </Card>
+  );
 
-      <Card>
-        {priceBox}
-        <div className="flex items-end gap-3">
-          <div className="min-w-0 flex-1">{routeRows}</div>
+  const codeCard = (
+    <Card className="flex items-center justify-between gap-4 py-6">
+      <p className="flex items-center gap-2 text-[18px] font-bold">
+        {isRide ? "PIN desta corrida" : isFood ? "Código de entrega" : "Código da coleta"}
+        <Icon name="info" size={18} className="text-placeholder-99" />
+      </p>
+      <span className="text-[40px] font-bold leading-none tracking-wider text-info-99 tabular-nums">{pin}</span>
+    </Card>
+  );
+
+  const summaryCard = (
+    <Card>
+      {priceBox}
+      {order.vertical === "comida" && (
+        <ul className="mt-4 flex flex-col gap-1.5 text-[15px]" role="list">
+          {order.lines.map((l) => (
+            <li key={l.lineId} className="flex justify-between gap-3">
+              <span className="min-w-0 truncate">
+                {l.quantity}× {l.name}
+              </span>
+              <span className="shrink-0 tabular-nums text-secondary-99">{formatBRL(l.unitPrice * l.quantity)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="flex items-end gap-3">
+        <div className="min-w-0 flex-1">{routeRows}</div>
+        {/* Encerrado não se edita mais: o lápis some. */}
+        {!finished && !cancelled && (
           <button
             type="button"
             aria-label="Alterar endereço"
-            onClick={() => setNotice(`Para mudar o endereço, cancele e peça a ${noun} de novo`)}
+            onClick={() => setNotice(`Para mudar o endereço, cancele e faça ${isFood ? "o pedido" : `a ${noun}`} de novo`)}
             className="mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-offwhite-99 transition-colors hover:bg-border-99"
           >
             <Icon name="editFill" size={20} />
           </button>
-        </div>
-      </Card>
+        )}
+      </div>
+    </Card>
+  );
 
-      <Card className="pb-2">
-        <h2 className="text-[20px] font-bold">Opções da {noun}</h2>
-        <ul className="mt-2" role="list">
-          {[
-            { icon: "navigateFill" as IconName, tint: "bg-[#35B6F5]", label: "Compartilhar rota", onClick: shareRoute },
-            { icon: "helpFill" as IconName, tint: "bg-[#1B2A7A]", label: "Ir para Central de Ajuda", onClick: () => setHelpOpen(true) },
-            { icon: "phoneFill" as IconName, tint: "bg-[#F4456B]", label: "Ligar 190", href: "tel:190" },
-          ].map((o) => {
-            const inner = (
-              <>
-                <span className={cx("flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white", o.tint)}>
-                  <Icon name={o.icon} size={22} />
-                </span>
-                <span className="flex-1 text-[17px] font-semibold">{o.label}</span>
-                <Icon name="chevronRight" size={20} className="text-placeholder-99" />
-              </>
-            );
-            const cls = "flex w-full items-center gap-4 py-3 text-left";
-            return (
-              <li key={o.label} className="border-b border-border-99 last:border-b-0">
-                {"href" in o ? (
-                  <a href={o.href} className={cls}>
-                    {inner}
-                  </a>
-                ) : (
-                  <button type="button" onClick={o.onClick} className={cls}>
-                    {inner}
-                  </button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </Card>
+  const optionsCard = (
+    <Card className="pb-2">
+      <h2 className="text-[20px] font-bold">{optionsTitle}</h2>
+      <ul className="mt-2" role="list">
+        {[
+          { icon: "navigateFill" as IconName, tint: "bg-[#35B6F5]", label: isFood ? "Compartilhar pedido" : "Compartilhar rota", onClick: shareRoute },
+          { icon: "helpFill" as IconName, tint: "bg-[#1B2A7A]", label: "Ir para Central de Ajuda", onClick: () => setHelpOpen(true) },
+          ...(isFood ? [] : [{ icon: "phoneFill" as IconName, tint: "bg-[#F4456B]", label: "Ligar 190", href: "tel:190" }]),
+        ].map((o) => {
+          const inner = (
+            <>
+              <span className={cx("flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white", o.tint)}>
+                <Icon name={o.icon} size={22} />
+              </span>
+              <span className="flex-1 text-[17px] font-semibold">{o.label}</span>
+              <Icon name="chevronRight" size={20} className="text-placeholder-99" />
+            </>
+          );
+          const cls = "flex w-full items-center gap-4 py-3 text-left";
+          return (
+            <li key={o.label} className="border-b border-border-99 last:border-b-0">
+              {"href" in o ? (
+                <a href={o.href} className={cls}>
+                  {inner}
+                </a>
+              ) : (
+                <button type="button" onClick={o.onClick} className={cls}>
+                  {inner}
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </Card>
+  );
 
-      {stage === 1 && (
-        <button
-          type="button"
-          onClick={() => setCancel("retain")}
-          className="rounded-3xl bg-white py-5 text-[17px] font-semibold text-alert-99 transition-colors hover:bg-offwhite-99"
-        >
-          Cancelar {noun}
-        </button>
+  const cancelButton = (
+    <button
+      type="button"
+      // No Food ainda não há entregador para segurar o pedido: vai direto aos motivos.
+      onClick={() => setCancel(isFood ? "reasons" : "retain")}
+      className="rounded-3xl bg-white py-5 text-[17px] font-semibold text-alert-99 transition-colors hover:bg-offwhite-99"
+    >
+      Cancelar {noun}
+    </button>
+  );
+
+  const foundPanel = (
+    <div className="flex flex-col gap-4">
+      {stage === 1 && !isFood && (
+        <p className="text-center text-[15px]">
+          Taxa de Cancelamento será aplicada se cancelar após
+          <br />
+          <span className="font-semibold tabular-nums text-orange-99">
+            {String(Math.floor(freeLeft / 60)).padStart(2, "0")}:{String(freeLeft % 60).padStart(2, "0")}
+          </span>
+        </p>
       )}
+      {isFood ? (
+        foodStatus
+      ) : (
+        <h1 className="text-center text-[20px] font-bold" aria-live="polite">
+          {heading}
+        </h1>
+      )}
+      {stage >= courierStage && personCard}
+      {((!isFood && stage === 1) || (isFood && stage >= courierStage)) && codeCard}
+      {summaryCard}
+      {optionsCard}
+      {((!isFood && stage === 1) || (isFood && stage === 0)) && cancelButton}
     </div>
   );
 
   const endPanel = (
     <div className="flex flex-col gap-4">
-      <Card className={cancelled ? "" : "bg-success-99-bg"}>
+      <Card tone={cancelled ? "white" : "success"}>
         <h1 className="text-[22px] font-bold">
-          {cancelled ? `${isRide ? "Corrida" : "Entrega"} cancelada` : isRide ? "Corrida finalizada" : "Pacote entregue"}
+          {cancelled
+            ? `${isRide ? "Corrida cancelada" : isFood ? "Pedido cancelado" : "Entrega cancelada"}`
+            : isRide
+              ? "Corrida finalizada"
+              : isFood
+                ? "Pedido entregue"
+                : "Pacote entregue"}
         </h1>
         <p className="mt-1 text-[15px] text-secondary-99">
           {cancelled
-            ? stage === 1 && freeLeft <= 0
+            ? !isFood && stage === 1 && freeLeft <= 0
               ? "Passou do prazo gratuito: no app seria cobrada a taxa de cancelamento. Aqui nada é cobrado."
               : "Nenhum valor foi cobrado."
             : isRide
               ? "Obrigado por viajar com a 99. O valor foi cobrado na forma escolhida."
-              : "O destinatário confirmou o recebimento com o código."}
+              : isFood
+                ? "Bom apetite. Obrigado por pedir pelo 99Food."
+                : "O destinatário confirmou o recebimento com o código."}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <LinkButton href={`/${order.vertical}`} size="sm">
-            {isRide ? "Nova corrida" : "Nova entrega"}
+            {isRide ? "Nova corrida" : isFood ? "Pedir de novo" : "Nova entrega"}
           </LinkButton>
           <LinkButton href="/" size="sm" variant="ghost">
             Início
           </LinkButton>
         </div>
       </Card>
-      <Card>
-        {priceBox}
-        {routeRows}
-      </Card>
+      {summaryCard}
     </div>
   );
 
@@ -450,7 +567,7 @@ export function TripTracking({ order, route }: { order: TripOrder; route?: LatLn
             variant="text"
             size="sm"
             onClick={() => {
-              if (stage === 0 && step < SEARCH_STEPS - 1) setStep((s) => s + 1);
+              if (hasSearch && stage === 0 && step < SEARCH_STEPS - 1) setStep((s) => s + 1);
               else setStage((s) => Math.min(s + 1, last));
             }}
             disabled={finished || cancelled || Boolean(cancel)}
