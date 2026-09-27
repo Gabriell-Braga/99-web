@@ -11,13 +11,35 @@ interface ActionBarProps {
   action: ReactNode;
   /** Texto abaixo dizendo o que falta, quando o botão está bloqueado. */
   hint?: ReactNode;
+  /**
+   * Pagamento numa linha, com a oferta verde à direita, e o botão na largura toda
+   * embaixo, como na tela de categorias da corrida no app.
+   */
+  stacked?: boolean;
 }
 
 /**
  * Barra de ação inferior do app: fixa no rodapé do painel, branca, com o
  * pagamento ou o total à esquerda e o botão primário à direita.
  */
-export function ActionBar({ left, offer, action, hint }: ActionBarProps) {
+export function ActionBar({ left, offer, action, hint, stacked }: ActionBarProps) {
+  if (stacked) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          {left}
+          {offer && (
+            <span className="flex shrink-0 items-center gap-1 text-[15px] text-green-99">
+              {offer}
+              <Icon name="chevronRight" size={18} className="text-black-99" />
+            </span>
+          )}
+        </div>
+        {action}
+        {hint}
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-2">
       {offer && (
@@ -69,7 +91,7 @@ export function PaymentBlock({
         <PaymentIcon name={icon} size={20} />
       </span>
       <span className="flex flex-col leading-tight">
-        <span className="text-[15px] font-bold">{label}</span>
+        <span className="whitespace-nowrap text-[15px] font-bold">{label}</span>
         {detail && <span className="text-[13px] text-secondary-99">{detail}</span>}
       </span>
       <Icon name="chevronDown" size={16} className="text-muted-99" />

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, useReducedMotion } from "motion/react";
 import { drivers, rideCategories } from "@/data/rides";
 import { rideDurationMin, rideFare } from "@/lib/pricing";
 import { formatBRL, formatKm } from "@/lib/format";
@@ -47,7 +46,6 @@ function arrivalLabel(minutes: number): string {
 
 export function RideView() {
   const router = useRouter();
-  const reduceMotion = useReducedMotion();
   const { saveOrder, rideOrigin, rideDestination } = useApp();
   const current = useCurrentLocation();
   // Origem escolhida na home entra já preenchida.
@@ -287,6 +285,8 @@ export function RideView() {
                   description={`Ainda não operamos em ${notCovered.city || notCovered.title}. Escolha um endereço no Brasil.`}
                 />
               ) : (
+                <div className="flex flex-col gap-1">
+                <p className="text-center text-[16px] text-secondary-99">Escolha uma ou mais categorias</p>
                 <ul className="flex flex-col" role="list" aria-label="Categorias">
                   {rideCategories.map((c) => {
                     const checked = category === c.id;
@@ -306,21 +306,12 @@ export function RideView() {
                             }
                           }}
                           className={cx(
-                            "relative isolate flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors duration-150 ease-out hover:duration-[120ms]",
-                            !checked && "hover:bg-offwhite-99",
+                            "relative isolate flex w-full cursor-pointer items-center gap-3 rounded-xl px-2 py-4 text-left transition-colors duration-150 ease-out hover:bg-offwhite-99 hover:duration-[120ms]",
                           )}
                         >
-                          {checked && (
-                            <motion.span
-                              layoutId={reduceMotion ? undefined : "categoria-corrida"}
-                              transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] }}
-                              className="absolute inset-0 -z-10 rounded-xl bg-offwhite-99"
-                              aria-hidden="true"
-                            />
-                          )}
                           <VehicleArt category={c.id} />
                           <span className="flex min-w-0 flex-1 flex-col">
-                            <span className="flex min-w-0 items-center gap-1.5 text-[17px] font-bold">
+                            <span className="flex min-w-0 items-center gap-1.5 text-[18px]">
                               <span className="truncate">{c.name}</span>
                               {c.seats > 0 ? (
                                 <span className="flex items-center gap-0.5 text-[13px] font-medium text-secondary-99">
@@ -331,7 +322,7 @@ export function RideView() {
                                 <Icon name="info" size={14} className="text-secondary-99" />
                               )}
                             </span>
-                            <span className={cx("text-sm text-secondary-99", route ? "whitespace-nowrap" : "truncate")}>
+                            <span className={cx("text-[15px] text-secondary-99", route ? "whitespace-nowrap" : "truncate")}>
                               {route ? `${arrivalLabel(c.etaMin + mins)} · ${mins} min` : c.description}
                             </span>
                           </span>
@@ -363,7 +354,7 @@ export function RideView() {
                               </button>
                             </span>
                           ) : (
-                            <span className="shrink-0 text-[17px] font-bold tabular-nums">{route ? formatBRL(price) : "—"}</span>
+                            <span className="shrink-0 text-[19px] font-bold tabular-nums">{route ? formatBRL(price) : "—"}</span>
                           )}
                           </span>
                           <span
@@ -380,6 +371,7 @@ export function RideView() {
                     );
                   })}
                 </ul>
+                </div>
               )}
 
               <Textarea
@@ -398,6 +390,8 @@ export function RideView() {
         !searching ? (
           <>
             <ActionBar
+              stacked
+              offer="Clique para descontos"
               left={
                 <PaymentBlock
                   icon={paymentIcon[payment]}
