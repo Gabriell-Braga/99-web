@@ -6,6 +6,7 @@ import type { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { haversineKm, pointAlong, type LatLng } from "@/lib/geo";
 import type { MapViewProps } from "@/components/map/MapView";
+import { vehicleImage } from "@/components/ui/VehicleArt";
 
 /** Estilo Positron servido pelo OpenFreeMap, sem chave. */
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
@@ -21,11 +22,8 @@ const HIDDEN_LAYER = /poi|housenumber|house_number|transit|shop|building.*(label
 /** Rótulos de rua só a partir do zoom 15. */
 const ROAD_LABEL = /^highway-name|road.*(name|label)/i;
 
-const vehicleImage: Record<NonNullable<MapViewProps["vehicle"]>, string> = {
-  car: "/vehicles/car-white.png",
-  moto: "/vehicles/moto-white.png",
-  bag: "/vehicles/moto-box.png",
-};
+/** Mesma imagem do card da categoria; o entregador do Food vai de moto com caixa. */
+const imageFor = (kind: NonNullable<MapViewProps["vehicle"]>) => (kind === "bag" ? vehicleImage["entrega-moto"] : vehicleImage[kind]);
 
 /**
  * O MapLibre posiciona o marcador com `transform`; a animação de escala no mesmo
@@ -51,7 +49,7 @@ function userDot(): HTMLElement {
 
 function vehicleEl(kind: NonNullable<MapViewProps["vehicle"]>): HTMLElement {
   const img = document.createElement("img");
-  img.src = vehicleImage[kind];
+  img.src = imageFor(kind);
   img.alt = "";
   img.width = 48;
   img.height = 48;
@@ -85,7 +83,7 @@ export default function RealMap({
   destination,
   route,
   progress,
-  vehicle = "car",
+  vehicle = "pop",
   searching,
   userLocation,
   interactive = true,
@@ -281,6 +279,9 @@ export default function RealMap({
         .addTo(map);
     }
     const marker = vehicleRef.current!;
+    // Trocou a categoria com o marcador já no mapa: só troca a imagem.
+    const img = marker.getElement() as HTMLImageElement;
+    if (!img.src.endsWith(imageFor(vehicle))) img.src = imageFor(vehicle);
     const target = Math.max(0, Math.min(1, progress));
     const from = currentRef.current;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

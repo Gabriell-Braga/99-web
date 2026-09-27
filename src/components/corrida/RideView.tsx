@@ -139,11 +139,11 @@ export function RideView() {
         route={route?.points}
         userLocation={current.status === "ready" ? current.position : null}
         center={current.position}
-        vehicle={selected.art === "moto" ? "moto" : "car"}
+        vehicle={selected.id}
         searching={phase === "searching"}
       />
     ),
-    [origin, destination, route, current.status, current.position, selected.art, phase],
+    [origin, destination, route, current.status, current.position, selected.id, phase],
   );
 
   if (phase === "paying") {

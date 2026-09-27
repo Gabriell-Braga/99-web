@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import type { LatLng } from "@/lib/geo";
 import { cx } from "@/lib/cx";
+import type { VehicleCategory } from "@/components/ui/VehicleArt";
 
 export interface MapPoint extends LatLng {
   label?: string;
@@ -15,7 +16,11 @@ export interface MapViewProps {
   route?: LatLng[] | null;
   /** 0 a 1: posição do veículo ao longo do trajeto. Undefined esconde o marcador. */
   progress?: number;
-  vehicle?: "car" | "moto" | "bag";
+  /**
+   * Categoria escolhida: o marcador usa a mesma imagem do card (táxi amarelo, moto
+   * ou carro com caixa na entrega). "bag" é o entregador do Food, moto com caixa.
+   */
+  vehicle?: VehicleCategory | "bag";
   /** Cor do pino de destino. No app é laranja. */
   accent?: "yellow" | "orange";
   /** Pulso no ponto de origem enquanto procura motorista. */

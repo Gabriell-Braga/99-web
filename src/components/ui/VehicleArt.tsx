@@ -1,10 +1,11 @@
 import type { PackageSize, RideCategory } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 
-type Category = RideCategory["id"] | PackageSize;
+export type VehicleCategory = RideCategory["id"] | PackageSize;
+type Category = VehicleCategory;
 
 /** Renders em `public/vehicles/`. A sombra já está na imagem. */
-const image: Record<Category, string> = {
+export const vehicleImage: Record<Category, string> = {
   pop: "/vehicles/car-white.png",
   "pop-expresso": "/vehicles/car-white.png",
   negocia: "/vehicles/car-white.png",
@@ -30,7 +31,7 @@ export function VehicleArt({ category, width = 64 }: { category: Category; width
     <span className="relative inline-block shrink-0" style={{ width, height: width }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={image[category]}
+        src={vehicleImage[category]}
         alt=""
         width={width}
         height={width}

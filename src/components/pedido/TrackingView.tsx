@@ -73,7 +73,9 @@ function Tracking({ order }: { order: Order }) {
     return () => clearTimeout(t);
   }, [stage, finished, last]);
 
-  const vehicle = order.vertical === "corrida" ? (order.category === "moto" ? "moto" : "car") : order.vertical === "comida" ? "bag" : "moto";
+  // O marcador segue o que foi escolhido: a categoria da corrida ou o veículo da entrega, com caixa.
+  const vehicle =
+    order.vertical === "corrida" ? order.category : order.vertical === "comida" ? "bag" : order.size === "moto" ? "entrega-moto" : "entrega-carro";
   const showVehicle = order.vertical === "comida" ? true : stage >= 1;
   const searching = current.id === "procurando";
 

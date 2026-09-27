@@ -172,7 +172,7 @@ export function DeliveryView() {
         route={route?.points}
         userLocation={current.status === "ready" ? current.position : null}
         center={current.position}
-        vehicle={size === "moto" ? "moto" : "car"}
+        vehicle={size === "moto" ? "entrega-moto" : "entrega-carro"}
       />
     ),
     [a, b, route, current.status, current.position, size],
