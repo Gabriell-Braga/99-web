@@ -60,7 +60,7 @@ export function CategoryRail({ value, onChange }: CategoryRailProps) {
           ref={railRef}
           role="group"
           aria-label="Categorias"
-          className="scroll-rail flex gap-6 overflow-x-auto py-1"
+          className="scroll-rail -mr-4 flex gap-4 overflow-x-auto py-1 pr-4 md:mr-0 md:gap-6 md:pr-0"
         >
           {foodCategories.map((c, i) => {
             const active = value === c.id;
@@ -72,9 +72,9 @@ export function CategoryRail({ value, onChange }: CategoryRailProps) {
                 type="button"
                 aria-pressed={active}
                 onClick={() => onChange(active ? null : c.id)}
-                className="flex w-[88px] shrink-0 flex-col items-center gap-2 rounded-xl py-1 text-center"
+                className="flex w-[74px] shrink-0 flex-col items-center gap-2 rounded-xl py-1 text-center md:w-[88px]"
               >
-                <span className="flex h-[72px] w-[72px] items-center justify-center">
+                <span className="flex h-14 w-14 items-center justify-center md:h-[72px] md:w-[72px]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={c.icon}
@@ -86,7 +86,7 @@ export function CategoryRail({ value, onChange }: CategoryRailProps) {
                     decoding="async"
                   />
                 </span>
-                <span className={cx("text-[14px] leading-tight text-black-99", active ? "font-bold" : "font-normal")}>
+                <span className={cx("text-[15px] leading-tight text-black-99 md:text-[14px]", active ? "font-bold" : "font-normal")}>
                   {c.label}
                 </span>
               </button>

@@ -39,26 +39,26 @@ export function BottomNav() {
         inFlow ? "hidden lg:flex" : "flex",
       )}
     >
-      <ul className="pointer-events-auto flex h-16 items-center gap-1 rounded-full bg-white px-2 shadow-high" role="list">
+      <ul className="pointer-events-auto flex h-20 items-center rounded-full bg-white px-1 shadow-high" role="list">
         {items.map((it) => {
           const active = pathname.startsWith(it.href);
           const inner = (
-            <span className="relative flex h-12 w-16 items-center justify-center">
+            <span className="relative flex h-[72px] w-20 items-center justify-center">
               {active && (
                 <motion.span
                   layoutId={reduce ? undefined : "nav-ativo"}
                   transition={transition}
-                  className="absolute h-12 w-12 rounded-full bg-yellow-99"
+                  className="absolute h-[72px] w-[72px] rounded-full bg-yellow-99"
                   aria-hidden="true"
                 />
               )}
-              <span className="relative flex flex-col items-center justify-center gap-0.5 text-black-99">
-                <Icon name={it.icon} size={24} />
+              <span className="relative flex flex-col items-center justify-center gap-1 text-black-99">
+                <Icon name={it.icon} size={active ? 28 : 24} />
                 {/* No item selecionado fica só o ícone dentro do círculo amarelo. */}
                 {active ? (
                   <span className="sr-only">{it.label}</span>
                 ) : (
-                  <span className="text-[11px] font-medium leading-none">{it.label}</span>
+                  <span className="text-[13px] leading-none text-secondary-99">{it.label}</span>
                 )}
               </span>
             </span>
