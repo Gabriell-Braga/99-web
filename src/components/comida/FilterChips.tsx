@@ -5,8 +5,8 @@ import { Modal } from "@/components/ui/Modal";
 import { Icon } from "@/components/ui/Icon";
 
 const REGRAS: { atraso: string; cupom: string }[] = [
-  { atraso: "15 a 30 minutos", cupom: "Cupom de R$ 10 OFF" },
-  { atraso: "30 minutos ou mais", cupom: "Cupom de R$ 30 OFF" },
+  { atraso: "15 a 30 minutos", cupom: "Cupom de R$10 OFF" },
+  { atraso: "30 minutos ou mais", cupom: "Cupom de R$30 OFF" },
 ];
 
 /**
@@ -40,45 +40,69 @@ export function FilterChips() {
         </button>
       </div>
 
-      <Modal open={aberto} onClose={() => setAberto(false)} title="No Horário" width="sm">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-4 rounded-2xl bg-yellow-99-light p-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-yellow-99 text-black-99" aria-hidden="true">
-              <Icon name="boltFill" size={26} />
-            </span>
-            <p className="text-[15px] font-semibold text-black-99">
-              Ganhe cupons a partir de R$ 10 se o seu pedido atrasar.
-            </p>
+      <Modal open={aberto} onClose={() => setAberto(false)} title="No Horário" width="sm" bare>
+        <div className="min-h-0 flex-1 overflow-y-auto bg-subtle-99">
+          {/* Topo amarelo-claro com título e selo, como a tela do app; os cartões sobem por cima. */}
+          <div className="bg-yellow-99-light px-4 pb-20 pt-4 md:px-6">
+            <button
+              type="button"
+              onClick={() => setAberto(false)}
+              aria-label="Voltar"
+              className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-black-99 transition-colors hover:bg-black-99/5"
+            >
+              <Icon name="chevronLeft" size={30} />
+            </button>
+            <div className="mt-4 flex items-center gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-[30px] font-extrabold leading-tight text-black-99">No Horário</p>
+                <p className="mt-2 text-[16px] text-black-99">Ganhe cupons a partir de R$ 10 se o seu pedido atrasar</p>
+              </div>
+              <span
+                aria-hidden="true"
+                className="flex h-24 w-20 shrink-0 rotate-6 items-center justify-center rounded-b-[40px] rounded-t-[18px] bg-yellow-99 text-black-99 shadow-[6px_6px_0_#E0B800]"
+              >
+                <Icon name="boltFill" size={48} />
+              </span>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <h3 className="text-[17px] font-bold">O que é</h3>
-            <p className="text-[15px] text-secondary-99">
-              Se o pedido entregue pela equipe parceira não chegar no horário previsto, você ganha um cupom de desconto
-              proporcional ao atraso, contado depois que o pedido é concluído.
-            </p>
-          </div>
+          <div className="-mt-14 flex flex-col gap-4 px-4 pb-8 md:px-6">
+            <section className="rounded-3xl bg-white p-6">
+              <h3 className="text-[22px] font-bold">O que é?</h3>
+              <p className="mt-3 text-[16px] leading-relaxed text-black-99">
+                Se o pedido entregue pela equipe parceira não chegar no horário previsto, depois da conclusão você ganha um cupom de
+                desconto de acordo com o atraso.
+              </p>
+            </section>
 
-          <div className="flex flex-col gap-2">
-            <h3 className="text-[17px] font-bold">Regras da recompensa</h3>
-            <ul className="overflow-hidden rounded-2xl border border-border-99" role="list">
-              <li className="flex bg-offwhite-99 text-[13px] font-bold text-secondary-99">
-                <span className="flex-1 px-4 py-2">Tempo de atraso</span>
-                <span className="flex-1 border-l border-border-99 px-4 py-2">Valor do cupom</span>
-              </li>
-              {REGRAS.map((r) => (
-                <li key={r.atraso} className="flex border-t border-border-99 text-[15px]">
-                  <span className="flex-1 px-4 py-3">{r.atraso}</span>
-                  <span className="flex-1 border-l border-border-99 px-4 py-3 font-semibold">{r.cupom}</span>
-                </li>
-              ))}
-            </ul>
+            <section className="rounded-3xl bg-white p-6">
+              <h3 className="text-[22px] font-bold">Regras da recompensa</h3>
+              <table className="mt-4 w-full overflow-hidden rounded-2xl border-separate border-spacing-0 border border-border-99 text-center text-[14px] min-[400px]:text-[15px]">
+                <thead>
+                  <tr className="bg-offwhite-99 text-secondary-99">
+                    <th className="px-3 py-3 font-semibold">Tempo de atraso</th>
+                    <th className="border-l border-border-99 px-3 py-3 font-semibold">Valor do cupom</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {REGRAS.map((r) => (
+                    <tr key={r.atraso}>
+                      <td className="border-t border-border-99 px-2 py-4">{r.atraso}</td>
+                      <td className="border-l border-t border-border-99 px-2 py-4">{r.cupom}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="mt-4 text-[14px] leading-relaxed text-secondary-99">
+                Como saber se vou ganhar um cupom?
+                <br />
+                Atraso = horário da entrega − primeira previsão de entrega.
+                <br />
+                *Cupom válido apenas para pedidos finalizados. Cancelamentos não dão direito a compensação. Neste conceito nenhum
+                cupom é real.
+              </p>
+            </section>
           </div>
-
-          <p className="text-[13px] text-muted-99">
-            O atraso é a diferença entre a entrega e a primeira previsão. Vale só para pedidos finalizados: cancelamento não
-            dá direito à compensação. Neste conceito nenhum cupom é real.
-          </p>
         </div>
       </Modal>
     </>

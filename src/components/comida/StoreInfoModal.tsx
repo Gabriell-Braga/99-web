@@ -103,9 +103,29 @@ export function StoreInfoModal({
   ];
 
   return (
-    <Modal open={open} onClose={onClose} title={restaurant.name} width="md">
-      <div className="flex flex-col gap-5">
-        <div className="flex gap-6 border-b border-border-99" role="tablist" aria-label="Informações ou avaliações">
+    <Modal open={open} onClose={onClose} title={restaurant.name} width="md" bare>
+      <div className="px-2 pt-4 md:px-4">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Voltar"
+          className="flex h-11 w-11 items-center justify-center rounded-full text-black-99 transition-colors hover:bg-offwhite-99"
+        >
+          <Icon name="chevronLeft" size={30} />
+        </button>
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 md:px-6">
+      <div className="flex flex-col gap-6">
+        <div className="mt-2 flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[26px] font-extrabold leading-tight">{restaurant.name}</p>
+            <p className="mt-1 text-[15px] text-secondary-99">{restaurant.cuisine}</p>
+          </div>
+          <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center text-black-99" title="Telefone da loja (demonstração)">
+            <Icon name="phone" size={28} />
+          </span>
+        </div>
+        <div className="flex gap-10" role="tablist" aria-label="Informações ou avaliações">
           {(["informacoes", "avaliacoes"] as const).map((t) => (
             <button
               key={t}
@@ -114,8 +134,8 @@ export function StoreInfoModal({
               aria-selected={aba === t}
               onClick={() => onAba(t)}
               className={cx(
-                "relative -mb-px pb-2 text-[17px] font-bold transition-colors duration-150",
-                aba === t ? "text-black-99" : "text-secondary-99 hover:text-black-99",
+                "relative pb-3 text-[19px] transition-colors duration-150",
+                aba === t ? "font-bold text-black-99" : "text-secondary-99 hover:text-black-99",
               )}
             >
               {t === "informacoes" ? "Informações" : "Avaliações"}
@@ -123,7 +143,7 @@ export function StoreInfoModal({
                 <motion.span
                   layoutId={reduce ? undefined : "aba-loja"}
                   transition={{ duration: reduce ? 0 : 0.22, ease: [0.4, 0, 0.2, 1] }}
-                  className="absolute inset-x-0 -bottom-px h-1 rounded-full bg-yellow-99"
+                  className="absolute inset-x-0 bottom-0 h-1 rounded-full bg-yellow-99"
                   aria-hidden="true"
                 />
               )}
@@ -133,8 +153,8 @@ export function StoreInfoModal({
 
         {aba === "informacoes" ? (
           <div className="flex flex-col gap-6">
-            <div className="flex items-start gap-3">
-              <Icon name="clock" size={22} className="mt-0.5 shrink-0 text-black-99" />
+            <div className="flex items-start gap-6">
+              <Icon name="clock" size={26} className="shrink-0 text-black-99" />
               <div className="flex min-w-0 flex-1 flex-col">
                 <button
                   type="button"
@@ -143,7 +163,7 @@ export function StoreInfoModal({
                   className="flex w-full items-center gap-2 text-left"
                 >
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="text-[17px] font-bold">{restaurant.open ? "Aberta agora" : "Fechada"}</span>
+                    <span className="text-[18px]">{restaurant.open ? "Aberta agora" : "Fechado"}</span>
                     <span className="text-[15px] text-secondary-99">
                       {restaurant.open
                         ? `Entrega em ${restaurant.etaMin}–${restaurant.etaMax} min`
@@ -185,10 +205,10 @@ export function StoreInfoModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <Icon name="card" size={22} className="mt-0.5 shrink-0 text-black-99" />
+            <div className="flex items-start gap-6">
+              <Icon name="card" size={26} className="shrink-0 text-black-99" />
               <div className="flex min-w-0 flex-col gap-2">
-                <p className="text-[17px] font-bold">Formas de pagamento</p>
+                <p className="text-[18px]">Formas de pagamento</p>
                 <p className="text-[13px] text-secondary-99">Online pelo app</p>
                 <ul className="flex flex-wrap gap-2" role="list">
                   {ONLINE.map((p) => (
@@ -211,10 +231,10 @@ export function StoreInfoModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <Icon name="pin" size={22} className="mt-0.5 shrink-0 text-black-99" />
+            <div className="flex items-start gap-6">
+              <Icon name="pin" size={26} className="shrink-0 text-black-99" />
               <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <p className="text-[17px] font-bold">Endereço</p>
+                <p className="text-[18px]">Endereço</p>
                 <p className="text-[15px] text-secondary-99">{restaurant.address}</p>
                 <div className="h-40 overflow-hidden rounded-xl border border-border-99">
                   <MapView
@@ -229,10 +249,10 @@ export function StoreInfoModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <Icon name="moto" size={22} className="mt-0.5 shrink-0 text-black-99" />
+            <div className="flex items-start gap-6">
+              <Icon name="moto" size={26} className="shrink-0 text-black-99" />
               <div className="flex min-w-0 flex-col">
-                <p className="text-[17px] font-bold">{restaurant.deliveredBy}</p>
+                <p className="text-[18px]">{restaurant.deliveredBy}</p>
                 <p className="text-[15px] text-secondary-99">
                   {restaurant.deliveredBy === "Entrega pela loja"
                     ? "A entrega é feita pela própria loja, e o acompanhamento em tempo real não fica disponível."
@@ -241,10 +261,10 @@ export function StoreInfoModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <Icon name="cash" size={22} className="mt-0.5 shrink-0 text-black-99" />
+            <div className="flex items-start gap-6">
+              <Icon name="cash" size={26} className="shrink-0 text-black-99" />
               <div className="flex min-w-0 flex-col">
-                <p className="text-[17px] font-bold">Mínimo</p>
+                <p className="text-[18px]">Mínimo</p>
                 <p className="text-[15px] text-secondary-99">
                   O valor mínimo desta loja é {formatBRL(restaurant.minOrder)}.
                 </p>
@@ -279,7 +299,7 @@ export function StoreInfoModal({
               </ul>
             </div>
 
-            <div className="scroll-rail flex gap-2 overflow-x-auto pb-1">
+            <div className="flex flex-wrap gap-3">
               {filtros.map((f) => (
                 <button
                   key={f.id}
@@ -287,7 +307,7 @@ export function StoreInfoModal({
                   aria-pressed={filtro === f.id}
                   onClick={() => setFiltro(f.id)}
                   className={cx(
-                    "flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-3 text-[13px] font-semibold transition-colors duration-150",
+                    "flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-[15px] transition-colors duration-150",
                     filtro === f.id ? "bg-yellow-99 text-black-99" : "bg-offwhite-99 text-black-99 hover:bg-border-99",
                   )}
                 >
@@ -314,6 +334,7 @@ export function StoreInfoModal({
             </p>
           </div>
         )}
+      </div>
       </div>
     </Modal>
   );
