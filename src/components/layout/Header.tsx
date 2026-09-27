@@ -11,6 +11,7 @@ import { Icon } from "@/components/ui/Icon";
 import { bagCount, useApp } from "@/context/AppProvider";
 import { AddressPicker } from "@/components/comida/AddressPicker";
 import { useUserName } from "@/lib/useUserName";
+import { isStoreRoute } from "@/lib/routes";
 import { CountBubble } from "@/components/ui/CountBubble";
 import { cx } from "@/lib/cx";
 
@@ -75,7 +76,7 @@ export function Header() {
   const fullBleed = ["/corrida", "/entrega", "/pedido"].some((p) => pathname.startsWith(p));
 
   return (
-    <header className="bg-yellow-99 pb-6">
+    <header className={cx("bg-yellow-99 pb-6", isStoreRoute(pathname) && "max-md:hidden")}>
       <div
         className={cx(
           "flex h-[72px] items-center gap-3 px-4 md:gap-4 md:px-8",

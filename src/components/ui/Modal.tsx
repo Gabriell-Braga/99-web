@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { cx } from "@/lib/cx";
@@ -15,10 +15,17 @@ interface ModalProps {
   width?: "sm" | "md" | "lg";
   /** Em telas pequenas, sobe do rodapé como uma gaveta. */
   sheetOnMobile?: boolean;
+  /**
+   * Sem cabeçalho nem margens: o conteúdo desenha a tela toda. No celular ocupa a
+   * tela inteira, como as telas empilhadas do app. O título fica só para leitores de tela.
+   */
+  bare?: boolean;
 }
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const noop = () => () => {};
 
 const widths = { sm: "max-w-md", md: "max-w-[560px]", lg: "max-w-3xl" };
 
@@ -29,11 +36,15 @@ export function Modal({
   children,
   footer,
   width = "md",
+  bare,
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
   const reduce = useReducedMotion();
+  // Só no cliente, e só depois de hidratar: aberto já no primeiro render (link com
+  // ?item=), o portal no servidor não bateria com o do navegador.
+  const mounted = useSyncExternalStore(noop, () => true, () => false);
 
   useEffect(() => {
     if (!open) return;
@@ -83,13 +94,13 @@ export function Modal({
 
   // O modal vai para o body: dentro de um ancestral com transform, "fixed"
   // passa a se medir por ele, e a caixa aparecia recortada no lugar errado.
-  if (typeof document === "undefined") return null;
+  if (!mounted) return null;
 
   return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
+          className={cx("fixed inset-0 z-50 flex justify-center", bare ? "items-stretch md:items-center md:p-6" : "items-end sm:items-center sm:p-6")}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -113,11 +124,20 @@ export function Modal({
             exit={{ y: 8, opacity: 0 }}
             transition={transition}
             className={cx(
-              "relative flex max-h-[92dvh] w-full flex-col bg-white shadow-high focus:outline-none",
-              "rounded-t-[20px] sm:rounded-[20px]",
+              "relative flex w-full flex-col overflow-hidden bg-white shadow-high focus:outline-none",
+              bare ? "h-dvh md:h-auto md:max-h-[92dvh] md:rounded-[24px]" : "max-h-[92dvh] rounded-t-[20px] sm:rounded-[20px]",
               widths[width],
             )}
           >
+            {bare ? (
+              <>
+                <h2 id={titleId} className="sr-only">
+                  {title}
+                </h2>
+                {children}
+              </>
+            ) : (
+              <>
             <header className="flex items-center justify-between gap-4 border-b border-border-99 px-6 py-4">
               <h2 id={titleId} className="text-[22px] font-semibold leading-tight">
                 {title}
@@ -134,6 +154,8 @@ export function Modal({
             <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{children}</div>
             {footer && (
               <footer className="border-t border-border-99 px-6 py-4">{footer}</footer>
+            )}
+              </>
             )}
           </motion.div>
         </motion.div>

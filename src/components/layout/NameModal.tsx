@@ -59,7 +59,8 @@ export function NameModal() {
     if (value.trim()) saveUserName(value);
   }
 
-  if (typeof document === "undefined") return null;
+  // undefined = servidor ou hidratação: ainda não há o que mostrar.
+  if (name === undefined) return null;
 
   return createPortal(
     <AnimatePresence>

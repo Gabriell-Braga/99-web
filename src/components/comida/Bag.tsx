@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { bagCount, bagSubtotal, useApp } from "@/context/AppProvider";
 import { getRestaurant } from "@/data/restaurants";
 import { formatBRL } from "@/lib/format";
@@ -11,6 +11,8 @@ import { Stepper } from "@/components/ui/Stepper";
 import { EmptyState, BlockedHint } from "@/components/ui/States";
 import { Icon } from "@/components/ui/Icon";
 import { Modal } from "@/components/ui/Modal";
+import { isStoreRoute } from "@/lib/routes";
+import { cx } from "@/lib/cx";
 
 /** Conteúdo do carrinho: itens com stepper de círculos vazados, totais e "Continuar". */
 export function CartContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -153,13 +155,15 @@ export function CartColumn() {
 /** Abaixo de lg, botão fixo no rodapé com contador, abrindo o carrinho em folha. */
 export function CartFloating() {
   const { bag } = useApp();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const count = bagCount(bag);
   const subtotal = bagSubtotal(bag);
   if (count === 0) return null;
   return (
     <>
-      <div className="fixed inset-x-4 bottom-24 z-30 lg:hidden">
+      {/* Na loja a pílula de serviços sai no celular; o botão fica logo acima da faixa do mínimo. */}
+      <div className={cx("fixed inset-x-4 z-30 lg:hidden", isStoreRoute(pathname) ? "bottom-16 md:bottom-28" : "bottom-28")}>
         <Button full size="lg" onClick={() => setOpen(true)} className="shadow-high" aria-haspopup="dialog">
           <Icon name="cart" />
           <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-black-99 px-1.5 text-xs font-bold text-white">{count}</span>

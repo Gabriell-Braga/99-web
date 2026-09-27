@@ -9,7 +9,7 @@ interface StepperProps {
   label?: string;
   /** "square": quadrados no card de item. "circle": círculos vazados no carrinho. */
   variant?: "square" | "circle";
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
   removeAtMin?: boolean;
 }
 
@@ -24,13 +24,13 @@ export function Stepper({
   size = "md",
   removeAtMin,
 }: StepperProps) {
-  const dim = size === "sm" ? "h-8 w-8" : "h-10 w-10";
+  const dim = size === "sm" ? "h-8 w-8" : size === "lg" ? "h-12 w-12" : "h-10 w-10";
   const atMin = value <= min;
   const btn = cx(
     "flex items-center justify-center text-black-99 transition-colors disabled:text-disabled-99",
     dim,
     variant === "square"
-      ? "rounded-lg bg-offwhite-99 hover:bg-border-99 disabled:bg-offwhite-99"
+      ? cx(size === "lg" ? "rounded-2xl" : "rounded-lg", "bg-offwhite-99 hover:bg-border-99 disabled:bg-offwhite-99")
       : "rounded-full border border-border-99 bg-white hover:bg-subtle-99 disabled:bg-white",
   );
   return (
@@ -44,7 +44,7 @@ export function Stepper({
       >
         <Icon name={atMin && removeAtMin ? "trash" : "minus"} size={size === "sm" ? 16 : 18} />
       </button>
-      <span className={cx("min-w-5 text-center font-bold tabular-nums", size === "sm" ? "text-[15px]" : "text-[17px]")} aria-live="polite">
+      <span className={cx("min-w-5 text-center font-bold tabular-nums", size === "sm" ? "text-[15px]" : size === "lg" ? "text-[20px]" : "text-[17px]")} aria-live="polite">
         {value}
       </span>
       <button type="button" onClick={() => onChange(value + 1)} disabled={value >= max} aria-label="Aumentar" className={btn}>

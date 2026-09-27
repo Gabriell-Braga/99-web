@@ -25,6 +25,7 @@ import ErrorIcon from "@material-symbols/svg-600/rounded/error.svg";
 import ErrorFill from "@material-symbols/svg-600/rounded/error-fill.svg";
 import HandshakeFill from "@material-symbols/svg-600/rounded/handshake-fill.svg";
 import Home from "@material-symbols/svg-600/rounded/home.svg";
+import Favorite from "@material-symbols/svg-600/rounded/favorite.svg";
 import Info from "@material-symbols/svg-600/rounded/info.svg";
 import KeyboardArrowDown from "@material-symbols/svg-600/rounded/keyboard_arrow_down.svg";
 import LocalFireDepartmentFill from "@material-symbols/svg-600/rounded/local_fire_department-fill.svg";
@@ -43,6 +44,8 @@ import Remove from "@material-symbols/svg-600/rounded/remove.svg";
 import Restaurant from "@material-symbols/svg-600/rounded/restaurant.svg";
 import Schedule from "@material-symbols/svg-600/rounded/schedule.svg";
 import Search from "@material-symbols/svg-600/rounded/search.svg";
+import Share from "@material-symbols/svg-600/rounded/share.svg";
+import Call from "@material-symbols/svg-600/rounded/call.svg";
 import PercentDiscount from "@material-symbols/svg-600/rounded/percent_discount.svg";
 import PercentDiscountFill from "@material-symbols/svg-600/rounded/percent_discount-fill.svg";
 
@@ -88,6 +91,7 @@ const icons = {
   couponFill: PercentDiscountFill,
   flameFill: LocalFireDepartmentFill,
   handshakeFill: HandshakeFill,
+  heart: Favorite,
   home: Home,
   info: Info,
   minus: Remove,
@@ -98,6 +102,8 @@ const icons = {
   receipt: AssignmentRound,
   refresh: Refresh,
   search: Search,
+  share: Share,
+  phone: Call,
   skipForward: SkipNext,
   starFill: StarFill,
   swap: SwapVert,
