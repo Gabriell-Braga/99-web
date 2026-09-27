@@ -93,16 +93,18 @@ export function FoodListing() {
       <div className="relative -mt-8 rounded-t-[24px] bg-white">
         {/* Aba branca que sai da folha, recuada até a coluna da página. As duas
             pontas ligam na folha por uma curva côncava, como no app. */}
-        <Container className="pointer-events-none absolute inset-x-0 top-0 -translate-y-full overflow-hidden">
-          <div className="pointer-events-auto relative w-fit max-w-full rounded-t-3xl bg-white py-2 pl-4 pr-1">
+        {/* No celular a curva é menor e fica dentro da coluna; desce 2px sobre a folha
+            para cobrir o começo do raio dela. */}
+        <Container className="pointer-events-none absolute inset-x-0 top-0.5 -translate-y-full overflow-hidden pb-0.5 md:top-0 md:pb-0">
+          <div className="pointer-events-auto relative ml-3 w-fit max-w-[calc(100%-1.5rem)] rounded-t-3xl bg-white py-1.5 pl-1 pr-0 md:ml-0 md:max-w-full md:py-2 md:pl-4 md:pr-1">
             <FilterChips />
             <span
               aria-hidden="true"
-              className="absolute bottom-0 right-full h-10 w-10 bg-white [mask-image:radial-gradient(circle_40px_at_0_0,transparent_98%,#000_100%)]"
+              className="absolute -bottom-0.5 right-full h-3.5 w-3 bg-white [mask-image:radial-gradient(circle_12px_at_0_0,transparent_98%,#000_100%)] md:bottom-0 md:h-10 md:w-10 md:[mask-image:radial-gradient(circle_40px_at_0_0,transparent_98%,#000_100%)]"
             />
             <span
               aria-hidden="true"
-              className="absolute bottom-0 left-full h-10 w-10 bg-white [mask-image:radial-gradient(circle_40px_at_100%_0,transparent_98%,#000_100%)]"
+              className="absolute -bottom-0.5 left-full h-3.5 w-3 bg-white [mask-image:radial-gradient(circle_12px_at_100%_0,transparent_98%,#000_100%)] md:bottom-0 md:h-10 md:w-10 md:[mask-image:radial-gradient(circle_40px_at_100%_0,transparent_98%,#000_100%)]"
             />
           </div>
         </Container>

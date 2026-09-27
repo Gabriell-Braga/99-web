@@ -18,9 +18,9 @@ export function FilterChips() {
 
   return (
     <>
-      <div className="scroll-rail flex items-center gap-2 overflow-x-auto">
-        <span className="flex h-11 shrink-0 items-center gap-2 rounded-full px-4 text-[15px] font-semibold text-black-99">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-99 text-black-99" aria-hidden="true">
+      <div className="scroll-rail flex items-center overflow-x-auto md:gap-2">
+        <span className="flex h-10 shrink-0 items-center gap-1.5 rounded-full px-1.5 text-[14px] md:h-11 md:gap-2 md:px-4 md:text-[15px] font-semibold text-black-99">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-yellow-99 text-black-99 md:h-8 md:w-8" aria-hidden="true">
             <Icon name="moto" size={22} />
           </span>
           Entrega grátis
@@ -30,9 +30,9 @@ export function FilterChips() {
           type="button"
           onClick={() => setAberto(true)}
           aria-haspopup="dialog"
-          className="flex h-11 shrink-0 items-center gap-2 rounded-full px-4 text-[15px] font-semibold text-black-99 transition-colors duration-150 hover:bg-offwhite-99"
+          className="flex h-10 shrink-0 items-center gap-1.5 rounded-full px-1.5 text-[14px] md:h-11 md:gap-2 md:px-4 md:text-[15px] font-semibold text-black-99 transition-colors duration-150 hover:bg-offwhite-99"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-99 text-black-99" aria-hidden="true">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-yellow-99 text-black-99 md:h-8 md:w-8" aria-hidden="true">
             <Icon name="boltFill" size={18} />
           </span>
           No Horário
