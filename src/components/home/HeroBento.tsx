@@ -25,7 +25,7 @@ const blocos: Bloco[] = [
     titulo: "Corrida",
     texto: "Pop, Moto, Negocia e Táxi com o preço lado a lado.",
     imagem: "/vehicles/car-white.png",
-    bloco: "row-span-2 bg-yellow-99 rounded-[28px] rounded-tl-[88px]",
+    bloco: "row-span-2 bg-yellow-99 rounded-[28px] rounded-tr-[88px]",
     img: "absolute -bottom-3 left-1/2 w-[84%] max-w-[256px] -translate-x-1/2 sm:-bottom-4",
   },
   {
@@ -34,7 +34,7 @@ const blocos: Bloco[] = [
     texto: "Almoço, lanche e mercado.",
     imagem: "/food-cut/burger.webp",
     bloco: "bg-black-99 text-white rounded-[28px]",
-    img: "absolute -bottom-6 -right-5 w-[62%] max-w-[210px]",
+    img: "absolute bottom-3 right-4 w-[50%] max-w-[180px]",
     escuro: true,
   },
   {
@@ -42,8 +42,8 @@ const blocos: Bloco[] = [
     titulo: "Entrega",
     texto: "Pacote na moto ou no carro.",
     imagem: "/vehicles/moto-box.png",
-    bloco: "bg-orange-99-bg rounded-[28px] rounded-br-[88px]",
-    img: "absolute -bottom-3 -right-2 w-[52%] max-w-[170px]",
+    bloco: "bg-orange-99-bg rounded-[28px] rounded-bl-[88px]",
+    img: "absolute bottom-2 right-4 w-[48%] max-w-[170px]",
   },
 ];
 
