@@ -32,7 +32,7 @@ export function ServiceCards({ items }: { items: Servico[] }) {
         >
           <Link
             href={s.href}
-            className="group flex h-full flex-col gap-3 rounded-2xl bg-white p-6 transition-[translate,box-shadow,background-color] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] hover:-translate-y-1 hover:shadow-high motion-reduce:hover:translate-y-0"
+            className="group flex h-full flex-col gap-3 rounded-3xl bg-white p-6 transition-[translate,box-shadow,background-color] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] hover:-translate-y-1 hover:shadow-high motion-reduce:hover:translate-y-0"
           >
             <span
               className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-99 text-black-99 transition-[scale] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-110 motion-reduce:group-hover:scale-100"
@@ -40,8 +40,8 @@ export function ServiceCards({ items }: { items: Servico[] }) {
             >
               <Icon name={s.icon} size={24} />
             </span>
-            <span className="text-[20px] font-bold">{s.title}</span>
-            <span className="text-[15px] text-secondary-99">{s.description}</span>
+            <span className="text-[22px] font-bold">{s.title}</span>
+            <span className="text-[16px] leading-snug text-black-99/70">{s.description}</span>
             <span className="mt-auto inline-flex items-center gap-2 pt-3 text-[15px] font-bold text-black-99">
               {s.cta}
               <Icon

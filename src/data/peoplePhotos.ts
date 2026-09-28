@@ -13,13 +13,6 @@ export interface PhotoCredit {
  */
 export const peopleCredits: PhotoCredit[] = [
   {
-    id: "corrida",
-    label: "Táxi na rua",
-    autor: "Rawpixel",
-    licenca: "CC0 1.0",
-    fonte: "https://www.rawpixel.com/image/2280893/free-photo-image-taxi-cab-car",
-  },
-  {
     id: "mesa",
     label: "Refeição na mesa",
     autor: "Rawpixel",
