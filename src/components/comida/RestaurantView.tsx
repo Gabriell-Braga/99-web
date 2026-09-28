@@ -11,6 +11,7 @@ import { getRestaurant } from "@/data/restaurants";
 import { FoodShell } from "@/components/comida/FoodShell";
 import { FoodArt } from "@/components/comida/FoodArt";
 import { StoreLogo } from "@/components/comida/StoreLogo";
+import { StoreCover } from "@/components/comida/StoreCover";
 import { StoreInfoModal, type Aba } from "@/components/comida/StoreInfoModal";
 import { menuVariantIndex } from "@/data/foodPhotos";
 import { ItemModal } from "@/components/comida/ItemModal";
@@ -83,7 +84,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
       {/* Capa da loja. No celular ocupa a largura toda e a folha branca sobe por
           cima com raio de 24px; no desktop fica arredondada dentro da coluna. */}
       <div className="relative -mx-4 h-[200px] md:mx-0 md:h-[240px] md:overflow-hidden md:rounded-3xl">
-        <FoodArt kind={restaurant.art} seed={`${restaurant.slug}-capa`} tint={restaurant.tint} eager className="absolute inset-0" />
+        <StoreCover r={restaurant} className="absolute inset-0" />
         <div className="absolute inset-x-4 top-4 flex items-center justify-between md:inset-x-6 md:top-6">
           <Link href="/comida" aria-label="Voltar para o Food" className={coverButton}>
             <Icon name="chevronLeft" size={28} />

@@ -20,7 +20,7 @@ export const foodPhotos: Record<ArtKind, string[]> = {
   pasta: ["/food/pasta.webp", "/food/pasta-2.webp", "/food/pasta-3.webp"],
   chinesa: ["/food/chinesa.webp"],
   sorvete: ["/food/sorvete.webp"],
-  padaria: ["/food/padaria.webp", "/food/padaria-2.webp"],
+  padaria: ["/food/padaria-2.webp"],
   carne: ["/food/carne.webp"],
   arabe: ["/food/arabe.webp"],
 };
@@ -85,7 +85,6 @@ export const photoCredits: PhotoCredit[] = [
   { id: "chicken-2", label: "Frango 2", autor: "HaJunkiyada", licenca: "CC BY-SA 4.0", fonte: "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Grilled_chicken_with_rice%2C_potatoes_and_vegetables.jpg" },
   { id: "pasta-2", label: "Massa 2", autor: "JIP", licenca: "CC BY-SA 4.0", fonte: "https://commons.wikimedia.org/wiki/File:Pasta_bolognese_at_restaurant_Vltava.jpg" },
   { id: "drink-2", label: "Bebida 2", autor: "public domain", licenca: "CC0", fonte: "https://commons.wikimedia.org/wiki/File:Pineapple_Juice_fruits-465832.jpg" },
-  { id: "padaria", label: "Padaria", autor: "autor não informado", licenca: "CC BY 2.0", fonte: "https://commons.wikimedia.org/wiki/File:Acme_bread.jpg" },
   { id: "dessert-2", label: "Doces 2", autor: "Daria YakovlevaMinor edits made by Subsidiary acco", licenca: "CC0", fonte: "https://commons.wikimedia.org/wiki/File:Piece_of_chocolate_cake_on_a_white_plate_decorated_with_chocolate_sauce.jpg" },
   { id: "acai-2", label: "Açaí 2", autor: "ella.o", licenca: "BY 2.0", fonte: "https://www.flickr.com/photos/155807330@N05/30276166867" },
   { id: "sushi-2", label: "Japonesa 2", autor: "avlxyz", licenca: "BY-SA 2.0", fonte: "https://www.flickr.com/photos/10559879@N00/4734585503" },
@@ -96,5 +95,5 @@ export const photoCredits: PhotoCredit[] = [
   { id: "pizza-3", label: "Pizza 3", autor: "PattayaPatrol", licenca: "CC BY-SA 4.0", fonte: "https://commons.wikimedia.org/wiki/File:DZ6_0560_Wood-fired_pizza_topped_with_ham_peppers_and_melted_cheese_ready_to_slice_and_serve.jpg" },
   { id: "dessert-3", label: "Doces 3", autor: "Pilauricey (talk)", licenca: "CC BY-SA 3.0", fonte: "https://commons.wikimedia.org/wiki/File:Carnegie_Deli_Strawberry_Cheesecake.jpg" },
   { id: "chicken-3", label: "Frango 3", autor: "Jameswasswa", licenca: "CC BY-SA 4.0", fonte: "https://commons.wikimedia.org/wiki/File:Whole_spiced_chicken_(roasted).jpg" },
-  { id: "padaria-2", label: "Padaria 2", autor: "Shixart1985", licenca: "CC BY 2.0", fonte: "https://commons.wikimedia.org/wiki/File:Coffee%2C_croissants%2C_and_jam_on_a_plate_with_cookies_on_a_table_during_breakfast_time_in_a_cozy_setting.jpg" },
+  { id: "padaria-2", label: "Padaria", autor: "Shixart1985", licenca: "CC BY 2.0", fonte: "https://commons.wikimedia.org/wiki/File:Coffee%2C_croissants%2C_and_jam_on_a_plate_with_cookies_on_a_table_during_breakfast_time_in_a_cozy_setting.jpg" },
 ];

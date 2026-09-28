@@ -6,6 +6,7 @@ import type { Restaurant } from "@/lib/types";
 import { formatBRL } from "@/lib/format";
 import { FoodArt } from "@/components/comida/FoodArt";
 import { StoreLogo } from "@/components/comida/StoreLogo";
+import { storeCover } from "@/data/storeCovers";
 import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/States";
 import { cx } from "@/lib/cx";
@@ -37,7 +38,7 @@ export function StoreCard({ r }: { r: Restaurant }) {
     <div className="relative flex gap-4 py-3">
       <Link href={`/comida/${r.slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={r.name} />
       <span className={cx("relative h-[84px] w-[112px] shrink-0 min-[400px]:h-[96px] min-[400px]:w-[128px]", !r.open && "grayscale")}>
-        <FoodArt kind={r.art} seed={`${r.slug}-capa`} tint={r.tint} className="h-full w-full rounded-2xl" />
+        <FoodArt kind={r.art} src={storeCover(r)} tint={r.tint} className="h-full w-full rounded-2xl" />
         <StoreLogo r={r} className="absolute left-1.5 top-1.5 h-9 w-9 rounded-[10px] ring-2 ring-white" />
       </span>
       <div className="min-w-0 flex-1">

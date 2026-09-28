@@ -183,7 +183,23 @@ export function DeliveryView() {
       <MapPanelLayout
         map={map}
         onBack={() => setPaying(false)}
-        panel={<PaymentFlow method={payment} amount={fare} orderRef={orderId} noun="entrega" onConfirmed={confirm} onCancel={() => setPaying(false)} />}
+        panel={
+          <PaymentFlow
+            method={payment}
+            amount={fare}
+            orderRef={orderId}
+            noun="entrega"
+            onConfirmed={confirm}
+            onCancel={() => setPaying(false)}
+            summary={{
+              origem: pointLabel(pickup),
+              destino: pointLabel(dropoff),
+              categoria: size === "moto" ? "Entrega Moto" : "Entrega Carro",
+              detalhe: `${formatKm(km)} · chega em ${eta.min}–${eta.max} min`,
+              imagem: size === "moto" ? "/vehicles/moto-box.png" : "/vehicles/car-box.png",
+            }}
+          />
+        }
       />
     );
   }

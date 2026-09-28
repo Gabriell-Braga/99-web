@@ -135,3 +135,9 @@ export function StoreLogo({ r, className }: { r: Pick<Restaurant, "slug" | "name
     </div>
   );
 }
+
+/** Cor de fundo da marca, para a capa da loja. Logo branca cai no tom da loja, senão a capa some no branco da página. */
+export function storeBrandColor(r: Pick<Restaurant, "slug" | "tint">): string {
+  const bg = logos[r.slug]?.bg;
+  return !bg || bg.toUpperCase() === "#FFFFFF" ? r.tint : bg;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import Link from "next/link";
 import { restaurants } from "@/data/restaurants";
 import { foodCategories } from "@/data/categories";
@@ -11,11 +11,12 @@ import { FoodShell } from "@/components/comida/FoodShell";
 import { PromoRail } from "@/components/comida/PromoRail";
 import { FilterChips } from "@/components/comida/FilterChips";
 import { CategoryRail } from "@/components/comida/CategoryRail";
-import { StoreCard, StoreCardSkeleton } from "@/components/comida/RestaurantCard";
+import { StoreCard } from "@/components/comida/RestaurantCard";
 import { UauSection, type Offer } from "@/components/comida/OfferCard";
 import { StoreFilters, type StoreFilterState } from "@/components/comida/StoreFilters";
 import { FoodArt } from "@/components/comida/FoodArt";
 import { StoreLogo } from "@/components/comida/StoreLogo";
+import { storeCover } from "@/data/storeCovers";
 import { cx } from "@/lib/cx";
 import { AddressPicker } from "@/components/comida/AddressPicker";
 import { Icon } from "@/components/ui/Icon";
@@ -50,14 +51,7 @@ export function FoodListing() {
   const { address } = useApp();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<FoodCategoryId | null>(null);
-  const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const loading = loadedFor !== address.id;
-
-  useEffect(() => {
-    const t = setTimeout(() => setLoadedFor(address.id), 700);
-    return () => clearTimeout(t);
-  }, [address.id]);
 
   const [filters, setFilters] = useState<StoreFilterState>({ sort: "relevancia", freeDelivery: false, vr: false });
   const filtering = Boolean(query.trim() || category || filters.freeDelivery || filters.vr || filters.sort !== "relevancia");
@@ -147,7 +141,7 @@ export function FoodListing() {
           <div className="flex flex-col gap-7">
             <CategoryRail value={category} onChange={setCategory} />
 
-            {address.covered && !filtering && !loading && (
+            {address.covered && !filtering && (
               <>
                 <UauSection offers={offers} />
 
@@ -160,7 +154,7 @@ export function FoodListing() {
                       <li key={r.slug} className="w-[150px] shrink-0 snap-start min-[400px]:w-[164px]">
                         <Link href={`/comida/${r.slug}`} className="block">
                           <span className="relative block">
-                            <FoodArt kind={r.art} seed={`${r.slug}-capa`} tint={r.tint} className={cx("h-[104px] w-full rounded-2xl", !r.open && "grayscale")} />
+                            <FoodArt kind={r.art} src={storeCover(r)} tint={r.tint} className={cx("h-[104px] w-full rounded-2xl", !r.open && "grayscale")} />
                             <StoreLogo r={r} className="absolute left-2 top-2 h-10 w-10 rounded-xl ring-2 ring-white" />
                           </span>
                           <span className="mt-2 block truncate text-[17px] font-semibold">{r.name}</span>
@@ -191,13 +185,7 @@ export function FoodListing() {
                   Lojas
                 </h2>
                 <StoreFilters value={filters} onChange={setFilters} />
-                {loading ? (
-                  <div className="grid grid-cols-1 gap-x-8 md:grid-cols-2" aria-busy="true" aria-label="Carregando lojas">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <StoreCardSkeleton key={i} />
-                    ))}
-                  </div>
-                ) : list.length === 0 ? (
+                {list.length === 0 ? (
                   <EmptyState
                     icon="search"
                     title="Nenhuma loja encontrada"

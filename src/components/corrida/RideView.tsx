@@ -15,7 +15,7 @@ import { ActionBar, PaymentBlock } from "@/components/layout/ActionBar";
 import { MapView } from "@/components/map/MapView";
 import { AddressSearch } from "@/components/map/AddressSearch";
 import { RoutePair } from "@/components/map/RoutePair";
-import { VehicleArt } from "@/components/ui/VehicleArt";
+import { VehicleArt, vehicleImage } from "@/components/ui/VehicleArt";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Textarea } from "@/components/ui/Field";
@@ -151,7 +151,23 @@ export function RideView() {
       <MapPanelLayout
         map={map}
         onBack={() => setPhase("form")}
-        panel={<PaymentFlow method={payment} amount={fare} orderRef={orderId} noun="corrida" onConfirmed={confirm} onCancel={() => setPhase("form")} />}
+        panel={
+          <PaymentFlow
+            method={payment}
+            amount={fare}
+            orderRef={orderId}
+            noun="corrida"
+            onConfirmed={confirm}
+            onCancel={() => setPhase("form")}
+            summary={{
+              origem: origin?.title ?? "Localização atual",
+              destino: destination?.title ?? "",
+              categoria: selected.name,
+              detalhe: `${formatKm(km)} · ${duration} min`,
+              imagem: vehicleImage[selected.id],
+            }}
+          />
+        }
       />
     );
   }

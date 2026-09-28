@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { bagCount, bagSubtotal, useApp } from "@/context/AppProvider";
-import { getRestaurant } from "@/data/restaurants";
+import { getRestaurant, restaurants } from "@/data/restaurants";
+import { coupons } from "@/lib/pricing";
+import { StoreLogo } from "@/components/comida/StoreLogo";
 import { formatBRL } from "@/lib/format";
 import { Button, LinkButton } from "@/components/ui/Button";
 import { Stepper } from "@/components/ui/Stepper";
-import { EmptyState, BlockedHint } from "@/components/ui/States";
+import { BlockedHint } from "@/components/ui/States";
 import { Icon } from "@/components/ui/Icon";
 import { Modal } from "@/components/ui/Modal";
 import { isStoreRoute } from "@/lib/routes";
@@ -33,17 +36,7 @@ export function CartContent({ onNavigate }: { onNavigate?: () => void }) {
 
   if (bag.lines.length === 0 || !restaurant) {
     return (
-      <EmptyState
-        icon="cart"
-        title="Seu carrinho está vazio"
-        description="Escolha uma loja e adicione itens. Eles ficam aqui enquanto você navega."
-        action={
-          <LinkButton href="/comida" variant="ghost" size="sm">
-            Ver lojas
-          </LinkButton>
-        }
-        compact
-      />
+      <EmptyCart onNavigate={onNavigate} />
     );
   }
 
@@ -308,5 +301,86 @@ function CartScreen({ onClose }: { onClose: () => void }) {
         </Button>
       </div>
     </>
+  );
+}
+
+/** Lojas abertas mais bem avaliadas, para o carrinho vazio não ficar em branco. */
+const populares = restaurants
+  .filter((r) => r.open)
+  .sort((a, b) => b.rating - a.rating || b.ratingCount - a.ratingCount)
+  .slice(0, 3);
+
+/**
+ * Carrinho vazio: em vez da coluna em branco, os cupons do protótipo para
+ * copiar e as lojas mais bem avaliadas.
+ */
+function EmptyCart({ onNavigate }: { onNavigate?: () => void }) {
+  const [copiado, setCopiado] = useState<string | null>(null);
+
+  function copiar(codigo: string) {
+    navigator.clipboard?.writeText(codigo).catch(() => {});
+    setCopiado(codigo);
+    setTimeout(() => setCopiado((c) => (c === codigo ? null : c)), 1600);
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-3 rounded-2xl bg-offwhite-99 p-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-secondary-99" aria-hidden="true">
+          <Icon name="cart" size={20} />
+        </span>
+        <p className="text-[14px] leading-snug text-secondary-99">
+          <span className="block text-[15px] font-bold text-black-99">Seu carrinho está vazio</span>
+          Os itens ficam aqui enquanto você navega.
+        </p>
+      </div>
+
+      <section aria-labelledby="cupons-title" className="flex flex-col gap-2">
+        <h3 id="cupons-title" className="text-[15px] font-bold">
+          Cupons para você
+        </h3>
+        {Object.entries(coupons).map(([codigo, c]) => (
+          <div key={codigo} className="flex items-center gap-3 rounded-2xl border border-dashed border-green-99/40 bg-green-99-tint px-3 py-2.5">
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-bold tracking-wide text-green-99-ink">{codigo}</span>
+              <span className="block text-[13px] text-green-99-ink/80">{c.label}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => copiar(codigo)}
+              className="shrink-0 rounded-lg bg-white px-3 py-1.5 text-[13px] font-bold text-green-99-ink transition-colors hover:bg-offwhite-99"
+            >
+              {copiado === codigo ? "Copiado" : "Copiar"}
+            </button>
+          </div>
+        ))}
+      </section>
+
+      <section aria-labelledby="populares-title" className="flex flex-col gap-1">
+        <h3 id="populares-title" className="text-[15px] font-bold">
+          Bem avaliadas agora
+        </h3>
+        <ul role="list">
+          {populares.map((r) => (
+            <li key={r.slug}>
+              <Link
+                href={`/comida/${r.slug}`}
+                onClick={onNavigate}
+                className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-offwhite-99"
+              >
+                <StoreLogo r={r} className="h-10 w-10 shrink-0 rounded-xl ring-1 ring-border-99" />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] font-bold">{r.name}</span>
+                  <span className="block text-[13px] text-secondary-99">
+                    {r.rating.toFixed(1).replace(".", ",")} · {r.etaMin}-{r.etaMax} min
+                  </span>
+                </span>
+                <Icon name="chevronRight" size={18} className="shrink-0 text-secondary-99" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 }
