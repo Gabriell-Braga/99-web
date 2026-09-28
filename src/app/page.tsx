@@ -222,7 +222,7 @@ export default function HomePage() {
         <h2 className="max-w-2xl text-[32px] font-bold leading-[1.1] md:text-[44px]">
           Por que pedir pelo <Grifo>computador</Grifo>
         </h2>
-        <ul className="mt-10 grid gap-4 lg:mt-14 lg:grid-cols-3" role="list">
+        <ul className="mt-10 grid grid-cols-1 gap-4 lg:mt-14 lg:grid-cols-3" role="list">
           {vantagens.map((v) => {
             const texto = (
               <div className="flex flex-col gap-2">
@@ -236,19 +236,19 @@ export default function HomePage() {
                 <li
                   key={v.service}
                   className={cx(
-                    "grid items-center gap-8 rounded-[28px] p-6 sm:grid-cols-2 sm:p-8 lg:col-span-2 lg:p-10",
-                    v.arte === "precos" ? "rounded-tl-[96px] bg-yellow-99" : "rounded-br-[96px] bg-orange-99-bg",
+                    "grid min-w-0 items-center gap-8 rounded-[24px] p-5 sm:grid-cols-2 sm:rounded-[28px] sm:p-8 lg:col-span-2 lg:p-10",
+                    v.arte === "precos" ? "rounded-tl-[56px] bg-yellow-99 sm:rounded-tl-[96px]" : "rounded-br-[56px] bg-orange-99-bg sm:rounded-br-[96px]",
                   )}
                 >
-                  <div className={cx("flex justify-center", v.arte === "entrega" && "sm:order-first")}>
+                  <div className={cx("flex min-w-0 justify-center", v.arte === "entrega" && "sm:order-first")}>
                     {v.arte === "precos" ? <PrecosLadoALado /> : <ResumoEntrega />}
                   </div>
-                  <div className={cx(v.arte === "precos" && "sm:order-first")}>{texto}</div>
+                  <div className={cx("min-w-0", v.arte === "precos" && "sm:order-first")}>{texto}</div>
                 </li>
               );
             }
             return (
-              <li key={v.service} className="flex flex-col overflow-hidden rounded-[28px] bg-offwhite-99">
+              <li key={v.service} className="flex min-w-0 flex-col overflow-hidden rounded-[24px] bg-offwhite-99 sm:rounded-[28px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={v.imagem} alt="" className="h-[200px] w-full object-cover" loading="lazy" decoding="async" />
                 <div className="p-6 sm:p-8">{texto}</div>

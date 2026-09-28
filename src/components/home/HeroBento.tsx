@@ -25,7 +25,7 @@ const blocos: Bloco[] = [
     titulo: "Corrida",
     texto: "Pop, Moto, Negocia e Táxi com o preço lado a lado.",
     imagem: "/vehicles/car-white.png",
-    bloco: "row-span-2 bg-yellow-99 rounded-[28px] rounded-tr-[88px]",
+    bloco: "row-span-2 bg-yellow-99 rounded-[24px] rounded-tr-[56px] sm:rounded-[28px] sm:rounded-tr-[88px]",
     img: "absolute -bottom-3 left-1/2 w-[84%] max-w-[256px] -translate-x-1/2 sm:-bottom-4",
   },
   {
@@ -33,7 +33,7 @@ const blocos: Bloco[] = [
     titulo: "Food",
     texto: "Almoço, lanche e mercado.",
     imagem: "/food-cut/burger.webp",
-    bloco: "bg-black-99 text-white rounded-[28px]",
+    bloco: "bg-black-99 text-white rounded-[24px] sm:rounded-[28px]",
     img: "absolute bottom-3 right-4 w-[50%] max-w-[180px]",
     escuro: true,
   },
@@ -42,7 +42,7 @@ const blocos: Bloco[] = [
     titulo: "Entrega",
     texto: "Pacote na moto ou no carro.",
     imagem: "/vehicles/moto-box.png",
-    bloco: "bg-orange-99-bg rounded-[28px] rounded-bl-[88px]",
+    bloco: "bg-orange-99-bg rounded-[24px] rounded-bl-[56px] sm:rounded-[28px] sm:rounded-bl-[88px]",
     img: "absolute bottom-2 right-4 w-[48%] max-w-[170px]",
   },
 ];
@@ -72,23 +72,23 @@ export function HeroBento() {
           <Link
             href={b.href}
             className={cx(
-              "group relative flex h-full flex-col gap-1 overflow-hidden p-5 transition-[translate] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] hover:-translate-y-1 motion-reduce:hover:translate-y-0 sm:p-6",
+              "group relative flex h-full flex-col gap-1 overflow-hidden p-4 transition-[translate] duration-300 ease-[cubic-bezier(0.33,0,0.2,1)] hover:-translate-y-1 motion-reduce:hover:translate-y-0 sm:p-6",
               b.bloco,
             )}
           >
-            <span className="flex items-center gap-2 text-[22px] font-bold leading-tight sm:text-[26px]">
+            <span className="flex items-center gap-2 text-[19px] font-bold leading-tight min-[400px]:text-[22px] sm:text-[26px]">
               {b.titulo}
               <span
                 aria-hidden="true"
                 className={cx(
-                  "flex h-7 w-7 items-center justify-center rounded-full transition-[rotate] duration-300 group-hover:-rotate-45 motion-reduce:group-hover:rotate-0",
+                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-[rotate] sm:h-7 sm:w-7 duration-300 group-hover:-rotate-45 motion-reduce:group-hover:rotate-0",
                   b.escuro ? "bg-yellow-99 text-black-99" : "bg-black-99 text-white",
                 )}
               >
                 <Icon name="arrowRight" size={16} />
               </span>
             </span>
-            <span className={cx("max-w-[15rem] text-[15px] leading-snug", b.escuro ? "text-white/75" : "text-black-99/75")}>{b.texto}</span>
+            <span className={cx("max-w-[15rem] text-[14px] leading-snug sm:text-[15px]", b.escuro ? "text-white/75" : "text-black-99/75")}>{b.texto}</span>
             {i === 0 && <Trajeto />}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

@@ -141,9 +141,21 @@ export function RideView() {
         center={current.position}
         vehicle={selected.id}
         searching={phase === "searching"}
+        callouts={
+          phase === "form" && editing === null && origin && destination && route
+            ? {
+                origin: { lead: [`${selected.etaMin} min`], text: origin.title, onClick: () => setEditing("origin") },
+                destination: {
+                  lead: [formatKm(km), `${duration} min`],
+                  text: destination.title,
+                  onClick: () => setEditing("destination"),
+                },
+              }
+            : undefined
+        }
       />
     ),
-    [origin, destination, route, current.status, current.position, selected.id, phase],
+    [origin, destination, route, current.status, current.position, selected.id, selected.etaMin, phase, editing, km, duration],
   );
 
   if (phase === "paying") {
@@ -297,12 +309,16 @@ export function RideView() {
           ) : (
             <>
               <h1 className="sr-only">Corrida</h1>
-              <RoutePair
-                origin={origin && { title: origin.title }}
-                destination={destination && { title: destination.title }}
-                onEditOrigin={() => setEditing("origin")}
-                onEditDestination={() => setEditing("destination")}
-              />
+              {/* No celular a origem e o destino ficam nos balões do mapa, como no app,
+                  e a folha começa direto nas categorias. */}
+              <div className="hidden lg:block">
+                <RoutePair
+                  origin={origin && { title: origin.title }}
+                  destination={destination && { title: destination.title }}
+                  onEditOrigin={() => setEditing("origin")}
+                  onEditDestination={() => setEditing("destination")}
+                />
+              </div>
 
               {notCovered ? (
                 <ErrorNote

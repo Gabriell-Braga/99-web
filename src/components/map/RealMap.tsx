@@ -5,7 +5,7 @@ import * as maplibregl from "maplibre-gl";
 import type { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { haversineKm, pointAlong, type LatLng } from "@/lib/geo";
-import type { MapViewProps } from "@/components/map/MapView";
+import type { MapCallout, MapViewProps } from "@/components/map/MapView";
 import { vehicleImage } from "@/components/ui/VehicleArt";
 
 /** Estilo Positron servido pelo OpenFreeMap, sem chave. */
@@ -157,6 +157,40 @@ function roadSpots(map: MLMap, origin: LatLng): { at: LatLng; angle: number }[] 
 }
 
 
+/**
+ * Balão branco preso a uma ponta do trajeto: negrito à esquerda (tempo ou
+ * distância), endereço em até duas linhas e a seta. Montado com textContent,
+ * sem HTML vindo do endereço.
+ */
+function calloutEl(c: MapCallout, onClick: () => void): HTMLElement {
+  const el = document.createElement("button");
+  el.type = "button";
+  el.setAttribute("aria-label", `${c.lead.join(", ")}, ${c.text}. Alterar`);
+  el.style.cssText =
+    "display:flex;align-items:center;gap:10px;max-width:230px;padding:8px 6px 8px 12px;border:0;border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.16);font:inherit;color:#212121;text-align:left;cursor:pointer";
+  const lead = document.createElement("span");
+  lead.style.cssText = "display:flex;flex-direction:column;font-size:14px;font-weight:800;line-height:1.2;white-space:nowrap";
+  for (const l of c.lead) {
+    const s = document.createElement("span");
+    s.textContent = l;
+    lead.appendChild(s);
+  }
+  const text = document.createElement("span");
+  text.textContent = c.text;
+  text.style.cssText =
+    "min-width:0;font-size:13px;font-weight:500;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical";
+  el.append(lead, text);
+  el.insertAdjacentHTML(
+    "beforeend",
+    '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex-shrink:0;color:#9e9e9e"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  );
+  el.addEventListener("click", (e) => {
+    e.stopPropagation();
+    onClick();
+  });
+  return el;
+}
+
 function userDot(): HTMLElement {
   const el = document.createElement("span");
   el.style.cssText =
@@ -209,6 +243,7 @@ export default function RealMap({
   attribution = true,
   center,
   zoom = 14,
+  callouts,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -393,6 +428,53 @@ export default function RealMap({
     else pendingRef.current = apply;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, routeKey, searching, lookingAround, vehicle, userLocation?.lat, userLocation?.lng]);
+
+  // Balões de origem e destino. O clique lê o callback mais recente pela ref,
+  // então trocar só a função não recria os marcadores.
+  const calloutsRef = useRef<Marker[]>([]);
+  const calloutHandlers = useRef(callouts);
+  useEffect(() => {
+    calloutHandlers.current = callouts;
+  });
+  const calloutKey = callouts
+    ? `${callouts.origin?.lead.join("|")}:${callouts.origin?.text}:${callouts.destination?.lead.join("|")}:${callouts.destination?.text}`
+    : "";
+  useEffect(() => {
+    const apply = () => {
+      const map = mapRef.current;
+      if (!map) return;
+      calloutsRef.current.forEach((m) => m.remove());
+      calloutsRef.current = [];
+      if (!callouts || !origin || !destination) return;
+      const line = route && route.length > 1 ? route : [];
+      const a = line.length > 1 ? line[0] : origin;
+      const b = line.length > 1 ? line[line.length - 1] : destination;
+      // Cada balão abre na direção da outra ponta, então fica dentro do
+      // enquadramento; a origem desce e o destino sobe para não se cruzarem.
+      const originWest = a.lng <= b.lng;
+      const put = (c: MapCallout, p: LatLng, role: "origin" | "destination") => {
+        const isOrigin = role === "origin";
+        const east = isOrigin ? originWest : !originWest;
+        const anchor = isOrigin ? (east ? "top-left" : "top-right") : east ? "bottom-left" : "bottom-right";
+        const el = calloutEl(c, () => calloutHandlers.current?.[role]?.onClick?.());
+        const m = new maplibregl.Marker({ element: el, anchor, offset: [east ? -8 : 8, isOrigin ? 14 : -14] })
+          .setLngLat([p.lng, p.lat])
+          .addTo(map);
+        calloutsRef.current.push(m);
+      };
+      if (callouts.origin) put(callouts.origin, a, "origin");
+      if (callouts.destination) put(callouts.destination, b, "destination");
+    };
+    if (readyRef.current) apply();
+    else {
+      const prev = pendingRef.current;
+      pendingRef.current = () => {
+        prev?.();
+        apply();
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calloutKey, origin?.lat, origin?.lng, destination?.lat, destination?.lng, routeKey]);
 
   // Rota cinza enquanto confirma o destino; verde depois, com transição suave.
   useEffect(() => {

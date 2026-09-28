@@ -9,6 +9,15 @@ export interface MapPoint extends LatLng {
   label?: string;
 }
 
+/** Balão sobre uma ponta do trajeto, como no app: tempo ou distância em negrito, endereço e seta. */
+export interface MapCallout {
+  /** Linhas em negrito à esquerda: "7 min", ou "35,3 km" e "45 min". */
+  lead: string[];
+  text: string;
+  /** Tocar no balão abre a edição daquele ponto. */
+  onClick?: () => void;
+}
+
 export interface MapViewProps {
   origin?: MapPoint | null;
   destination?: MapPoint | null;
@@ -34,6 +43,8 @@ export interface MapViewProps {
   lookingAround?: boolean;
   /** Ponto azul da localização atual do usuário. */
   userLocation?: LatLng | null;
+  /** Balões de origem e destino sobre o mapa. */
+  callouts?: { origin?: MapCallout; destination?: MapCallout };
   interactive?: boolean;
   /** Crédito do mapa sobre o canvas. Desligado onde a página já credita no rodapé. */
   attribution?: boolean;
