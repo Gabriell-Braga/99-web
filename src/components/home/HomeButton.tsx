@@ -50,7 +50,7 @@ interface HomeButtonProps {
 export function HomeButton({ href, onClick, children, tom = "amarelo", className }: HomeButtonProps) {
   const t = tons[tom];
   const classe = cx(
-    "group relative isolate inline-flex h-14 items-center gap-3 overflow-hidden rounded-full pl-1.5 pr-6 text-[17px] font-bold",
+        "group relative isolate inline-flex h-14 items-center gap-3 overflow-hidden rounded-xl pl-1.5 pr-5 text-[17px] font-bold",
     t.base,
     className,
   );
@@ -60,7 +60,7 @@ export function HomeButton({ href, onClick, children, tom = "amarelo", className
       <span
         aria-hidden="true"
         className={cx(
-          "absolute left-1.5 top-1/2 -z-10 h-11 w-11 -translate-y-1/2 rounded-full transition-[scale] duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-[26] motion-reduce:transition-none motion-reduce:group-hover:scale-100",
+          "absolute left-1.5 top-1/2 -z-10 h-11 w-11 -translate-y-1/2 rounded-lg transition-[scale] duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)] group-hover:scale-[26] motion-reduce:transition-none motion-reduce:group-hover:scale-100",
           t.bolha,
         )}
       />
@@ -68,7 +68,7 @@ export function HomeButton({ href, onClick, children, tom = "amarelo", className
       <span
         aria-hidden="true"
         className={cx(
-          "flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)]",
+          "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors duration-[600ms] ease-[cubic-bezier(0.33,0,0.2,1)]",
           t.seta,
         )}
       >
