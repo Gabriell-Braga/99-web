@@ -33,17 +33,18 @@ const blocos: Bloco[] = [
     titulo: "Food",
     texto: "Almoço, lanche e mercado.",
     imagem: "/food-icons/lanches.webp",
-    bloco: "bg-black-99 text-white rounded-[24px] sm:rounded-[28px]",
+    // O prato do ícone é translúcido: em fundo escuro ele fica cinza, por isso o Food vai no claro.
+    bloco: "bg-orange-99-bg rounded-[24px] sm:rounded-[28px]",
     img: "absolute bottom-2 right-3 w-[50%] max-w-[180px]",
-    escuro: true,
   },
   {
     href: "/entrega",
     titulo: "Entrega",
     texto: "Pacote na moto ou no carro.",
     imagem: "/vehicles/moto-box.png",
-    bloco: "bg-orange-99-bg rounded-[24px] rounded-bl-[56px] sm:rounded-[28px] sm:rounded-bl-[88px]",
+    bloco: "bg-black-99 text-white rounded-[24px] rounded-bl-[56px] sm:rounded-[28px] sm:rounded-bl-[88px]",
     img: "absolute bottom-2 right-4 w-[48%] max-w-[170px]",
+    escuro: true,
   },
 ];
 
