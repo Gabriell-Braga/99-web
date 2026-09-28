@@ -239,6 +239,7 @@ function CartScreen({ onClose }: { onClose: () => void }) {
                 {it && (
                   <FoodArt
                     kind={it.art}
+                    src={it.photo}
                     seed={it.id}
                     index={menuVariantIndex(restaurant, it.id)}
                     tint={restaurant.tint}

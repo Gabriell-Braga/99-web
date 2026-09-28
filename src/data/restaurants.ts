@@ -107,6 +107,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "smash-duplo",
             name: "Smash duplo",
+            photo: "/food/burger.webp",
             promoPrice: 27.9,
             description:
               "Dois discos de 90 g, queijo prato, cebola na chapa e maionese da casa no pão brioche.",
@@ -118,6 +119,8 @@ export const restaurants: Restaurant[] = [
           {
             id: "classico",
             name: "Clássico da casa",
+            promoPrice: 25.9,
+            photo: "/food/burger-2.webp",
             description: "Blend 160 g, queijo cheddar, alface, tomate e picles.",
             price: 32.9,
             art: "burger",
@@ -222,6 +225,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "margherita",
             name: "Margherita",
+            photo: "/food/pizza.webp",
             promoPrice: 46.9,
             description: "Molho de tomate San Marzano, mozzarella de búfala e manjericão fresco.",
             price: 58,
@@ -232,6 +236,8 @@ export const restaurants: Restaurant[] = [
           {
             id: "calabresa",
             name: "Calabresa",
+            promoPrice: 49.9,
+            photo: "/food/pizza-2.webp",
             description: "Calabresa artesanal fatiada, cebola roxa e azeitonas pretas.",
             price: 62,
             art: "pizza",
@@ -431,6 +437,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "combo-20",
             name: "Combinado 20 peças",
+            photo: "/food/sushi.webp",
             promoPrice: 64.9,
             description: "8 sashimis de salmão, 6 niguiris, 6 uramakis.",
             price: 79.9,
@@ -563,6 +570,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "galeto-inteiro",
             name: "Galeto inteiro",
+            photo: "/food/chicken-3.webp",
             promoPrice: 54.9,
             description: "Serve 2 pessoas. Acompanha polenta frita e maionese.",
             price: 64.9,
@@ -1264,6 +1272,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "carbonara-bm",
             name: "Spaghetti alla carbonara",
+            photo: "/food/pasta.webp",
             promoPrice: 52.9,
             description: "Guanciale, gema, pecorino e pimenta-do-reino.",
             price: 63.9,
@@ -1828,6 +1837,7 @@ export const restaurants: Restaurant[] = [
           {
             id: "picanha-brasa",
             name: "Picanha na brasa 400 g",
+            photo: "/food/carne.webp",
             promoPrice: 118.9,
             description: "Com farofa, vinagrete e arroz. Serve duas pessoas.",
             price: 139.9,

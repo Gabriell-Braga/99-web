@@ -160,7 +160,7 @@ function ItemBody({
       <div className="min-h-0 flex-1 overflow-y-auto">
         {/* Foto de ponta a ponta; a folha branca sobe por cima com raio de 24px. */}
         <div className="relative h-[300px] md:h-[280px]">
-          <FoodArt kind={item.art} seed={item.id} index={menuVariantIndex(restaurant, item.id)} tint={restaurant.tint} eager className="absolute inset-0" />
+          <FoodArt kind={item.art} src={item.photo} seed={item.id} index={menuVariantIndex(restaurant, item.id)} tint={restaurant.tint} eager className="absolute inset-0" />
           <div className="absolute inset-x-4 top-4 flex justify-between">
             <button type="button" onClick={onClose} aria-label="Fechar" className={photoButton}>
               <Icon name="x" size={26} />

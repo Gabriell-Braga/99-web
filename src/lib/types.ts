@@ -82,6 +82,8 @@ export interface MenuItem {
   /** Preço promocional em verde; o cheio aparece riscado. */
   promoPrice?: number;
   art: ArtKind;
+  /** Foto fixa do prato, quando a variante automática da categoria não combina com ele. */
+  photo?: string;
   available: boolean;
   options?: OptionGroup[];
 }

@@ -10,6 +10,7 @@ import { bagSubtotal, useApp } from "@/context/AppProvider";
 import { getRestaurant } from "@/data/restaurants";
 import { FoodShell } from "@/components/comida/FoodShell";
 import { FoodArt } from "@/components/comida/FoodArt";
+import { StoreLogo } from "@/components/comida/StoreLogo";
 import { StoreInfoModal, type Aba } from "@/components/comida/StoreInfoModal";
 import { menuVariantIndex } from "@/data/foodPhotos";
 import { ItemModal } from "@/components/comida/ItemModal";
@@ -109,7 +110,7 @@ export function RestaurantView({ restaurant }: { restaurant: Restaurant }) {
 
       <header className="relative -mx-4 -mt-6 rounded-t-[24px] bg-white px-4 pt-6 md:mx-0 md:mt-6 md:rounded-none md:px-0 md:pt-0">
         <div className="flex items-center gap-4">
-          <FoodArt kind={restaurant.art} seed={restaurant.slug} tint={restaurant.tint} className="h-16 w-16 shrink-0 rounded-2xl" />
+          <StoreLogo r={restaurant} className="h-16 w-16 shrink-0 rounded-2xl ring-1 ring-border-99" />
           <div className="flex min-w-0 flex-col gap-1">
             <button
               type="button"
@@ -371,7 +372,7 @@ function ItemPhoto({
 }) {
   return (
     <span className={cx("relative block shrink-0", className)}>
-      <FoodArt kind={item.art} seed={item.id} index={menuVariantIndex(restaurant, item.id)} tint={restaurant.tint} className="h-full w-full rounded-2xl" />
+      <FoodArt kind={item.art} src={item.photo} seed={item.id} index={menuVariantIndex(restaurant, item.id)} tint={restaurant.tint} className="h-full w-full rounded-2xl" />
       {add && (
         <span
           aria-hidden="true"

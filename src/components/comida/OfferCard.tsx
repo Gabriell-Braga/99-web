@@ -49,7 +49,7 @@ function UauCard({ offer, eager }: { offer: Offer; eager?: boolean }) {
   return (
     <Link href={`/comida/${r.slug}?item=${item.id}`} className="block w-[136px] shrink-0 snap-start min-[400px]:w-[150px] lg:w-[172px]">
       <span className="relative block aspect-square">
-        <FoodArt kind={item.art} seed={item.id} index={menuVariantIndex(r, item.id)} tint={r.tint} eager={eager} className="h-full w-full rounded-2xl" />
+        <FoodArt kind={item.art} src={item.photo} seed={item.id} index={menuVariantIndex(r, item.id)} tint={r.tint} eager={eager} className="h-full w-full rounded-2xl" />
         <span className="absolute bottom-2 left-2 rounded-lg bg-[#1FAE5B] px-1.5 py-0.5 text-[14px] font-bold text-white">
           -{discountPercent(item.price, item.promoPrice)}%
         </span>

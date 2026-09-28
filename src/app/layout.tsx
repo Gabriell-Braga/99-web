@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Bebas_Neue, Montserrat, Pacifico, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/context/AppProvider";
 import { Header } from "@/components/layout/Header";
@@ -14,6 +14,11 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
+// Fontes só das logos das lojas fictícias, para cada marca ter cara própria.
+const pacifico = Pacifico({ variable: "--font-script", subsets: ["latin"], weight: "400", display: "swap" });
+const playfair = Playfair_Display({ variable: "--font-serif", subsets: ["latin"], weight: ["700", "900"], display: "swap" });
+const bebas = Bebas_Neue({ variable: "--font-display", subsets: ["latin"], weight: "400", display: "swap" });
+
 export const metadata: Metadata = {
   title: {
     default: "99 Web",
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${montserrat.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${montserrat.variable} ${pacifico.variable} ${playfair.variable} ${bebas.variable} h-full antialiased`}>
       <head>
         <link rel="preconnect" href="https://tile.openstreetmap.org" />
         <link rel="preconnect" href="https://nominatim.openstreetmap.org" />

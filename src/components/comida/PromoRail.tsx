@@ -13,29 +13,30 @@ function Banner({ p, eager, onPick }: { p: Promo; eager: boolean; onPick: (c: Fo
     <button
       type="button"
       onClick={() => onPick(p.category)}
-      className="relative h-[196px] w-[272px] shrink-0 snap-start overflow-hidden rounded-[24px] bg-yellow-99 text-left text-black-99 transition-transform duration-200 active:scale-[0.98] min-[400px]:h-[210px] min-[400px]:w-[292px] lg:h-[230px] lg:w-[330px]"
+      className="relative h-[148px] w-[264px] shrink-0 snap-start overflow-hidden rounded-[20px] bg-yellow-99 text-left text-black-99 transition-transform duration-200 active:scale-[0.98] min-[400px]:h-[156px] min-[400px]:w-[280px] lg:h-[164px] lg:w-[296px]"
     >
-      <span className="relative z-10 block px-5 pt-5">
-        <span className={cx("block max-w-[62%] font-extrabold leading-[1.05] tracking-tight", p.price ? "text-[22px]" : "text-[30px] lg:text-[32px]")}>
+      {/* O texto fica na metade esquerda, centrado na altura; a comida nunca passa por baixo dele. */}
+      <span className="relative z-10 flex h-full w-[56%] flex-col justify-center pl-4">
+        <span className={cx("block font-extrabold leading-[1.02] tracking-tight", p.price ? "text-[19px] lg:text-[20px]" : "text-[23px] lg:text-[25px]")}>
           {p.title}
         </span>
         {p.price && (
           <span className="mt-1 flex items-start gap-0.5 leading-none">
-            <span className="mt-2.5 text-[13px] font-extrabold">R$</span>
+            <span className="mt-2 text-[12px] font-extrabold">R$</span>
             <span className="flex flex-col">
-              <span className="mb-0.5 border-y border-black-99 text-center text-[8px] font-extrabold uppercase leading-[1.4] tracking-wider">
+              <span className="mb-0.5 border-y border-black-99 text-center text-[7px] font-extrabold uppercase leading-[1.4] tracking-wider">
                 A partir de
               </span>
-              <span className="text-[50px] font-black tracking-tighter">{p.price.reais}</span>
+              <span className="text-[40px] font-black tracking-tighter">{p.price.reais}</span>
             </span>
-            <span className="mt-2.5 text-[20px] font-black">,{p.price.centavos}</span>
+            <span className="mt-2 text-[17px] font-black">,{p.price.centavos}</span>
           </span>
         )}
       </span>
       {p.blob && (
         <span
           aria-hidden="true"
-          className="absolute -bottom-10 -right-6 h-[170px] w-[230px] rotate-[-18deg] rounded-[46%_54%_40%_60%/55%_45%_55%_45%] bg-[#D992F2]"
+          className="absolute -bottom-8 -right-6 h-[120px] w-[160px] rotate-[-18deg] rounded-[46%_54%_40%_60%/55%_45%_55%_45%] bg-[#D992F2]"
         />
       )}
       {back && (
@@ -44,7 +45,7 @@ function Banner({ p, eager, onPick }: { p: Promo; eager: boolean; onPick: (c: Fo
           src={back}
           alt=""
           aria-hidden="true"
-          className="absolute -bottom-2 right-[40%] w-[34%] object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.18)]"
+          className="absolute -bottom-3 right-[24%] w-[22%] object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.18)]"
           loading={eager ? "eager" : "lazy"}
           decoding="async"
         />
@@ -56,7 +57,7 @@ function Banner({ p, eager, onPick }: { p: Promo; eager: boolean; onPick: (c: Fo
         aria-hidden="true"
         className={cx(
           "absolute object-contain drop-shadow-[0_8px_14px_rgba(0,0,0,0.22)]",
-          back ? "-bottom-5 -right-4 w-[60%]" : "-bottom-10 -right-8 w-[66%]",
+          back ? "-bottom-4 -right-3 w-[46%]" : "-bottom-6 -right-6 w-[52%]",
         )}
         loading={eager ? "eager" : "lazy"}
         fetchPriority={eager ? "high" : undefined}
@@ -110,7 +111,7 @@ export function PromoRail({ onPick }: { onPick: (c: FoodCategoryId) => void }) {
         ref={railRef}
         role="group"
         aria-label="Ofertas em destaque"
-        className="scroll-rail -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:scroll-px-0 md:px-0"
+        className="scroll-rail -mx-4 -my-1.5 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 py-1.5 md:-mx-1.5 md:scroll-px-1.5 md:px-1.5"
       >
         {promos.map((p, i) => (
           <Banner key={p.id} p={p} eager={i === 0} onPick={onPick} />

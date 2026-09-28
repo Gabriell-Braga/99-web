@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Restaurant } from "@/lib/types";
 import { formatBRL } from "@/lib/format";
 import { FoodArt } from "@/components/comida/FoodArt";
+import { StoreLogo } from "@/components/comida/StoreLogo";
 import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/States";
 import { cx } from "@/lib/cx";
@@ -35,12 +36,10 @@ export function StoreCard({ r }: { r: Restaurant }) {
   return (
     <div className="relative flex gap-4 py-3">
       <Link href={`/comida/${r.slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={r.name} />
-      <FoodArt
-        kind={r.art}
-        seed={r.slug}
-        tint={r.tint}
-        className={cx("h-[84px] w-[112px] shrink-0 rounded-2xl min-[400px]:h-[96px] min-[400px]:w-[128px]", !r.open && "grayscale")}
-      />
+      <span className={cx("relative h-[84px] w-[112px] shrink-0 min-[400px]:h-[96px] min-[400px]:w-[128px]", !r.open && "grayscale")}>
+        <FoodArt kind={r.art} seed={`${r.slug}-capa`} tint={r.tint} className="h-full w-full rounded-2xl" />
+        <StoreLogo r={r} className="absolute left-1.5 top-1.5 h-9 w-9 rounded-[10px] ring-2 ring-white" />
+      </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-start gap-2">
           <p className={cx("min-w-0 flex-1 truncate text-[17px] font-bold min-[400px]:text-[18px]", !r.open && "text-secondary-99")}>{r.name}</p>

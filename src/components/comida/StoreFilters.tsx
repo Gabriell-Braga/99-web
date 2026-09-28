@@ -49,7 +49,9 @@ export function StoreFilters({ value, onChange }: { value: StoreFilterState; onC
 
   return (
     <div ref={menuRef} className="sticky top-0 z-20 -mx-4 bg-white px-4 py-3 md:mx-0 md:px-0">
-      <div className="scroll-rail flex gap-2.5 overflow-x-auto">
+      {/* Folga de 6px dentro do trilho: o overflow corta tudo que passa da borda,
+          e o contorno de foco fica 4px para fora do botão. */}
+      <div className="scroll-rail -m-1.5 flex gap-2.5 overflow-x-auto p-1.5">
         <button
           type="button"
           onClick={() => (active ? onChange({ sort: "relevancia", freeDelivery: false, vr: false }) : setOpen((v) => !v))}

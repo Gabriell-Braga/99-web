@@ -13,18 +13,20 @@ interface FoodArtProps {
   seed?: string;
   /** Posição no cardápio: garante variantes diferentes em pratos vizinhos. */
   index?: number;
+  /** Foto fixa do prato; quando vem, vence a variante escolhida pela categoria. */
+  src?: string;
 }
 
 /**
  * Quadro do prato ou da loja, sempre com foto real servida de public/food. As
  * imagens são de licença livre e os créditos ficam no rodapé.
  */
-export function FoodArt({ kind, tint = "#F1F1F1", className, eager, seed, index }: FoodArtProps) {
+export function FoodArt({ kind, tint = "#F1F1F1", className, eager, seed, index, src }: FoodArtProps) {
   return (
     <div className={cx("overflow-hidden", className)} style={{ background: tint }} aria-hidden="true">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={pickPhoto(kind, seed, index)}
+        src={src ?? pickPhoto(kind, seed, index)}
         alt=""
         className="h-full w-full object-cover"
         loading={eager ? "eager" : "lazy"}

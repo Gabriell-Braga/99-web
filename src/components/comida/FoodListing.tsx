@@ -12,9 +12,10 @@ import { PromoRail } from "@/components/comida/PromoRail";
 import { FilterChips } from "@/components/comida/FilterChips";
 import { CategoryRail } from "@/components/comida/CategoryRail";
 import { StoreCard, StoreCardSkeleton } from "@/components/comida/RestaurantCard";
-import { UauSection, discountPercent, type Offer } from "@/components/comida/OfferCard";
+import { UauSection, type Offer } from "@/components/comida/OfferCard";
 import { StoreFilters, type StoreFilterState } from "@/components/comida/StoreFilters";
 import { FoodArt } from "@/components/comida/FoodArt";
+import { StoreLogo } from "@/components/comida/StoreLogo";
 import { cx } from "@/lib/cx";
 import { AddressPicker } from "@/components/comida/AddressPicker";
 import { Icon } from "@/components/ui/Icon";
@@ -37,7 +38,10 @@ function SectionTitle({ children, href, id }: { children: string; href?: string;
   );
 }
 
-/** Vale-refeição: na demonstração, só as lojas de sobremesa e sorvete não aceitam. */
+/** Pratos da faixa UAU, na ordem em que aparecem. Todos têm foto fixa e preço promocional. */
+const UAU_PICKS = ["smash-duplo", "classico", "picanha-brasa", "calabresa", "combo-20", "galeto-inteiro", "margherita", "carbonara-bm"];
+
+/** Vale-refeição:na demonstração, só as lojas de sobremesa e sorvete não aceitam. */
 function acceptsVR(r: Restaurant): boolean {
   return r.category !== "sorvetes" && r.category !== "doces";
 }
@@ -75,15 +79,19 @@ export function FoodListing() {
       .sort((a, b) => Number(b.open) - Number(a.open) || by[filters.sort](a, b));
   }, [query, category, filters]);
 
+  // A faixa UAU é vitrine: pratos escolhidos a dedo pela foto, com os lanches na frente.
   const offers = useMemo<Offer[]>(
     () =>
-      restaurants
-        .filter((r) => r.open)
-        .flatMap((r) =>
-          r.menu.flatMap((s) => s.items.filter((i) => i.promoPrice && i.available).map((i) => ({ restaurant: r, item: i as Offer["item"] }))),
-        )
-        .sort((a, b) => discountPercent(b.item.price, b.item.promoPrice) - discountPercent(a.item.price, a.item.promoPrice))
-        .slice(0, 10),
+      UAU_PICKS.flatMap((id) => {
+        for (const r of restaurants) {
+          if (!r.open) continue;
+          for (const s of r.menu) {
+            const i = s.items.find((x) => x.id === id);
+            if (i?.promoPrice && i.available) return [{ restaurant: r, item: i as Offer["item"] }];
+          }
+        }
+        return [];
+      }),
     [],
   );
 
@@ -147,13 +155,13 @@ export function FoodListing() {
                   <SectionTitle id="ultimas" href="#lojas">
                     Últimas lojas
                   </SectionTitle>
-                  <ul className="scroll-rail -mx-4 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:px-0" role="list">
+                  <ul className="scroll-rail -mx-4 -my-1.5 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 py-1.5 md:-mx-1.5 md:scroll-px-1.5 md:px-1.5" role="list">
                     {recent.map((r) => (
                       <li key={r.slug} className="w-[150px] shrink-0 snap-start min-[400px]:w-[164px]">
                         <Link href={`/comida/${r.slug}`} className="block">
                           <span className="relative block">
                             <FoodArt kind={r.art} seed={`${r.slug}-capa`} tint={r.tint} className={cx("h-[104px] w-full rounded-2xl", !r.open && "grayscale")} />
-                            <FoodArt kind={r.art} seed={r.slug} tint={r.tint} className="absolute left-2 top-2 h-9 w-9 rounded-xl ring-2 ring-white" />
+                            <StoreLogo r={r} className="absolute left-2 top-2 h-10 w-10 rounded-xl ring-2 ring-white" />
                           </span>
                           <span className="mt-2 block truncate text-[17px] font-semibold">{r.name}</span>
                           <span className="block truncate text-[15px] text-secondary-99">
