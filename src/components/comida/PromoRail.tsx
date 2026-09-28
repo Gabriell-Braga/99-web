@@ -36,7 +36,7 @@ function Banner({ p, eager, onPick }: { p: Promo; eager: boolean; onPick: (c: Fo
       {p.blob && (
         <span
           aria-hidden="true"
-          className="absolute -bottom-8 -right-6 h-[120px] w-[160px] rotate-[-18deg] rounded-[46%_54%_40%_60%/55%_45%_55%_45%] bg-[#D992F2]"
+          className="absolute right-[3%] top-1/2 h-[100px] w-[116px] -translate-y-1/2 rotate-[-18deg] rounded-[46%_54%_40%_60%/55%_45%_55%_45%] bg-[#D992F2]"
         />
       )}
       {back && (
@@ -45,7 +45,7 @@ function Banner({ p, eager, onPick }: { p: Promo; eager: boolean; onPick: (c: Fo
           src={back}
           alt=""
           aria-hidden="true"
-          className="absolute -bottom-3 right-[24%] w-[22%] object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.18)]"
+          className="absolute right-[1%] top-[10%] w-[22%] object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.18)]"
           loading={eager ? "eager" : "lazy"}
           decoding="async"
         />
@@ -57,7 +57,7 @@ function Banner({ p, eager, onPick }: { p: Promo; eager: boolean; onPick: (c: Fo
         aria-hidden="true"
         className={cx(
           "absolute object-contain drop-shadow-[0_8px_14px_rgba(0,0,0,0.22)]",
-          back ? "-bottom-4 -right-3 w-[46%]" : "-bottom-6 -right-6 w-[52%]",
+          back ? "right-[4%] top-[54%] w-[38%] -translate-y-1/2" : "right-[2%] top-1/2 w-[44%] -translate-y-1/2",
         )}
         loading={eager ? "eager" : "lazy"}
         fetchPriority={eager ? "high" : undefined}
