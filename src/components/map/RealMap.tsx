@@ -51,6 +51,43 @@ function radar(): HTMLElement {
 }
 
 /**
+ * Carro visto de cima, como os do mapa do app: lataria clara com sombreado nas
+ * laterais, para-brisa e vidro traseiro escuros, retrovisores, faróis e lanternas.
+ * A frente aponta para cima. O sufixo separa os gradientes de cada cor na página.
+ */
+function carTop(id: string, edge: string, mid: string): string {
+  return `<svg width="22" height="44" viewBox="0 0 24 48" aria-hidden="true" style="overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28)) drop-shadow(0 0 .6px rgba(0,0,0,.35))">
+<defs>
+<linearGradient id="lat-${id}" x1="0" x2="1"><stop offset="0" stop-color="${edge}"/><stop offset=".3" stop-color="${mid}"/><stop offset=".7" stop-color="${mid}"/><stop offset="1" stop-color="${edge}"/></linearGradient>
+<linearGradient id="vid-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46505C"/><stop offset="1" stop-color="#1F252C"/></linearGradient>
+</defs>
+<ellipse cx="1.4" cy="15.2" rx="1.6" ry="1.1" fill="${edge}"/><ellipse cx="22.6" cy="15.2" rx="1.6" ry="1.1" fill="${edge}"/>
+<path d="M6 1.8C9 .7 15 .7 18 1.8c3 1.1 4 4 4 8.2l.4 28c0 5-2.6 8.6-10.4 8.8C4.2 46.6 1.6 43 1.6 38L2 10C2 5.8 3 2.9 6 1.8z" fill="url(#lat-${id})"/>
+<path d="M5.2 14.6c3.4-1.6 10.2-1.6 13.6 0l-1.3 6.2c-3.6-.9-7.4-.9-11 0z" fill="url(#vid-${id})"/>
+<path d="M4.3 16.6l1.6 5v11.6l-1.6 3.2z" fill="#2F3740"/><path d="M19.7 16.6l-1.6 5v11.6l1.6 3.2z" fill="#2F3740"/>
+<rect x="6.3" y="21.4" width="11.4" height="12" rx="2.4" fill="${mid}"/>
+<rect x="7.4" y="22.4" width="9.2" height="3" rx="1.5" fill="#fff" opacity=".45"/>
+<path d="M6.1 34.4c3.9.8 7.9.8 11.8 0l1 4.6c-4.4 1.3-9.4 1.3-13.8 0z" fill="url(#vid-${id})"/>
+<path d="M8 4.2c2.6-.7 5.4-.7 8 0" stroke="${edge}" stroke-width=".6" fill="none"/>
+<rect x="3.6" y="2.4" width="4" height="1.8" rx=".9" fill="#FFF7D1"/><rect x="16.4" y="2.4" width="4" height="1.8" rx=".9" fill="#FFF7D1"/>
+<rect x="3.6" y="44" width="3.8" height="1.5" rx=".75" fill="#D93025"/><rect x="16.6" y="44" width="3.8" height="1.5" rx=".75" fill="#D93025"/>
+</svg>`;
+}
+
+const CAR_TOP = carTop("pop", "#C9CED5", "#FFFFFF");
+const CAR_TOP_TAXI = carTop("taxi", "#E0AE00", "#FFD84A");
+
+/** Moto vista de cima: pneus, tanque amarelo, piloto de capacete e ombros. */
+const MOTO_TOP = `<svg width="16" height="34" viewBox="0 0 16 34" aria-hidden="true" style="overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28))">
+<rect x="6" y="0" width="4" height="8" rx="2" fill="#1F252C"/><rect x="6" y="26" width="4" height="8" rx="2" fill="#1F252C"/>
+<rect x="1" y="6.4" width="14" height="1.8" rx=".9" fill="#2F3740"/>
+<rect x="4.2" y="7" width="7.6" height="20" rx="3.8" fill="#FFDD00"/>
+<ellipse cx="8" cy="18" rx="6.2" ry="3.6" fill="#2F3740"/>
+<circle cx="8" cy="15.4" r="3.6" fill="#FFFFFF" stroke="#C9CED5" stroke-width=".6"/>
+<path d="M5.4 13.6a3.6 3.6 0 0 1 5.2 0" stroke="#2F3740" stroke-width="1.2" fill="none"/>
+</svg>`;
+
+/**
  * Veículo parado por perto, visto de cima como no app, girado na direção da rua.
  * A foto lateral da categoria não gira bem, por isso aqui é um desenho simples.
  */
@@ -62,10 +99,7 @@ function nearbyCar(kind: NonNullable<MapViewProps["vehicle"]>, angleDeg: number)
   const inner = document.createElement("span");
   inner.className = "map-nearby";
   inner.style.cssText = `display:flex;width:40px;height:40px;align-items:center;justify-content:center;--turn:${angleDeg}deg`;
-  const body = taxi ? "#F1C400" : "#2B2D31";
-  inner.innerHTML = moto
-    ? `<svg width="14" height="30" viewBox="0 0 14 30" aria-hidden="true"><rect x="4" y="0.5" width="6" height="7" rx="3" fill="#1b1b1b"/><rect x="2" y="7" width="10" height="15" rx="5" fill="${body}"/><circle cx="7" cy="12" r="3.2" fill="#E8EAED"/><rect x="4" y="22" width="6" height="7.5" rx="3" fill="#1b1b1b"/></svg>`
-    : `<svg width="20" height="36" viewBox="0 0 20 36" aria-hidden="true" style="filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))"><rect x="1" y="1" width="18" height="34" rx="6" fill="${body}"/><rect x="3.5" y="7" width="13" height="7" rx="2.5" fill="#C9D3DE"/><rect x="3.5" y="24" width="13" height="5" rx="2" fill="#C9D3DE"/><rect x="4" y="15.5" width="12" height="7" rx="1.5" fill="${body}" opacity=".85"/><rect x="2.5" y="1.5" width="4" height="2.4" rx="1" fill="#FFF6C8"/><rect x="13.5" y="1.5" width="4" height="2.4" rx="1" fill="#FFF6C8"/></svg>`;
+  inner.innerHTML = moto ? MOTO_TOP : taxi ? CAR_TOP_TAXI : CAR_TOP;
   wrap.appendChild(inner);
   return wrap;
 }
