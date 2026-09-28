@@ -32,9 +32,9 @@ const blocos: Bloco[] = [
     href: "/comida",
     titulo: "Food",
     texto: "Almoço, lanche e mercado.",
-    imagem: "/food-cut/burger.webp",
+    imagem: "/food-icons/lanches.webp",
     bloco: "bg-black-99 text-white rounded-[24px] sm:rounded-[28px]",
-    img: "absolute bottom-3 right-4 w-[50%] max-w-[180px]",
+    img: "absolute bottom-2 right-3 w-[50%] max-w-[180px]",
     escuro: true,
   },
   {
