@@ -8,6 +8,9 @@ import { HomeButton } from "@/components/home/HomeButton";
 import { ServiceCards, type Servico } from "@/components/home/ServiceCards";
 import { restaurants } from "@/data/restaurants";
 import { foodCategories } from "@/data/categories";
+import { deliveryCategories } from "@/data/rides";
+import { deliveryFare } from "@/lib/pricing";
+import { formatBRL } from "@/lib/format";
 
 const servicos: Servico[] = [
   {
@@ -44,9 +47,9 @@ interface Vantagem {
   service: string;
   title: string;
   description: ReactNode;
-  /** Foto do bloco. Sem ela (`arte`), o bloco mostra a lista de preços da corrida. */
+  /** Foto do bloco, ou uma miniatura da tela do serviço sobre fundo de cor. */
   imagem?: string;
-  arte?: boolean;
+  arte?: "precos" | "entrega";
 }
 
 /** Vantagens, cada uma amarrada a um serviço da 99. Alternam foto e texto, como no site da 99. */
@@ -60,7 +63,7 @@ const vantagens: Vantagem[] = [
         <strong className="font-bold text-black-99">No Negocia você propõe o valor</strong> sem sair da tela.
       </>
     ),
-    arte: true,
+    arte: "precos",
   },
   {
     service: "99 Food",
@@ -82,7 +85,7 @@ const vantagens: Vantagem[] = [
         <strong className="font-bold text-black-99">Origem, destino, contatos e conteúdo</strong> no mesmo painel.
       </>
     ),
-    imagem: "/pessoas/entrega.webp",
+    arte: "entrega",
   },
   {
     service: "Feito para o computador",
@@ -142,6 +145,47 @@ function PrecosLadoALado() {
   );
 }
 
+/**
+ * Miniatura do pedido de entrega: retirada, destino e as duas opções com o
+ * preço calculado pela mesma fórmula do fluxo, para uma rota de 3,4 km.
+ */
+const opcoesEntrega = deliveryCategories.map((c) => ({
+  ...c,
+  preco: formatBRL(deliveryFare(3.4, c.id)),
+  img: c.id === "moto" ? "/vehicles/moto-box.png" : "/vehicles/car-box.png",
+}));
+
+function ResumoEntrega() {
+  return (
+    <div aria-hidden="true" className="flex w-[86%] max-w-[380px] flex-col gap-3 rounded-3xl bg-white p-4 shadow-high">
+      <div className="flex flex-col gap-2 rounded-2xl bg-offwhite-99 px-3 py-2.5 text-[14px]">
+        <span className="flex items-center gap-2.5">
+          <span className="h-3 w-3 shrink-0 rounded-full border-[3px] border-success-99 bg-white" />
+          <span className="truncate font-bold">Retirada · Rua Harmonia, 480</span>
+        </span>
+        <span className="flex items-center gap-2.5">
+          <span className="h-3 w-3 shrink-0 rounded-full border-[3px] border-orange-99 bg-white" />
+          <span className="truncate font-bold">Entrega · Av. Paulista, 1000</span>
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {opcoesEntrega.map((o, i) => (
+          <div
+            key={o.id}
+            className={cx("flex flex-col items-center rounded-2xl px-2 pb-2.5 pt-1 text-center", i === 0 ? "bg-yellow-99-light ring-2 ring-black-99" : "bg-offwhite-99")}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={o.img} alt="" className="h-16 w-16 object-contain" loading="lazy" decoding="async" />
+            <span className="text-[15px] font-bold leading-tight">{o.id === "moto" ? "Moto" : "Carro"}</span>
+            <span className="text-[12px] text-secondary-99">até {o.weight}</span>
+            <span className="mt-1 text-[15px] font-bold tabular-nums">{o.preco}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
@@ -186,11 +230,13 @@ export default function HomePage() {
                   className={cx(
                     "relative flex h-[240px] items-center justify-center overflow-hidden rounded-[28px] sm:h-[320px]",
                     direita ? "rounded-tr-[96px] lg:order-2" : "rounded-tl-[96px]",
-                    v.arte ? "bg-yellow-99" : "bg-offwhite-99",
+                    v.arte === "precos" ? "bg-yellow-99" : v.arte === "entrega" ? "bg-orange-99-bg" : "bg-offwhite-99",
                   )}
                 >
-                  {v.arte ? (
+                  {v.arte === "precos" ? (
                     <PrecosLadoALado />
+                  ) : v.arte === "entrega" ? (
+                    <ResumoEntrega />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={v.imagem} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
