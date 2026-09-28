@@ -77,17 +77,6 @@ const vantagens: Vantagem[] = [
     imagem: "/pessoas/mesa.webp",
   },
   {
-    service: "99 Entrega",
-    title: "Despache um pacote sem pegar o celular",
-    description: (
-      <>
-        Moto até 10 kg, carro até 30 kg.{" "}
-        <strong className="font-bold text-black-99">Origem, destino, contatos e conteúdo</strong> no mesmo painel.
-      </>
-    ),
-    arte: "entrega",
-  },
-  {
     service: "Feito para o computador",
     title: "Cole o endereço e pronto",
     description: (
@@ -97,6 +86,17 @@ const vantagens: Vantagem[] = [
       </>
     ),
     imagem: "/pessoas/computador.webp",
+  },
+  {
+    service: "99 Entrega",
+    title: "Despache um pacote sem pegar o celular",
+    description: (
+      <>
+        Moto até 10 kg, carro até 30 kg.{" "}
+        <strong className="font-bold text-black-99">Origem, destino, contatos e conteúdo</strong> no mesmo painel.
+      </>
+    ),
+    arte: "entrega",
   },
 ];
 
@@ -126,7 +126,7 @@ const precos = [
 
 function PrecosLadoALado() {
   return (
-    <ul aria-hidden="true" className="flex w-[82%] max-w-[360px] flex-col gap-2 rounded-3xl bg-white p-3 shadow-high">
+    <ul aria-hidden="true" className="flex w-full max-w-[340px] flex-col gap-2 rounded-3xl bg-white p-3 shadow-high">
       {precos.map((p) => (
         <li
           key={p.nome}
@@ -157,7 +157,7 @@ const opcoesEntrega = deliveryCategories.map((c) => ({
 
 function ResumoEntrega() {
   return (
-    <div aria-hidden="true" className="flex w-[86%] max-w-[380px] flex-col gap-3 rounded-3xl bg-white p-4 shadow-high">
+    <div aria-hidden="true" className="flex w-full max-w-[340px] flex-col gap-3 rounded-3xl bg-white p-4 shadow-high">
       <div className="flex flex-col gap-2 rounded-2xl bg-offwhite-99 px-3 py-2.5 text-[14px]">
         <span className="flex items-center gap-2.5">
           <span className="h-3 w-3 shrink-0 rounded-full border-[3px] border-success-99 bg-white" />
@@ -216,37 +216,42 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Vantagens: foto e texto alternando de lado, com um canto bem arredondado. */}
+      {/* Vantagens em bento: as duas com miniatura da tela ocupam a largura de duas
+          colunas, as de foto ficam em cards menores, e o lado da imagem alterna. */}
       <Container className="py-16 lg:py-24">
         <h2 className="max-w-2xl text-[32px] font-bold leading-[1.1] md:text-[44px]">
           Por que pedir pelo <Grifo>computador</Grifo>
         </h2>
-        <ul className="mt-12 flex flex-col gap-14 lg:mt-16 lg:gap-20" role="list">
-          {vantagens.map((v, i) => {
-            const direita = i % 2 === 1;
-            return (
-              <li key={v.service} className="grid items-center gap-6 lg:grid-cols-2 lg:gap-16">
-                <div
+        <ul className="mt-10 grid gap-4 lg:mt-14 lg:grid-cols-3" role="list">
+          {vantagens.map((v) => {
+            const texto = (
+              <div className="flex flex-col gap-2">
+                <span className="text-[14px] font-bold uppercase tracking-wide text-orange-99">{v.service}</span>
+                <h3 className={cx("font-bold leading-[1.15]", v.arte ? "text-[28px] md:text-[32px]" : "text-[24px]")}>{v.title}</h3>
+                <p className="max-w-md text-[16px] leading-relaxed text-black-99/75">{v.description}</p>
+              </div>
+            );
+            if (v.arte) {
+              return (
+                <li
+                  key={v.service}
                   className={cx(
-                    "relative flex h-[240px] items-center justify-center overflow-hidden rounded-[28px] sm:h-[320px]",
-                    direita ? "rounded-tr-[96px] lg:order-2" : "rounded-tl-[96px]",
-                    v.arte === "precos" ? "bg-yellow-99" : v.arte === "entrega" ? "bg-orange-99-bg" : "bg-offwhite-99",
+                    "grid items-center gap-8 rounded-[28px] p-6 sm:grid-cols-2 sm:p-8 lg:col-span-2 lg:p-10",
+                    v.arte === "precos" ? "rounded-tl-[96px] bg-yellow-99" : "rounded-br-[96px] bg-orange-99-bg",
                   )}
                 >
-                  {v.arte === "precos" ? (
-                    <PrecosLadoALado />
-                  ) : v.arte === "entrega" ? (
-                    <ResumoEntrega />
-                  ) : (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={v.imagem} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
-                  )}
-                </div>
-                <div className="flex flex-col gap-3">
-                  <span className="text-[14px] font-bold uppercase tracking-wide text-orange-99">{v.service}</span>
-                  <h3 className="text-[28px] font-bold leading-[1.15] md:text-[36px]">{v.title}</h3>
-                  <p className="max-w-lg text-[17px] leading-relaxed text-black-99/75">{v.description}</p>
-                </div>
+                  <div className={cx("flex justify-center", v.arte === "entrega" && "sm:order-first")}>
+                    {v.arte === "precos" ? <PrecosLadoALado /> : <ResumoEntrega />}
+                  </div>
+                  <div className={cx(v.arte === "precos" && "sm:order-first")}>{texto}</div>
+                </li>
+              );
+            }
+            return (
+              <li key={v.service} className="flex flex-col overflow-hidden rounded-[28px] bg-offwhite-99">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={v.imagem} alt="" className="h-[200px] w-full object-cover" loading="lazy" decoding="async" />
+                <div className="p-6 sm:p-8">{texto}</div>
               </li>
             );
           })}
